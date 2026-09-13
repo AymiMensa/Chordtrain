@@ -1,4 +1,4 @@
-# KIMIchord 和弦樹遊戲（Chordtrain）
+# 韶韻音樂學院 馬老師 專門設計給秀玲姊練習和弦樂理的程式（Chordtrain）
 
 以瀏覽器呈現的**樂理和弦教學遊戲**，將和弦知識視覺化為一棵棵可互動、可聆聽的「和弦樹」。本專案為高保真複刻並重構自 [chord-trees.nathanielschool.com](https://chord-trees.nathanielschool.com/) 的音樂教育工具，歷經 18 個版本的迭代修正，以繁體中文介面呈現。
 
