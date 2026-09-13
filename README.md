@@ -4,7 +4,7 @@
 
 ## 專案簡介
 
-KIMIchord 和弦樹遊戲把抽象的和聲學轉換成直覺的視覺與聽覺體驗：
+和弦樂理教學把抽象的和聲學轉換成直覺的視覺與聽覺體驗：
 
 - **三種學習難度**：初學者（Beginner，單音根音節點樹）、調內（Diatonic，調性音級與調內和弦）、中級（Intermediate，依 Major／Minor／Dominant 7th／Major 7th／Minor 7th／Diminished／Augmented 及延伸和弦分類的節點卡）。
 - **即時音訊合成**：以 Web Audio API 直接產生和弦、琶音與節拍器聲音，不依賴任何外部音訊檔；支援樂器音色、和弦／琶音音量、速度（30–300 BPM）、循環次數與 MIDI 匯出。
@@ -14,7 +14,7 @@ KIMIchord 和弦樹遊戲把抽象的和聲學轉換成直覺的視覺與聽覺�
 - **快捷鍵**：Space（播放）、M／L／R／G（旋律轉和弦等）、Esc（關閉）。
 - **教學歸屬**：頁尾保留「韶韻音樂學院 馬老師 專門為秀玲姊設計 和弦系統教學」版權宣告。
 
-核心遊戲為**單一自包含 HTML 檔案**（`client/public/KIMIchord_trees_fixed.html`，約 80 KB，內嵌全部 CSS／JavaScript，無外部資料依賴），外層以 React + Vite + Express 提供開發與正式環境的殼層。
+核心教學為**單一自包含 HTML 檔案**（`client/public/KIMIchord_trees_fixed.html`，約 80 KB，內嵌全部 CSS／JavaScript，無外部資料依賴），外層以 React + Vite + Express 提供開發與正式環境的殼層。
 
 ## 架構圖 (Architecture Diagram)
 
