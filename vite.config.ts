@@ -205,7 +205,11 @@ function vitePluginStorageProxy(): Plugin {
 
 const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime(), vitePluginManusDebugCollector(), vitePluginStorageProxy()];
 
+// GitHub Pages 專案站部署：設定 VITE_BASE=/Chordtrain/ 時，所有資源路徑會加上子路徑前綴
+const base = process.env.VITE_BASE || "/";
+
 export default defineConfig({
+  base,
   plugins,
   resolve: {
     alias: {

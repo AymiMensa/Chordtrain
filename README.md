@@ -127,7 +127,9 @@ pnpm start
 
 ### GitHub Pages
 
-靜態部署時僅需 `client/public/KIMIchord_trees_fixed.html` 一個檔案即可完整運行（純前端、Web Audio、無後端依賴），線上版本見 [aymimensa.github.io/Chordtrain/](https://aymimensa.github.io/Chordtrain/)。
+線上版本見 [aymimensa.github.io/Chordtrain/](https://aymimensa.github.io/Chordtrain/),由 GitHub Actions 自動部署（[.github/workflows/deploy-pages.yml](.github/workflows/deploy-pages.yml)）:每次推送至 `main` 時執行型別檢查 → `pnpm build`（`VITE_BASE=/Chordtrain/`）→ 上傳 `dist/public` 至 GitHub Pages。
+
+靜態部署時僅需 `client/public/KIMIchord_trees_fixed.html` 一個檔案即可完整運行（純前端、Web Audio、無後端依賴）。
 
 ## 更新歷史 (Date Sorted)
 
@@ -148,6 +150,7 @@ pnpm start
 | 約 2026-08 中旬 | v16 | Earth 還原白色背景；加入韶韻音樂學院版權頁尾；琶音改四分音符並依 BPM 排程 |
 | 約 2026-08 中旬 | v17 | 光軌改二次貝茲弧線＋粒子；節拍器預設 72 BPM、第一拍木魚重音；琶音 0% 靜音 |
 | 2026-08-21 | v18 | Earth 淺灰背景強化白色光軌對比；圓弧光軌外加淡出粒子效果；通過型別檢查與 production build |
+| 2026-09-14 | 部署 | 開源至 GitHub 並上線 GitHub Pages：新增 Actions 自動部署工作流；vite 加入 `VITE_BASE` 子路徑支援、iframe 改用 `BASE_URL` 相對路徑，確保專案站 `/Chordtrain/` 下完整運行 |
 
 ## 相關連結
 
