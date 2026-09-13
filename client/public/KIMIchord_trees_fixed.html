@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>和弦樹 — 視覺化和聲</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#141622;--panel:#191b2a;--panel-hover:#202237;--border:#25293d;--border-hover:#343a55;--text:#c8ccdb;--text2:#858ba0;--text3:#50566c;--accent:#4c8df7;--accent-hover:#67a1ff;--green:#2da88a;--green-hover:#43c09f;--orange:#b86c26;--purple:#7255b7;--red:#9b3154;--yellow:#c99a38;--pink:#bf5b9c;--cyan:#4bbfc2;--indigo:#5964c7;--white:#f2f4fb;--sidebar-w:160px;--footer-h:26px;}
+/* 第十八版主題：Earth 使用淺灰工作台，讓白色弧線核心與粒子光點清楚可見。 */
+body.theme-earth{--bg:#edf0f3;--panel:#f8f9fb;--panel-hover:#e4e8ed;--border:#d1d7df;--border-hover:#b6c0cc;--text:#344052;--text2:#697386;--text3:#929cad;--white:#1d2430;color-scheme:light}
+body.theme-earth .topbar,body.theme-earth .sidebar{background:#f8f9fb}
+body.theme-earth .content{background:#edf0f3}
+body.theme-earth .scale-bar{background:#f8f9fb}
+body.theme-earth .scale-chip{background:#e7ebef}
+body.theme-earth .tree-card-header .root-label,body.theme-earth .visual-label{background:#e4e9ef;color:var(--white)}
+body.theme-earth .chord-type-header{background:#e9edf1}
+body.theme-earth .chord-cell{background:#f8fafb}
+body.theme-earth .piano-mini{background:#f2f5f7;border-color:#c2cad4;box-shadow:0 2px 6px rgba(31,41,55,.16)}
+body.theme-morandi{--bg:#2d2b29;--panel:#3a3533;--panel-hover:#4a4240;--border:#5b514e;--border-hover:#756661;--text:#ded6d1;--text2:#b5a7a0;--text3:#8a7c76;--accent:#bd8f96;--accent-hover:#d2a9ae;--green:#8fa69a;--green-hover:#a8bcad;--orange:#bd8969;--purple:#9b889e;--red:#a36d76;--yellow:#c6aa79;--pink:#b58da7;--cyan:#84aaa5;--indigo:#808ba8;--white:#f5efec;}
+body.theme-ocean{--bg:#0d1b2a;--panel:#112b38;--panel-hover:#173b49;--border:#1e4654;--border-hover:#2c6572;--text:#c9e1e2;--text2:#8eb8bf;--text3:#5b8490;--accent:#38a9c5;--accent-hover:#59c5dc;--green:#39b99a;--green-hover:#5ad0af;--orange:#d08b5c;--purple:#7e88d4;--red:#b65d78;--yellow:#c6ae62;--pink:#b979ab;--cyan:#55c8d0;--indigo:#7088cf;--white:#e8f7f7;}
+body.theme-morandi .topbar,body.theme-morandi .sidebar{background:#332f2d}
+body.theme-morandi .content{background:#302d2b}
+body.theme-morandi .scale-bar{background:#3a3533}
+body.theme-ocean .topbar,body.theme-ocean .sidebar{background:#0f2431}
+body.theme-ocean .content{background:#0d1f2e}
+body.theme-ocean .scale-bar{background:#112b38}
+/* 第十五版主題與互動：月亮按鈕套用全畫面深色工作台；和弦點擊後由 activeChord 驅動雙視覺化即時重繪。 */
+body.theme-dark{color-scheme:dark}
+body.theme-dark .topbar,body.theme-dark .sidebar{background:var(--panel)}
+body.theme-dark .content{background:var(--bg)}
+body.theme-dark .scale-bar{background:var(--panel)}
+body.theme-dark .scale-chip{background:var(--panel-hover)}
+body.theme-dark .tree-card-header .root-label,body.theme-dark .visual-label{background:var(--panel-hover)}
+body.theme-dark .chord-type-header,body.theme-dark .chord-cell{background:var(--panel)}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:var(--text);font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-hover);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--text3)}
+
+/* TOP BAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;background:#171927;border-bottom:1px solid var(--border);height:50px;flex-shrink:0;position:relative;z-index:50}
+.topbar-left{display:flex;align-items:center;gap:10px;min-width:0}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:20px;height:20px;border-radius:50%;background:#e7e9f1;color:#25283a;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;flex-shrink:0}
+.logo-text{font-size:12px;font-weight:800;color:var(--white);letter-spacing:-0.2px}
+.logo-sub{font-size:8px;color:var(--text2);margin-top:-2px;white-space:nowrap}
+.topbar-center{text-align:center;flex:1;min-width:0}
+.topbar-center h1{font-size:10px;font-weight:800;color:var(--white);letter-spacing:1px;text-transform:uppercase;white-space:nowrap}
+.topbar-center p{font-size:8px;color:var(--text2);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar-center .tags{display:flex;gap:10px;justify-content:center;margin-top:2px;font-size:8px;color:var(--text3);white-space:nowrap}
+.topbar-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.theme-picker{position:relative;display:flex;align-items:center}
+.theme-menu{display:none;position:absolute;right:0;top:calc(100% + 7px);min-width:126px;padding:5px;background:var(--panel);border:1px solid var(--border-hover);border-radius:7px;box-shadow:0 12px 28px rgba(0,0,0,.35);z-index:160}
+.theme-picker.open .theme-menu{display:grid;gap:3px}
+.theme-option{width:100%;padding:7px 9px;border:1px solid transparent;border-radius:4px;background:transparent;color:var(--text2);font:600 10px/1.2 inherit;text-align:left;cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+.theme-option:hover,.theme-option.on{background:var(--border-hover);border-color:var(--border-hover);color:var(--text)}
+.theme-option.on{color:var(--accent)}
+.top-btn{padding:5px 9px;border-radius:5px;border:1px solid var(--border);background:var(--panel);color:var(--text2);font-size:10px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap;font-family:inherit}
+.top-icon{min-width:26px;padding-left:7px;padding-right:7px;text-align:center}
+.top-btn:hover{background:var(--border-hover);border-color:var(--border-hover)}
+.top-btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.top-btn.primary:hover{background:var(--accent-hover)}
+.menu-btn{display:none;width:36px;height:36px;border-radius:6px;border:1px solid var(--border);background:var(--panel);color:var(--text2);font-size:18px;cursor:pointer;align-items:center;justify-content:center}
+
+/* MAIN */
+.main-layout{display:flex;height:calc(100vh - 50px - var(--footer-h));overflow:hidden}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar-w);background:#171927;border-right:1px solid var(--border);padding:9px 7px;display:flex;flex-direction:column;gap:9px;overflow-y:auto;overflow-x:hidden;flex-shrink:0;transition:transform .25s ease}
+.sb-section h4{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text3);font-weight:700;margin-bottom:10px}
+.sb-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px}
+.sb-row label{font-size:9px;color:var(--text2);font-weight:500;white-space:nowrap}
+.sb-select{padding:4px 6px;border-radius:4px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:9px;min-width:67px;max-width:96px;cursor:pointer;font-family:inherit;outline:none}
+.sb-select:focus{border-color:var(--accent)}
+.sb-btn{width:100%;padding:6px 4px;border-radius:4px;border:1px solid var(--border);background:var(--bg);color:var(--text2);font-size:9px;font-weight:600;cursor:pointer;margin-bottom:4px;display:flex;align-items:center;justify-content:center;gap:4px;transition:all .15s;font-family:inherit}
+.sb-btn:hover{background:var(--border-hover)}
+.sb-btn.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.sb-btn.green{background:var(--green);color:#fff;border-color:var(--green)}
+.sb-btn.green:hover{background:var(--green-hover)}
+.sb-btn.red{background:var(--red);color:#fff;border-color:var(--red)}
+.note-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;margin-bottom:8px}
+.note-chip{padding:4px 0;border-radius:3px;border:1px solid var(--border);background:var(--bg);color:var(--text2);font-size:9px;font-weight:700;text-align:center;cursor:pointer;transition:all .15s}
+.note-chip:hover{background:var(--border-hover)}
+.note-chip.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.mode-toggle{display:flex;border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:10px}
+.mode-opt{flex:1;padding:5px 3px;text-align:center;font-size:9px;color:var(--text2);cursor:pointer;background:var(--bg);transition:all .15s;font-weight:600}
+.mode-opt.on{background:var(--accent);color:#fff}
+.slider-row{margin-bottom:10px}
+.slider-row label{display:flex;justify-content:space-between;font-size:9px;color:var(--text2);margin-bottom:3px;font-weight:500}
+.slider-row input[type=range]{width:100%;height:4px;-webkit-appearance:none;appearance:none;background:var(--border);border-radius:2px;outline:none}
+.slider-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid var(--panel)}
+.slider-row input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid var(--panel)}
+.cycle-row{display:flex;gap:4px}
+.cycle-btn{flex:1;padding:4px;border-radius:3px;border:1px solid var(--border);background:var(--bg);color:var(--text2);font-size:9px;cursor:pointer;text-align:center;transition:all .15s;font-weight:600}
+.cycle-btn.on{background:var(--accent);color:#fff}
+.export-btn{width:100%;padding:6px;border-radius:4px;border:1px solid var(--border);background:var(--bg);color:var(--text2);font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;margin-bottom:4px;transition:all .15s;font-family:inherit;font-weight:600}
+.export-btn:hover{background:var(--border-hover)}
+.shortcut{font-size:8px;color:var(--text3);margin-top:4px;line-height:1.55}
+.mascot-row{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap}
+.mascot-btn{width:25px;height:25px;border-radius:4px;border:1px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;transition:all .15s}
+.mascot-btn.on{background:var(--green);border-color:var(--green)}
+.mascot-names{font-size:8px;color:var(--text3);margin-top:4px}
+
+/* VISUALIZATION TOGGLE */
+.vis-toggle{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:10px}
+.vis-opt{flex:1;padding:10px 4px;text-align:center;font-size:11px;color:var(--text2);cursor:pointer;background:var(--bg);transition:all .15s;font-weight:700;display:flex;align-items:center;justify-content:center;gap:5px}
+.vis-opt.on{background:var(--purple);color:#fff}
+.vis-opt svg{width:14px;height:14px;fill:currentColor}
+
+/* MOBILE SIDEBAR */
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:90;backdrop-filter:blur(2px)}
+.sidebar-overlay.show{display:block}
+
+/* CONTENT */
+.content{flex:1;padding:8px 9px;overflow-y:auto;overflow-x:auto;min-width:0;position:relative;background:#151724}
+.content-hint{text-align:center;font-size:9px;color:var(--text3);margin-bottom:8px;padding:0 10px}
+
+.copyright{height:var(--footer-h);margin-left:var(--sidebar-w);display:flex;align-items:center;justify-content:center;padding:0 12px;background:var(--panel);border-top:1px solid var(--border);color:var(--text3);font-size:10px;letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* SCALE BAR */
+.scale-bar{display:flex;gap:5px;justify-content:center;margin-bottom:12px;padding:8px;background:#171a28;border:1px solid var(--border);border-radius:5px;flex-wrap:wrap}
+.scale-chip{padding:5px 10px;border-radius:4px;border:1px solid var(--border);background:#202438;color:var(--text2);font-size:10px;font-weight:700;cursor:pointer;text-align:center;min-width:38px;transition:all .15s;position:relative}
+.scale-chip:hover{background:var(--border-hover)}
+.scale-chip.on{background:var(--green);color:#fff;border-color:var(--green)}
+.scale-chip .sc-roman{font-size:8px;color:var(--text3);display:block;margin-bottom:1px;font-weight:600}
+.scale-chip.on .sc-roman{color:rgba(255,255,255,0.7)}
+.diatonic-header{text-align:center;margin-bottom:16px}
+.diatonic-header h2{font-size:14px;color:var(--text2);font-weight:600}
+.diatonic-header .mode-name{color:var(--green);font-size:12px;margin-top:4px;font-weight:700}
+
+/* TREE CARDS */
+.tree-grid{display:grid;grid-template-columns:repeat(4,minmax(240px,1fr));gap:14px;min-width:1010px}
+.tree-card{background:transparent;border:0;border-radius:0;padding:5px 4px;position:relative;transition:all .15s}
+.tree-card:hover{transform:translateY(-1px)}
+.tree-card-header{text-align:center;margin-bottom:14px}
+.tree-card-header .root-label{display:inline-block;padding:4px 16px;border-radius:4px;background:#1d2234;color:var(--white);font-size:13px;font-weight:800;margin-bottom:3px;border:1px solid var(--border)}
+.tree-card-header .root-sub{font-size:8px;color:var(--text3);font-weight:500}
+.tree-svg-wrap{position:relative;height:182px;margin-bottom:4px}
+.tree-svg{width:100%;height:100%}
+.tree-node{cursor:pointer;transition:all .2s}
+.tree-node:hover{filter:brightness(1.25);transform:scale(1.08)}
+.tree-node circle{transition:all .2s}
+.tree-link{fill:none;stroke-width:1.5;opacity:.35;transition:all .2s}
+.tree-link.hl{stroke-width:2.5;opacity:.8}
+.tree-outer-ring{fill:none;stroke:var(--border);stroke-width:1;stroke-dasharray:4,4;opacity:.4}
+
+/* 吉祥物移動：沿和弦節點之間移動，白色 5px 軌跡在 5 秒內淡出。 */
+#mascotTravelLayer{position:fixed!important;inset:0!important;z-index:120;pointer-events:none;overflow:visible;contain:layout style}
+#mascotTrailSvg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.mascot-trail-group{fill:none;opacity:1;pointer-events:none;animation:mascotTrailFade 5s ease-out forwards}
+.mascot-trail-halo{display:none}
+.mascot-trail{fill:none;stroke:#fff;stroke-width:5;stroke-linecap:round;opacity:1;filter:none;vector-effect:non-scaling-stroke}
+.mascot-trail-particle{fill:#fff;opacity:.3;transform-box:fill-box;transform-origin:center;animation:mascotTrailParticle 2.4s ease-in-out infinite;filter:drop-shadow(0 0 2px rgba(255,255,255,.45));vector-effect:non-scaling-stroke}
+@keyframes mascotTrailFade{from{opacity:1}to{opacity:0}}
+@keyframes mascotTrailParticle{0%,100%{transform:scale(.72);opacity:.16}50%{transform:scale(1.18);opacity:.42}}
+#mascotTraveler{position:absolute!important;left:0;top:0;display:none;align-items:center;justify-content:center;width:34px;height:34px;border:2px solid rgba(255,255,255,.85);border-radius:50%;background:rgba(13,17,23,.92);box-shadow:0 0 14px rgba(255,255,255,.35);font-size:20px;line-height:1;transform:translate3d(-100px,-100px,0);transition:transform .65s cubic-bezier(.23,1,.32,1);will-change:transform}
+#mascotTraveler.show{display:flex}
+@media (prefers-reduced-motion:reduce){.mascot-trail{animation:mascotTrailFade 5s linear forwards;opacity:1}.mascot-trail-particle{animation:none;opacity:.26}#mascotTraveler{transition:none}}
+
+/* SEVENTH CHIPS */
+.seventh-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.seventh-chip{flex:1;min-width:50px;padding:6px 8px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text2);font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;text-align:center;white-space:nowrap}
+.seventh-chip:hover{background:var(--border-hover);transform:translateY(-1px)}
+.seventh-chip.on{color:#fff!important}
+
+/* EXTENDED */
+.extended-row{margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.extended-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px;font-weight:700;user-select:none}
+.extended-label:hover{color:var(--text2)}
+.extended-label::before{content:"\25B6";font-size:8px;transition:transform .2s;display:inline-block}
+.extended-label.open::before{transform:rotate(90deg)}
+.extended-content{display:none;gap:6px;flex-wrap:wrap}
+.extended-content.show{display:flex}
+.ext-chip{padding:5px 10px;border-radius:5px;border:1px solid var(--border);background:var(--bg);color:var(--text2);font-size:10px;font-weight:600;cursor:pointer;transition:all .15s}
+.ext-chip:hover{background:var(--border-hover);color:var(--text)}
+
+/* ===== STAFF (五線譜) ===== */
+.staff-wrap{height:130px;background:var(--bg);border-radius:8px;overflow:hidden;position:relative;border:1px solid var(--border);margin-bottom:10px}
+.staff-svg{width:100%;height:100%}
+.staff-line{stroke:var(--text3);stroke-width:1}
+.staff-ledger{stroke:var(--text3);stroke-width:1}
+.note-head{fill:var(--text);stroke:none}
+.note-head.active{fill:var(--accent)}
+.note-stem{stroke:var(--text);stroke-width:1.5}
+.note-stem.active{stroke:var(--accent)}
+.note-acc{fill:var(--text2);font-size:14px;font-family:'Inter',sans-serif;font-weight:700}
+.note-acc.active{fill:var(--accent)}
+.staff-label{fill:var(--text3);font-size:10px;font-family:'Inter',sans-serif;font-weight:600}
+.staff-clef{pointer-events:none}
+
+/* ===== PIANO ===== */
+.visualization{display:flex;flex-direction:column;align-items:center;gap:3px;width:100%}
+.visual-label{display:flex;flex-direction:column;align-items:center;min-width:56px;padding:3px 14px;border:1px solid var(--border);border-radius:3px;background:#1d2234;color:var(--text2);line-height:1.1}
+.visual-label strong{font-size:9px;color:var(--text);font-weight:800}
+.visual-label span{font-size:7px;color:var(--text3);margin-top:2px}
+.piano-mini{height:60px;width:min(116px,100%);background:#0e111d;border-radius:3px;overflow:hidden;position:relative;border:1px solid #3a4058;margin:0 auto 8px;box-shadow:0 2px 6px rgba(0,0,0,.35)}
+.piano{display:flex;height:100%;position:relative;justify-content:flex-start;width:100%}
+.p-mini-w{flex:1;height:100%;background:linear-gradient(180deg,#f6f7fb,#d7dae4);border-right:1px solid #9ca1ae;display:flex;align-items:flex-end;justify-content:center;padding-bottom:3px;font-size:7px;color:#45495a;font-weight:700;position:relative;z-index:1;min-width:0}
+.p-mini-w:last-child{border-right:none}
+.p-mini-w.on{background:linear-gradient(180deg,#4e9cff,#2c62c4)!important;color:#fff;box-shadow:inset 0 -4px 0 rgba(255,255,255,.18)}
+.p-mini-b{width:var(--bw);height:61%;background:linear-gradient(180deg,#303544,#111522);border-radius:0 0 2px 2px;position:absolute;z-index:2;top:0;display:flex;align-items:flex-end;justify-content:center;padding-bottom:2px;font-size:6px;color:#777;font-weight:600;pointer-events:none;border:1px solid #080a11;border-top:none}
+.p-mini-b.on{background:linear-gradient(180deg,#4e9cff,#2557b5)!important;color:#fff;box-shadow:0 0 6px rgba(76,141,247,.7)}
+
+/* INTERMEDIATE */
+.list-grid{display:grid;grid-template-columns:repeat(4,minmax(220px,1fr));gap:14px;min-width:930px}
+.list-card{background:transparent;border:0;border-radius:0;padding:5px 4px;overflow:hidden}
+.list-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.list-card-header h4{font-size:13px;font-weight:800;color:var(--white)}
+.list-card-header .count{font-size:8px;color:var(--text3);background:var(--border);padding:2px 6px;border-radius:8px;font-weight:700}
+.chord-type-group{margin-bottom:10px}
+.chord-type-header{display:flex;align-items:center;justify-content:space-between;padding:5px 6px;background:#191d2d;border-radius:3px;border:1px solid var(--border);cursor:pointer;transition:all .15s;margin-bottom:4px;user-select:none}
+.chord-type-header:hover{background:var(--border-hover)}
+.chord-type-title{font-size:8px;color:var(--text2);font-weight:700;text-transform:uppercase;letter-spacing:0.4px}
+.chord-type-count{font-size:8px;color:var(--text3);font-weight:700}
+.chord-type-arrow{font-size:8px;color:var(--text3);transition:transform .2s}
+.chord-type-group.open .chord-type-arrow{transform:rotate(180deg)}
+.chord-cells{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:6px;max-height:0;overflow:hidden;transition:max-height .3s ease,opacity .3s ease;opacity:0}
+.chord-type-group.open .chord-cells{max-height:500px;opacity:1;margin-bottom:6px}
+.chord-cell{padding:5px 3px;border-radius:3px;border:1px solid var(--border);background:#1b2030;text-align:center;cursor:pointer;transition:all .15s;min-height:45px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.chord-cell:hover{background:var(--border-hover);transform:translateY(-2px);border-color:var(--border-hover)}
+.chord-cell .cn{font-size:8px;font-weight:700;color:var(--text);line-height:1.2}
+.chord-cell .ci{font-size:7px;color:var(--text3);line-height:1.3}
+
+/* PLAY BAR */
+.playbar{display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+.playbar-btn{padding:10px 24px;border-radius:8px;border:none;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;font-family:inherit}
+.playbar-btn.primary{background:var(--accent);color:#fff}
+.playbar-btn.primary:hover{background:var(--accent-hover)}
+.playbar-btn.secondary{background:var(--border);color:var(--text)}
+.playbar-btn.secondary:hover{background:var(--border-hover)}
+
+/* PROGRESSION */
+.progression-bar{display:flex;gap:8px;align-items:center;justify-content:center;margin-bottom:16px;padding:12px;background:var(--panel);border:1px solid var(--border);border-radius:10px;flex-wrap:wrap;min-height:56px}
+.progression-bar.empty{color:var(--text3);font-size:12px;font-weight:500}
+.prog-chip{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;background:var(--bg);border:1px solid var(--border);font-size:13px;font-weight:700;color:var(--text);cursor:pointer;transition:all .15s;position:relative}
+.prog-chip:hover{background:var(--border-hover);transform:translateY(-1px)}
+.prog-chip .prog-x{width:16px;height:16px;border-radius:50%;background:var(--red);color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;transition:opacity .15s}
+.prog-chip:hover .prog-x{opacity:1}
+.prog-arrow{color:var(--text3);font-size:12px}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--panel);border:1px solid var(--border);color:var(--text);padding:10px 20px;border-radius:8px;font-size:12px;font-weight:600;z-index:200;transition:transform .3s ease;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* 操作說明：以可滾動的深色面板承載完整說明，避免小螢幕內容被裁切。 */
+.help-modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(5,7,13,.72);backdrop-filter:blur(4px);z-index:190}
+.help-modal.show{display:flex}
+.help-dialog{width:min(720px,100%);max-height:min(82vh,720px);overflow-y:auto;background:var(--panel);border:1px solid var(--border-hover);border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.45);color:var(--text)}
+.help-head{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 18px;background:var(--panel);border-bottom:1px solid var(--border);z-index:1}
+.help-head h2{font-size:16px;color:var(--white);font-weight:800}
+.help-head p{font-size:10px;color:var(--text2);margin-top:3px}
+.help-close{width:30px;height:30px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text2);font-size:20px;line-height:1;cursor:pointer}
+.help-close:hover{background:var(--border-hover);color:var(--text)}
+.help-body{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;padding:18px}
+.help-section{padding:12px 13px;background:rgba(0,0,0,.12);border:1px solid var(--border);border-radius:8px}
+.help-section.wide{grid-column:1/-1}
+.help-section h3{margin-bottom:7px;color:var(--accent);font-size:12px;font-weight:800}
+.help-section p,.help-section li{font-size:10px;line-height:1.65;color:var(--text2)}
+.help-section ul{padding-left:17px}
+.help-section strong{color:var(--text)}
+.shortcut-list{display:grid;grid-template-columns:auto 1fr;gap:5px 12px;align-items:baseline}
+.shortcut-list kbd{padding:2px 5px;border:1px solid var(--border-hover);border-radius:4px;background:var(--bg);color:var(--white);font:700 9px/1.2 inherit}
+@media(max-width:640px){
+  .help-modal{padding:10px}
+  .help-dialog{max-height:88vh;border-radius:9px}
+  .help-body{grid-template-columns:1fr;gap:10px;padding:12px}
+  .help-section.wide{grid-column:auto}
+}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:1024px){
+  .tree-grid{grid-template-columns:repeat(2,minmax(0,1fr));min-width:0;width:100%}
+  .list-grid{grid-template-columns:repeat(2,minmax(0,1fr));min-width:0;width:100%}
+}
+@media(max-width:900px){
+  :root{--footer-h:28px}
+  .sidebar{position:fixed;left:0;top:56px;height:calc(100vh - 56px);z-index:100;transform:translateX(-100%);box-shadow:4px 0 20px rgba(0,0,0,0.5)}
+  .sidebar.open{transform:translateX(0)}
+  .menu-btn{display:flex}
+  .topbar-center{display:none}
+  .content{padding:12px;overflow-x:hidden}
+  .copyright{margin-left:0;font-size:9px;padding:0 8px}
+}
+@media(max-width:640px){
+  .tree-grid{grid-template-columns:minmax(0,1fr);min-width:0;width:100%}
+  .list-grid{grid-template-columns:minmax(0,1fr);min-width:0;width:100%}
+  .tree-card,.list-card{min-width:0;width:100%}
+  .logo-sub{display:none}
+  .topbar-right{gap:4px}
+  .top-btn{padding:5px 6px;font-size:9px}
+  .top-btn.primary{font-size:0;min-width:30px}
+  .top-btn.primary::before{content:'♫';font-size:12px}
+  .topbar-right>.theme-picker>.top-btn{font-size:0;min-width:26px}
+  .topbar-right>.theme-picker>.top-btn::before{content:'◉';font-size:12px}
+  .top-icon{font-size:12px;min-width:25px}
+  .scale-chip{padding:6px 10px;font-size:12px;min-width:44px}
+  .piano-mini{height:60px}
+  .staff-wrap{height:110px}
+  .tree-svg-wrap{height:180px}
+}
+@media(max-width:400px){
+  .topbar{padding:8px 10px}
+  .logo-text{font-size:13px}
+  .content{padding:10px;overflow-x:hidden}
+  .tree-card{padding:14px}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <button class="menu-btn" id="menuBtn" onclick="toggleSidebar()">☰</button>
+    <div class="logo">
+            <div class="logo-icon" aria-hidden="true">◉</div>
+      <div>
+        <div class="logo-text">和弦樹</div>
+        <div class="logo-sub">視覺化和聲。播放真實樂器。訓練你的聽感。</div>
+      </div>
+    </div>
+  </div>
+  <div class="topbar-center">
+        <h1>✦ 視覺化學習和弦 ✦</h1>
+        <p>看看音符如何在美麗、互動的和弦樹中連結</p>
+        <div class="tags">
+          <span>▸ 3 種難度</span>
+          <span>▸ 真實樂器</span>
+          <span>▸ 支援各種裝置</span>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="theme-picker" id="themePicker">
+      <button class="top-btn" id="themeBtn" aria-label="選擇背景色系" aria-expanded="false">◉ Earth⌄</button>
+      <div class="theme-menu" id="themeMenu" role="menu" aria-label="背景色系選擇">
+        <button class="theme-option on" type="button" data-theme="earth" role="menuitem">原有・淺灰</button>
+        <button class="theme-option" type="button" data-theme="morandi" role="menuitem">莫蘭迪</button>
+        <button class="theme-option" type="button" data-theme="ocean" role="menuitem">海洋</button>
+      </div>
+    </div>
+    <button class="top-btn primary" aria-label="旋律轉和弦模式" onclick="showToast('旋律 → 和弦模式已啟用')">♫ 旋律 → 和弦</button>
+    <button class="top-btn top-icon" id="darkModeBtn" aria-label="啟用深色模式" aria-pressed="true">☾</button>
+    <button class="top-btn top-icon" id="helpBtn" aria-label="開啟操作說明">?</button>
+  </div>
+</div>
+
+<!-- OVERLAY -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<!-- HELP MODAL -->
+<div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle" aria-hidden="true">
+  <div class="help-dialog">
+    <div class="help-head">
+      <div><h2 id="helpTitle">和弦樹操作說明</h2><p>用視覺化方式探索和弦、調內關係與聽覺。</p></div>
+      <button class="help-close" id="helpCloseBtn" type="button" aria-label="關閉操作說明">×</button>
+    </div>
+    <div class="help-body">
+      <section class="help-section">
+        <h3>三種難度</h3>
+        <ul>
+          <li><strong>初學者：</strong>從單音根音與基本三和弦開始，點擊樹上的節點即可聆聽並加入和弦進行。</li>
+          <li><strong>調內：</strong>依目前的 KEY、SCALE 與 MODE 展示調內七個和弦，卡片下方會以完整三和弦或七和弦呈現。</li>
+          <li><strong>中級：</strong>按根音分組探索多種和弦類型與轉位，展開分類即可播放各個和弦格。</li>
+        </ul>
+      </section>
+      <section class="help-section">
+        <h3>設定與控制項</h3>
+        <ul>
+          <li><strong>難度：</strong>切換初學者、調內、中級內容。</li>
+          <li><strong>KEY／SCALE／MODE：</strong>選擇調性、音階與調式；畫面會立即更新相應和弦。</li>
+          <li><strong>樂器：</strong>切換 Orchestral Piano、Guitar、Strings 或 Synth 音色。</li>
+          <li><strong>和弦音量／琶音音量／節拍：</strong>調整播放音量與 BPM。</li>
+        </ul>
+      </section>
+      <section class="help-section">
+        <h3>播放與創作</h3>
+        <ul>
+          <li><strong>Play：</strong>依目前調性播放一組調內和弦，吉祥物會跟隨節點移動。</li>
+          <li><strong>循環：</strong>持續重播調內和弦序列；再次點擊即可停止。</li>
+          <li><strong>隨機：</strong>建立並播放隨機和弦進行。</li>
+          <li><strong>生成／智慧和聲：</strong>分別產生目前設定或調內邏輯的和弦進行。</li>
+          <li><strong>錄音／MIDI：</strong>匯出目前可用的音訊錄音或 MIDI 檔案。</li>
+        </ul>
+      </section>
+      <section class="help-section">
+        <h3>快捷鍵</h3>
+        <div class="shortcut-list"><kbd>Space</kbd><span>播放調內和弦序列</span><kbd>M</kbd><span>切換節拍器</span><kbd>L</kbd><span>切換循環</span><kbd>R</kbd><span>建立隨機和弦進行</span><kbd>G</kbd><span>生成和弦進行</span><kbd>Esc</kbd><span>關閉操作說明或彈出層</span></div>
+      </section>
+      <section class="help-section wide">
+        <h3>吉祥物與視覺化</h3>
+        <p>播放時，左側選定的吉祥物會沿著目前畫面中的和弦節點移動；移動路徑會留下約 5px 的白色 SVG 弧線光軌，並在約五秒內淡出。右側的<strong>鋼琴</strong>視圖會高亮實際 MIDI 音高；切換到<strong>五線譜</strong>後，會依調性、音名字母、升降記號與和弦音程顯示完整全音符。拖曳內容捲軸時，吉祥物仍固定在 viewport 座標，不會漂移。</p>
+      </section>
+      <section class="help-section wide">
+        <h3>琶音與背景</h3>
+        <p>側欄的<strong>四分音符</strong>會依目前 BPM 以四分音符間隔逐音播放；切換至<strong>十六分音符</strong>後，和弦各音會以更密的十六分音符間隔播放。右上角 <strong>Earth</strong> 可切換原有淺灰、莫蘭迪與海洋背景色系；右側月亮按鈕則可啟用全畫面深色模式。</p>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main-layout">
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar">
+    <div class="sb-section">
+      <h4>設定</h4>
+      <div class="sb-row"><label>難度</label><select class="sb-select" id="levelSelect"><option value="Beginner">初學者</option><option value="Diatonic">調內</option><option value="Intermediate">中級</option></select></div>
+      <div id="diatonicControls">
+        <div class="sb-row"><label>KEY</label><select class="sb-select" id="keySelect"><option>C</option><option>C#</option><option>D</option><option>Eb</option><option>E</option><option>F</option><option>F#</option><option>G</option><option>Ab</option><option>A</option><option>Bb</option><option>B</option></select></div>
+        <div class="sb-row"><label>SCALE</label><select class="sb-select" id="scaleSelect"><option>Major</option><option>Natural Minor</option><option>Harmonic Minor</option><option>Dorian</option><option>Mixolydian</option></select></div>
+        <div class="sb-row"><label>MODE</label><select class="sb-select" id="modeSelect"><option>1st (Ionian)</option><option>2nd (Dorian)</option><option>3rd (Phrygian)</option><option>4th (Lydian)</option><option>5th (Mixolydian)</option><option>6th (Aeolian)</option><option>7th (Locrian)</option></select></div>
+      </div>
+    </div>
+
+    <div class="sb-section">
+      <h4>音符</h4>
+      <div class="note-grid" id="noteGrid">
+        <div class="note-chip">1</div><div class="note-chip">2</div><div class="note-chip">3</div>
+        <div class="note-chip on">4</div><div class="note-chip">5</div><div class="note-chip">6</div>
+      </div>
+      <div class="sb-row"><label>模式</label></div>
+      <div class="mode-toggle">
+        <div class="mode-opt on" id="modeRandom">⌁ 隨機</div>
+        <div class="mode-opt" id="modeManual">⌁ 手動</div>
+      </div>
+      <button class="sb-btn" id="generateBtn">⌁ 生成</button>
+      <button class="sb-btn green" id="playAllBtn">▷ 播放</button>
+      <button class="sb-btn" id="loopBtn">🔁</button>
+      <button class="sb-btn" id="smartHarmonizeBtn">⌁ 智慧和聲</button>
+      <button class="sb-btn" id="randomChordsBtn">⌁ 隨機和弦</button>
+    </div>
+
+    <div class="sb-section">
+      <h4>♫ 聲音</h4>
+      <div class="sb-row"><label>樂器</label><select class="sb-select" id="instSelect"><option value="Orchestral Piano">管弦鋼琴</option><option value="Piano">鋼琴</option><option value="Guitar">吉他</option><option value="Strings">弦樂</option><option value="Brass">銅管</option></select></div>
+      <div class="slider-row"><label><span>和弦</span><span id="chordVol">50%</span></label><input type="range" min="0" max="100" value="50" id="chordSlider"></div>
+      <div class="slider-row"><label><span>琶音</span><span id="arpVol">70%</span></label><input type="range" min="0" max="100" value="70" id="arpSlider"></div>
+      <div class="slider-row"><label><span>速度</span><span id="tempoVal">72</span></label><input type="range" min="30" max="300" value="72" id="tempoSlider"></div>
+      <div class="sb-row" style="margin-top:8px"><label><input type="checkbox" id="metronome"> 節拍器</label></div>
+      <div class="sb-row"><label>琶音</label></div>
+      <div class="mode-toggle" id="arpMode"><div class="mode-opt on">四分音符</div><div class="mode-opt">十六分音符</div></div>
+      <div class="sb-row"><label>循環次數</label></div>
+      <div class="cycle-row"><div class="cycle-btn">1x</div><div class="cycle-btn on">2x</div><div class="cycle-btn">4x</div></div>
+    </div>
+
+    <div class="sb-section">
+      <h4>視覺化</h4>
+      <div class="vis-toggle">
+        <div class="vis-opt on" id="visPiano" onclick="setVis('piano')">
+          <svg viewBox="0 0 24 24"><path d="M20 3H4a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zm-7 16H4V4h9v15zm7 0h-6V4h6v15z"/></svg>
+          鋼琴
+        </div>
+        <div class="vis-opt" id="visStaff" onclick="setVis('staff')">
+          <svg viewBox="0 0 24 24"><path d="M4 4h2v16H4V4zm4 0h1v16H8V4zm3 0h1v16h-1V4zm3 0h1v16h-1V4zm3 0h1v16h-1V4z"/></svg>
+          五線譜
+        </div>
+      </div>
+    </div>
+
+    <div class="sb-section">
+      <h4>匯出</h4>
+      <button class="export-btn" onclick="downloadMIDI()">⇩ 下載 MIDI</button>
+      <button class="export-btn" onclick="startRecording()">♩ 錄製音訊</button>
+    </div>
+
+    <div class="sb-section">
+      <div class="shortcut">
+        <strong>快捷鍵</strong><br>
+        空白鍵：播放<br>
+        M：節拍器<br>
+        L：循環<br>
+        R：隨機<br>
+        G：生成
+      </div>
+    </div>
+
+    <div class="sb-section">
+      <h4>吉祥物</h4>
+      <div class="mascot-row">
+        <div class="mascot-btn on">🌳</div><div class="mascot-btn">🦊</div><div class="mascot-btn">🐱</div><div class="mascot-btn">🐻</div><div class="mascot-btn">🐼</div>
+      </div>
+      <div class="mascot-names">旋律、節奏、火花、回聲、脈衝</div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content" id="contentArea">
+    <div class="progression-bar empty" id="progressionBar">點擊和弦以建立和弦進行</div>
+    <div class="content-hint" id="contentHint">選擇和弦加入進行 • 再次點擊根音以取消選取</div>
+    <div id="mainView"></div>
+  </div>
+</div>
+
+<footer class="copyright">韶韻音樂學院 馬老師&nbsp;&nbsp;專門為秀玲姊設計 和弦系統教學</footer>
+
+<div id="mascotTravelLayer" aria-hidden="true">
+  <svg id="mascotTrailSvg" xmlns="http://www.w3.org/2000/svg"></svg>
+  <div id="mascotTraveler">🌳</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+
+// ===== DATA =====
+const NOTES=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const NOTE_I={C:0,'C#':1,Db:1,D:2,'D#':3,Eb:3,E:4,F:5,'F#':6,Gb:6,G:7,'G#':8,Ab:8,A:9,'A#':10,Bb:10,B:11};
+const LETTERS=['C','D','E','F','G','A','B'];
+const NATURAL_PITCH={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
+const STAFF_LETTER_POS={C:-4,D:-3,E:-2,F:-1,G:0,A:1,B:2};
+const CHORDS={
+  'Major':{f:[0,4,7],color:'#3fb950',rom:'',intv:'Maj 3rd + Min 3rd'},
+  'Minor':{f:[0,3,7],color:'#58a6ff',rom:'m',intv:'Min 3rd + Maj 3rd'},
+  'Diminished':{f:[0,3,6],color:'#a371f7',rom:'°',intv:'Min 3rd + Min 3rd'},
+  'Augmented':{f:[0,4,8],color:'#f0883e',rom:'+',intv:'Maj 3rd + Maj 3rd'},
+  'Major 7':{f:[0,4,7,11],color:'#3fb950',rom:'maj7',intv:'Maj 3rd + Min 3rd + Maj 3rd'},
+  'Minor 7':{f:[0,3,7,10],color:'#58a6ff',rom:'m7',intv:'Min 3rd + Maj 3rd + Min 3rd'},
+  'Dominant 7':{f:[0,4,7,10],color:'#f0883e',rom:'7',intv:'Maj 3rd + Min 3rd + Min 3rd'},
+  'Dim 7':{f:[0,3,6,9],color:'#a371f7',rom:'°7',intv:'Min 3rd + Min 3rd + Min 3rd'},
+  'Sus2':{f:[0,2,7],color:'#79c0ff',rom:'sus2',intv:'Maj 2nd + Perf 4th'},
+  'Sus4':{f:[0,5,7],color:'#79c0ff',rom:'sus4',intv:'Perf 4th + Maj 2nd'},
+  'Add9':{f:[0,4,7,14],color:'#56d364',rom:'add9',intv:'Maj 3rd + Min 3rd + Maj 6th'},
+  'Minor Add9':{f:[0,3,7,14],color:'#56d364',rom:'madd9',intv:'Min 3rd + Maj 3rd + Maj 6th'},
+  'Minor(Maj7)':{f:[0,3,7,11],color:'#a371f7',rom:'m(maj7)',intv:'Min 3rd + Maj 3rd + Maj 3rd'},
+  'Minor 7b5':{f:[0,3,6,10],color:'#a371f7',rom:'m7b5',intv:'Min 3rd + Min 3rd + Maj 3rd'},
+  '7sus4':{f:[0,5,7,10],color:'#f0883e',rom:'7sus4',intv:'Perf 4th + Maj 2nd + Min 3rd'},
+  'Augmented Maj7':{f:[0,4,8,11],color:'#f0883e',rom:'augMaj7',intv:'Maj 3rd + Maj 3rd + Min 3rd'},
+};
+const CHORD_STEPS={
+  Major:[0,2,4],Minor:[0,2,4],Diminished:[0,2,4],Augmented:[0,2,4],
+  'Major 7':[0,2,4,6],'Minor 7':[0,2,4,6],'Dominant 7':[0,2,4,6],'Dim 7':[0,2,4,6],
+  Sus2:[0,1,4],Sus4:[0,3,4],Add9:[0,2,4,8],'Minor Add9':[0,2,4,8],
+  'Minor(Maj7)':[0,2,4,6],'Minor 7b5':[0,2,4,6],'7sus4':[0,3,4,6]
+  ,'Augmented Maj7':[0,2,4,6]
+};
+const SCALES={
+  'Major':[0,2,4,5,7,9,11],
+  'Natural Minor':[0,2,3,5,7,8,10],
+  'Harmonic Minor':[0,2,3,5,7,8,11],
+  'Dorian':[0,2,3,5,7,9,10],
+  'Mixolydian':[0,2,4,5,7,9,10],
+};
+const ROMAN=['I','ii','iii','IV','V','vi','vii°'];
+const INTERMEDIATE_TYPES=['Major','Minor','Dominant 7','Major 7','Minor 7','Diminished','Dim 7','Augmented','Sus2','Sus4','7sus4','Minor(Maj7)','Minor 7b5','Add9','Minor Add9'];
+const INTERMEDIATE_TYPE_LABELS={Major:'大三和弦',Minor:'小三和弦','Dominant 7':'屬七和弦','Major 7':'大七和弦','Minor 7':'小七和弦',Diminished:'減三和弦','Dim 7':'減七和弦',Augmented:'增三和弦',Sus2:'掛二和弦',Sus4:'掛四和弦','7sus4':'七掛四和弦','Minor(Maj7)':'小大七和弦','Minor 7b5':'半減七和弦',Add9:'加九和弦','Minor Add9':'小加九和弦'};
+
+function notePitchClass(note){
+  const match=/^([A-G])([#b]*)$/.exec(note||'C');
+  if(!match)return NOTE_I[note]??0;
+  let pc=NATURAL_PITCH[match[1]];
+  for(const accidental of match[2])pc+=accidental==='#'?1:-1;
+  return((pc%12)+12)%12;
+}
+
+function accidentalText(amount){
+  if(amount>0)return'#'.repeat(amount);
+  if(amount<0)return'b'.repeat(-amount);
+  return'';
+}
+
+function spellNote(root,interval,degreeSteps){
+  const rootName=root||'C';
+  const rootLetterIndex=Math.max(0,LETTERS.indexOf(rootName[0]));
+  const rootPc=notePitchClass(rootName);
+  const letter=LETTERS[(rootLetterIndex+degreeSteps)%7];
+  const octave=3+Math.floor((rootLetterIndex+degreeSteps)/7);
+  const midiValue=48+rootPc+interval;
+  const naturalMidi=NATURAL_PITCH[letter]+(octave+1)*12;
+  let accidental=midiValue-naturalMidi;
+  while(accidental>6)accidental-=12;
+  while(accidental<-6)accidental+=12;
+  return{midi:midiValue,letter,octave,accidental,accidentalText:accidentalText(accidental),name:letter+accidentalText(accidental)};
+}
+
+function spellScaleNotes(key,scale){
+  return SCALES[scale].map((interval,degree)=>spellNote(key,interval,degree).name);
+}
+
+function spellChord(root,q){
+  const intervals=CHORDS[q]?.f||[0];
+  const steps=CHORD_STEPS[q]||intervals.map((_,i)=>i*2);
+  return intervals.map((interval,index)=>spellNote(root,interval,steps[index]??index*2));
+}
+
+// ===== STATE =====
+let S={level:'Beginner',key:'C',scale:'Major',mode:'1st (Ionian)',inst:'Orchestral Piano',chordVol:0.5,arpVol:0.7,tempo:72,arpMode:'四分音符',theme:'earth',notes:[1,1,1,1,1,1,1],loop:false,progression:[],vis:'piano',activeChord:null,activeCardRoot:null};
+let AC=null,loopInterval=null,metroInterval=null,isRecording=false,arpTimers=[];
+let metroBeat=0;
+let selectedMascot='🌳',mascotHasPosition=false,mascotMoveTimer=null,mascotPosition=null,mascotTargetKey=null,mascotTargetEl=null;
+let mascotPlaybackActive=false,mascotPlaybackRun=0,mascotPlaybackTimers=[];
+
+function ac(){if(!AC)AC=new(window.AudioContext||window.webkitAudioContext)();return AC;}
+function mtof(m){return 440*Math.pow(2,(m-69)/12);}
+
+function playNote(midi,dur,vol,inst){
+  if(dur==null)dur=0.5;if(vol==null)vol=S.chordVol;if(inst==null)inst=S.inst;
+  const ctx=ac();
+  if(ctx.state==='suspended')ctx.resume();
+  const t=ctx.currentTime,freq=mtof(midi);
+  const master=ctx.createGain();master.connect(ctx.destination);
+  const filter=ctx.createBiquadFilter();filter.connect(master);
+
+  if(inst.includes('Piano')){
+    const o1=ctx.createOscillator(),o2=ctx.createOscillator(),g1=ctx.createGain(),g2=ctx.createGain();
+    o1.type='triangle';o2.type='sine';o1.frequency.value=freq;o2.frequency.value=freq*2;
+    o1.connect(g1);o2.connect(g2);g1.connect(filter);g2.connect(filter);
+    filter.type='lowpass';filter.frequency.setValueAtTime(3500,t);filter.Q.value=0.5;
+    master.gain.setValueAtTime(0,t);master.gain.linearRampToValueAtTime(vol*0.9,t+0.01);
+    master.gain.exponentialRampToValueAtTime(vol*0.3,t+0.15);master.gain.exponentialRampToValueAtTime(0.001,t+dur*2.5);
+    g1.gain.setValueAtTime(0.7,t);g2.gain.setValueAtTime(0.25,t);
+    o1.start(t);o1.stop(t+dur*2.5+0.1);o2.start(t);o2.stop(t+dur*2.5+0.1);
+  }else if(inst==='Guitar'){
+    const o=ctx.createOscillator();o.type='sawtooth';o.frequency.value=freq;o.connect(filter);
+    filter.type='lowpass';filter.frequency.setValueAtTime(2200,t);filter.frequency.exponentialRampToValueAtTime(900,t+0.4);
+    master.gain.setValueAtTime(0,t);master.gain.linearRampToValueAtTime(vol*0.5,t+0.02);
+    master.gain.exponentialRampToValueAtTime(0.001,t+dur*1.5);o.start(t);o.stop(t+dur*1.5+0.1);
+  }else if(inst==='Strings'){
+    const o1=ctx.createOscillator(),o2=ctx.createOscillator();
+    o1.type='sine';o2.type='triangle';o1.frequency.value=freq;o2.frequency.value=freq*1.002;
+    o1.connect(filter);o2.connect(filter);filter.type='lowpass';filter.frequency.setValueAtTime(1600,t);
+    master.gain.setValueAtTime(0,t);master.gain.linearRampToValueAtTime(vol*0.6,t+0.12);
+    master.gain.setValueAtTime(vol*0.6,t+dur);master.gain.exponentialRampToValueAtTime(0.001,t+dur*3);
+    o1.start(t);o1.stop(t+dur*3+0.1);o2.start(t);o2.stop(t+dur*3+0.1);
+  }else{
+    const o=ctx.createOscillator();o.type='square';o.frequency.value=freq;o.connect(filter);
+    filter.type='lowpass';filter.frequency.setValueAtTime(900,t);filter.frequency.linearRampToValueAtTime(1400,t+0.08);
+    master.gain.setValueAtTime(0,t);master.gain.linearRampToValueAtTime(vol*0.35,t+0.04);
+    master.gain.exponentialRampToValueAtTime(0.001,t+dur*1.3);o.start(t);o.stop(t+dur*1.3+0.1);
+  }
+}
+
+function getArpMode(){
+  const active=document.querySelector('#arpMode .mode-opt.on');
+  return S.arpMode||active?.textContent.trim()||'四分音符';
+}
+function getArpIntervalMs(){
+  const mode=getArpMode();
+  if(mode==='四分音符'||mode==='四分')return 60000/Math.max(1,S.tempo);
+  if(mode==='十六分音符'||mode==='十六分')return 60000/Math.max(1,S.tempo)/4;
+  return 0;
+}
+function clearArpeggioTimers(){
+  arpTimers.forEach(clearTimeout);
+  arpTimers=[];
+}
+function playChord(midis,dur,vol){
+  if(!Array.isArray(midis)||midis.length===0)return;
+  clearArpeggioTimers();
+  const interval=getArpIntervalMs();
+  if(interval>0){
+    // 琶音音量為 0% 時完全靜音；每個音的尾韻短於拍距，避免四分音符重疊成雙音。
+    if(S.arpVol<=0)return;
+    const noteDur=Math.max(0.012,(interval/1000)*0.24);
+    midis.forEach((m,i)=>{
+      arpTimers.push(setTimeout(()=>{
+        if(S.arpVol>0)playNote(m,noteDur,S.arpVol,S.inst);
+      },i*interval));
+    });
+    return;
+  }
+  midis.forEach(m=>playNote(m,dur==null?1.2:dur,vol==null?S.chordVol:vol,S.inst));
+}
+function playArpeggio(midis){playChord(midis);}
+
+function playMetronomeBeat(accent=false){
+  const ctx=ac();
+  if(ctx.state==='suspended')ctx.resume();
+  const t=ctx.currentTime;
+  const master=ctx.createGain();
+  const body=ctx.createBiquadFilter();
+  const osc=ctx.createOscillator();
+  const freq=accent?145:220;
+  osc.type='triangle';
+  osc.frequency.setValueAtTime(freq,t);
+  osc.frequency.exponentialRampToValueAtTime(accent?88:132,t+0.085);
+  body.type='bandpass';
+  body.frequency.setValueAtTime(accent?310:430,t);
+  body.Q.value=3.2;
+  master.gain.setValueAtTime(0,t);
+  master.gain.linearRampToValueAtTime(accent?0.34:0.19,t+0.003);
+  master.gain.exponentialRampToValueAtTime(0.001,t+0.16);
+  osc.connect(body);body.connect(master);master.connect(ctx.destination);
+  osc.start(t);osc.stop(t+0.19);
+}
+function nn(s){return NOTES[s%12];}
+function midi(root,intervals){const b=notePitchClass(root)+48;return intervals.map(i=>b+i);}
+
+function scaleStepInterval(scale,index,step){
+  const sc=SCALES[scale]||SCALES.Major;
+  const target=index+step;
+  return sc[target%7]+(target>=7?12:0)-sc[index];
+}
+
+function inferDiatonicQuality(scale,index,level){
+  const triadKey=`${scaleStepInterval(scale,index,2)}-${scaleStepInterval(scale,index,4)}`;
+  const triads={'4-7':'Major','3-7':'Minor','3-6':'Diminished','4-8':'Augmented'};
+  const triad=triads[triadKey]||'Major';
+  if(level==='Beginner')return triad;
+  if(level==='Intermediate')return index===4?'Dominant 7':triad;
+  const seventhKey=`${scaleStepInterval(scale,index,2)}-${scaleStepInterval(scale,index,4)}-${scaleStepInterval(scale,index,6)}`;
+  const sevenths={
+    '4-7-11':'Major 7','3-7-10':'Minor 7','4-7-10':'Dominant 7',
+    '3-6-10':'Minor 7b5','3-6-9':'Dim 7','3-7-11':'Minor(Maj7)',
+    '4-8-11':'Augmented Maj7'
+  };
+  return sevenths[seventhKey]||triad;
+}
+
+function getDiatonic(key,scale){
+  const sc=SCALES[scale]||SCALES.Major;
+  const scaleNotes=spellScaleNotes(key,scale);
+  return sc.map((i,idx)=>{
+    const note=scaleNotes[idx];
+    const q=inferDiatonicQuality(scale,idx,S.level);
+    return{note,q,roman:ROMAN[idx],midi:midi(note,CHORDS[q].f)};
+  });
+}
+
+function getChordQuality(idx){
+  return inferDiatonicQuality(S.scale,idx,S.level);
+}
+
+// ===== PROGRESSION =====
+function addToProgression(note,q){
+  const name=note+CHORDS[q].rom;
+  const exists=S.progression.findIndex(p=>p.name===name);
+  if(exists>=0){S.progression.splice(exists,1);}else{S.progression.push({name,note,q});}
+  if(S.progression.length>8)S.progression.shift();
+  renderProgression();
+}
+function removeFromProgression(idx){S.progression.splice(idx,1);renderProgression();}
+function renderProgression(){
+  const bar=document.getElementById('progressionBar');
+  if(S.progression.length===0){bar.className='progression-bar empty';bar.innerHTML='點擊和弦以建立和弦進行';return;}
+  bar.className='progression-bar';
+  bar.innerHTML=S.progression.map((p,i)=>`<div class="prog-chip" onclick="playChord(midi('${p.note}',CHORDS['${p.q}'].f))">${p.name}${i<S.progression.length-1?'<span class="prog-arrow">→</span>':''}<span class="prog-x" onclick="event.stopPropagation();removeFromProgression(${i})">×</span></div>`).join('');
+}
+
+// ===== TOAST =====
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
+
+// ===== THEME / HELP =====
+function applyTheme(theme,announce=true){
+  const next=['earth','dark','morandi','ocean'].includes(theme)?theme:'earth';
+  document.body.classList.remove('theme-earth','theme-morandi','theme-ocean');
+  document.body.classList.toggle('theme-dark',next==='dark');
+  if(next!=='dark')document.body.classList.add(`theme-${next}`);
+  S.theme=next;
+  document.querySelectorAll('.theme-option').forEach(option=>option.classList.toggle('on',option.dataset.theme===next));
+  const darkModeBtn=document.getElementById('darkModeBtn');
+  if(darkModeBtn){darkModeBtn.setAttribute('aria-pressed',String(next==='dark'));darkModeBtn.setAttribute('aria-label',next==='dark'?'深色模式已啟用':'啟用深色模式');}
+  const labels={earth:'原有淺灰背景',dark:'深色模式',morandi:'莫蘭迪背景',ocean:'海洋背景'};
+  if(announce)showToast(`${labels[next]}已套用`);
+}
+function setHelpModal(open){
+  const modal=document.getElementById('helpModal');
+  if(!modal)return;
+  modal.classList.toggle('show',open);
+  modal.setAttribute('aria-hidden',String(!open));
+  if(open)document.getElementById('helpCloseBtn')?.focus();
+}
+
+// ===== VISUALIZATION TOGGLE =====
+function setVis(mode){
+  S.vis=mode;
+  document.getElementById('visPiano').classList.toggle('on',mode==='piano');
+  document.getElementById('visStaff').classList.toggle('on',mode==='staff');
+  render();
+}
+
+// ===== STAFF RENDERER =====
+function staffInfoFromNote(note){
+  const pos=STAFF_LETTER_POS[note.letter]+(note.octave-4)*7;
+  return{...note,pos,y:40-pos*5,acc:note.accidentalText||'',midi:note.midi};
+}
+
+function fitStaffNotes(notes){
+  // 保留和弦音名字母與音程關係，只以完整八度移位，讓整組音符落在上加二線至下加二線之間。
+  let fitted=notes.map(note=>({...note}));
+  let infos=fitted.map(staffInfoFromNote);
+  while(infos.some(info=>info.pos<-6)){
+    fitted=fitted.map(note=>({...note,midi:note.midi+12,octave:note.octave+1}));
+    infos=fitted.map(staffInfoFromNote);
+  }
+  while(infos.some(info=>info.pos>10)){
+    fitted=fitted.map(note=>({...note,midi:note.midi-12,octave:note.octave-1}));
+    infos=fitted.map(staffInfoFromNote);
+  }
+  return fitted;
+}
+
+function accidentalGlyph(accidental){
+  return accidental.replace(/#/g,'♯').replace(/b/g,'♭');
+}
+
+function renderStaff(staffNotes){
+  if(!staffNotes||staffNotes.length===0)return'';
+  const fittedNotes=fitStaffNotes(staffNotes);
+  const infos=fittedNotes.map(staffInfoFromNote).sort((a,b)=>a.midi-b.midi);
+  
+  // 限制音符只出現在上加二線（C6）至下加二線（A3）範圍；不再把超界音符壓到畫布邊緣。
+  const minStaffY=40-10*5, maxStaffY=40-(-6)*5;
+  const limitedInfos=infos.map(info=>({
+    ...info,
+    pos:Math.max(-6,Math.min(10,info.pos)),
+    y:Math.max(minStaffY,Math.min(maxStaffY,info.y))
+  }));
+  const viewY1=-20, viewY2=86, vbH=viewY2-viewY1;
+
+  // 五線譜線由上至下為 F5、D5、B4、G4、E4；G4（第二線）固定在 y=40。
+  const staffYs=[10,20,30,40,50];
+  let svg=`<svg class="staff-svg" viewBox="0 0 280 ${vbH}" preserveAspectRatio="xMidYMid meet">`;
+
+  staffYs.forEach(sy=>{if(sy>=viewY1-5&&sy<=viewY2+5)svg+=`<line x1="20" y1="${sy-viewY1}" x2="260" y2="${sy-viewY1}" class="staff-line"/>`;});  
+
+  const noteX=208; // 同一拍的和弦音符共用 x，依指定相對原版左移 10px
+  limitedInfos.forEach(info=>{info.x=noteX;});
+
+  limitedInfos.forEach(info=>{
+    const ny=info.y-viewY1;
+    // 上加線（高於第一線 y=10）
+    if(info.y<10){
+      for(let ly=0;ly>=info.y-2;ly-=10){
+        if(ly>=viewY1-5&&ly<=viewY2+5)svg+=`<line x1="${info.x-12}" y1="${ly-viewY1}" x2="${info.x+12}" y2="${ly-viewY1}" class="staff-ledger"/>`;
+      }
+    }
+    // 下加線（低於第五線 y=50）
+    else if(info.y>50){
+      for(let ly=60;ly<=info.y+2;ly+=10){
+        if(ly>=viewY1-5&&ly<=viewY2+5)svg+=`<line x1="${info.x-12}" y1="${ly-viewY1}" x2="${info.x+12}" y2="${ly-viewY1}" class="staff-ledger"/>`;
+      }
+    }
+  });
+
+  // 使用公版 G clef 向量；相較上一版放大 1px 並上移 1px，讓尾端貼近第一線。
+  // x=20 與五線譜起點一致，音名從 x=54 開始，與譜號保留明確安全間距。
+  svg+=`<image class="staff-clef" href="/manus-storage/kimichord-gclef-colored_3505c1e0.svg" x="20" y="21.5" width="28" height="64" preserveAspectRatio="none" aria-label="高音譜號"/>`;
+
+  limitedInfos.forEach(info=>{
+    const ny=info.y-viewY1;
+    svg+=`<ellipse cx="${info.x}" cy="${ny}" rx="6" ry="4.5" class="note-head active"/>`;
+    if(info.acc){svg+=`<text x="${info.x-18}" y="${ny+4}" class="note-acc active">${accidentalGlyph(info.acc)}</text>`;}
+  });
+
+  const names=fittedNotes.map(note=>`${note.name}${note.octave}`).join(' · ');
+  svg+=`<text x="54" y="${vbH-2}" class="staff-label" text-anchor="start">${names}</text>`;
+
+  svg+='</svg>';
+  return `<div class="staff-wrap">${svg}</div>`;
+}
+
+// ===== PIANO RENDERER =====
+function renderMiniPiano(activeMidis,height){
+  if(!height)height='72px';
+  const octaves=2,startOct=3;
+  const whiteNotes=['C','D','E','F','G','A','B'];
+  const blackMap={'C':'C#','D':'D#','F':'F#','G':'G#','A':'A#'};
+  const totalWhite=octaves*7;
+  let whtml='',bhtml='';
+  for(let o=0;o<octaves;o++){
+    const oct=startOct+o;
+    whiteNotes.forEach((wn,wi)=>{
+      const semi=NOTE_I[wn],m=semi+(oct+1)*12;
+        const on=activeMidis.some(am=>am===m);
+      whtml+=`<div class="p-mini-w${on?' on':''}">${wn}</div>`;
+      if(blackMap[wn]){
+        const bn=blackMap[wn],bs=NOTE_I[bn],bm=bs+(oct+1)*12;
+        const bon=activeMidis.some(am=>am===bm);
+        const leftPct=((o*7+wi+0.675)/totalWhite)*100;
+        const widthPct=(1/totalWhite)*65;
+        bhtml+=`<div class="p-mini-b${bon?' on':''}" style="left:${leftPct}%;width:${widthPct}%;--bw:${widthPct}%">${bn}</div>`;
+      }
+    });
+  }
+  return `<div class="piano-mini" style="height:${height}"><div class="piano">${whtml}${bhtml}</div></div>`;
+}
+
+function renderMiniPianoForRoot(root){
+  const midis=[notePitchClass(root)+48];return renderMiniPiano(midis,'60px');
+}
+
+function previewNotesForCard(root,fallbackNotes){
+  const active=S.activeChord;
+  if(!active||!active.cardRoot||active.cardRoot!==root)return fallbackNotes;
+  return active.notes;
+}
+
+function renderVisualization(activeMidis,height,staffNotes){
+  if(S.vis==='staff')return renderStaff(staffNotes);
+  const label=staffNotes?.length===1?staffNotes[0].name:staffNotes?.map(n=>n.name).join(' · ')||'';
+  const kind=(staffNotes?.length||activeMidis?.length||0)>1?'和弦':'單音';
+  return `<div class="visualization"><div class="visual-label"><strong>${label}</strong><span>${kind}</span></div>${renderMiniPiano(activeMidis,height)}</div>`;
+}
+
+// ===== RENDERERS =====
+function renderBeginner(){
+  // 初學者視圖跟隨目前選取的調性與音階，避免播放目標不在畫面上。
+  const diatonic=getDiatonic(S.key,S.scale);
+  const roots=[0,2,5,4].map(index=>diatonic[index]).filter(Boolean);
+  let html='<div class="tree-grid">';
+  roots.forEach(dc=>{
+    const root=dc.note;
+    const previewNotes=previewNotesForCard(root,[spellNote(root,0,0)]);
+    const chords=spellScaleNotes(root,S.scale).map((note,idx)=>{
+      const q=getChordQuality(idx);
+      return{note,q,roman:ROMAN[idx],color:CHORDS[q].color};
+    });
+    html+=`<div class="tree-card" data-card-root="${root}">
+      <div class="tree-card-header">
+        <div class="root-label">${root}</div>
+        <div class="root-sub">${previewNotes.length>1?'和弦':'單音'}</div>
+      </div>
+      <div class="tree-svg-wrap">
+        <svg class="tree-svg" viewBox="0 0 260 210">
+          <circle cx="130" cy="105" r="82" class="tree-outer-ring"/>
+          <circle cx="130" cy="105" r="32" fill="#21262d" stroke="#484f58" stroke-width="2"/>
+          <text x="130" y="110" text-anchor="middle" fill="#fff" font-size="17" font-weight="800">${root}</text>
+          ${chords.map((c,i)=>{
+            const a=(i/7)*Math.PI*2-Math.PI/2;
+            const x=130+Math.cos(a)*62,y=105+Math.sin(a)*62;
+            return `<g class="tree-node" data-chord-note="${c.note}" data-chord-quality="${c.q}" onclick="selectChord('${c.note}','${c.q}',this)">
+              <circle cx="${x}" cy="${y}" r="21" fill="${c.color}" opacity="0.88"/>
+              <text x="${x}" y="${y+1}" text-anchor="middle" fill="#fff" font-size="10" font-weight="700" pointer-events="none">${c.note}${CHORDS[c.q].rom}</text>
+            </g>`;
+          }).join('')}
+          ${chords.map((c,i)=>{
+            const a=(i/7)*Math.PI*2-Math.PI/2;
+            const x=130+Math.cos(a)*62,y=105+Math.sin(a)*62;
+            return `<line x1="130" y1="105" x2="${x}" y2="${y}" stroke="${c.color}" stroke-width="1.5" opacity="0.3"/>`;
+          }).join('')}
+        </svg>
+      </div>
+      ${renderVisualization(previewNotes.map(note=>note.midi),'60px',previewNotes)}
+    </div>`;
+  });
+  html+='</div>';
+  document.getElementById('mainView').innerHTML=html;
+  document.getElementById('contentHint').textContent='選擇和弦加入進行 • 再次點擊根音以取消選取';
+}
+
+function getInversionIntervals(type,inv){
+  const f=CHORDS[type].f.slice();
+  if(inv===0)return f;
+  const rootNote=f[inv];
+  const shifted=f.slice(inv).concat(f.slice(0,inv).map(x=>x+12));
+  return shifted.map(x=>x-rootNote);
+}
+function getIntervalName(semitones){
+  const map={1:'Min 2nd',2:'Maj 2nd',3:'Min 3rd',4:'Maj 3rd',5:'Perf 4th',6:'Tritone',7:'Perf 5th',8:'Min 6th',9:'Maj 6th',10:'Min 7th',11:'Maj 7th',12:'Octave'};
+  return map[semitones]||semitones+' sem';
+}
+function getInversionIntervalDesc(type,inv){
+  const ints=getInversionIntervals(type,inv);
+  const diffs=[];
+  for(let i=1;i<ints.length;i++)diffs.push(getIntervalName(ints[i]-ints[i-1]));
+  return diffs.join(' + ');
+}
+function generateInversions(root,type){
+  const def=CHORDS[type];if(!def)return[];
+  const rootIdx=NOTE_I[root];
+  const intervals=def.f;
+  const inversions=[];
+  for(let inv=0;inv<intervals.length;inv++){
+    const notes=[];
+    for(let i=0;i<intervals.length;i++){
+      const relIdx=(i+inv)%intervals.length;
+      let semitone=intervals[relIdx]-intervals[inv];
+      if(i<inv)semitone+=12;
+      const noteIdx=(rootIdx+semitone)%12;
+      notes.push(NOTES[noteIdx]);
+    }
+    const intvDesc=getInversionIntervalDesc(type,inv);
+    inversions.push({notes:notes,intervals:intvDesc});
+  }
+  return inversions;
+}
+
+function renderIntermediate(){
+  // 中級視圖跟隨目前選取的調性與音階，讓可見節點與播放序列一致。
+  const diatonic=getDiatonic(S.key,S.scale);
+  const roots=[0,2,5,4].map(index=>diatonic[index]?.note).filter(Boolean);
+  let html='<div class="list-grid">';
+  roots.forEach(root=>{
+    html+=`<div class="list-card">
+      <div class="list-card-header"><h4>${root}</h4><span class="count">${INTERMEDIATE_TYPES.length} 種類型</span></div>`;
+    INTERMEDIATE_TYPES.forEach((type,ti)=>{
+      const inversions=generateInversions(root,type);
+      const color=CHORDS[type].color;
+      html+=`<div class="chord-type-group${ti<3?' open':''}">
+        <div class="chord-type-header" onclick="this.parentElement.classList.toggle('open')">
+          <span class="chord-type-title" style="color:${color}">${INTERMEDIATE_TYPE_LABELS[type]||type}</span>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span class="chord-type-count">${inversions.length}</span>
+            <span class="chord-type-arrow">▼</span>
+          </div>
+        </div>
+        <div class="chord-cells">`;
+      inversions.forEach((inv,ii)=>{
+        const midis=inv.notes.map(n=>NOTE_I[n]+60);
+        html+=`<div class="chord-cell" data-chord-note="${root}" data-chord-quality="${type}" onclick="selectChord('${root}','${type}',this,[${midis.join(',')}])">
+          <div class="cn">${inv.notes.join(' ')}</div>
+          <div class="ci">${inv.intervals}</div>
+        </div>`;
+      });
+      html+='</div></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';
+  document.getElementById('mainView').innerHTML=html;
+  document.getElementById('contentHint').textContent='點擊任一和弦格聆聽 • 展開分類以探索轉位';
+}
+
+function renderDiatonic(){
+  const openStates=[...document.querySelectorAll('.extended-row')].map(row=>row.querySelector('.extended-label')?.classList.contains('open')||false);
+  const diatonic=getDiatonic(S.key,S.scale);
+  let html='';
+  html+='<div class="diatonic-header"><h2>調內和弦：'+S.key+' '+S.scale+'</h2><div class="mode-name">'+S.mode+'</div></div>';
+  html+='<div class="scale-bar">';
+  diatonic.forEach((c,i)=>{
+    const isOn=i===0;
+    html+=`<div class="scale-chip${isOn?' on':''}" onclick="selectChord('${c.note}','${c.q}',this)">
+      <span class="sc-roman">${c.roman}</span>
+      ${c.note}${CHORDS[c.q].rom}
+    </div>`;
+  });
+  html+='</div>';
+
+  html+='<div class="tree-grid">';
+  const displayRoots=[3,6,0,1].map(index=>diatonic[index]).filter(Boolean);
+  displayRoots.forEach(dc=>{
+    const root=dc.note;
+    const chords=spellScaleNotes(root,S.scale).map((note,idx)=>{
+      const q=getChordQuality(idx);
+      return{note,q,roman:ROMAN[idx],color:CHORDS[q].color};
+    });
+    const seventhMap=[
+      {s:'maj7',q:'Major 7',c:'#3fb950'},{s:'7',q:'Dominant 7',c:'#f0883e'},
+      {s:'m7',q:'Minor 7',c:'#58a6ff'},{s:'°7',q:'Dim 7',c:'#a371f7'}
+    ];
+    const extTypes=['Add9','Minor Add9','Minor(Maj7)','Minor 7b5','7sus4','Sus2','Sus4'];
+    const previewNotes=previewNotesForCard(root,spellChord(root,dc.q));
+    html+=`<div class="tree-card" data-card-root="${root}">
+      <div class="tree-card-header">
+        <div class="root-label">${root}</div>
+        <div class="root-sub">${previewNotes.length>1?'和弦':'單音'}</div>
+      </div>
+      <div class="tree-svg-wrap">
+        <svg class="tree-svg" viewBox="0 0 260 210">
+          <circle cx="130" cy="105" r="82" class="tree-outer-ring"/>
+          <circle cx="130" cy="105" r="32" fill="#21262d" stroke="#58a6ff" stroke-width="2"/>
+          <text x="130" y="110" text-anchor="middle" fill="#fff" font-size="17" font-weight="800">${root}</text>
+          ${chords.map((c,i)=>{
+            const a=(i/7)*Math.PI*2-Math.PI/2;
+            const x=130+Math.cos(a)*62,y=105+Math.sin(a)*62;
+            return `<g class="tree-node" data-chord-note="${c.note}" data-chord-quality="${c.q}" onclick="selectChord('${c.note}','${c.q}',this)">
+              <circle cx="${x}" cy="${y}" r="21" fill="${c.color}" opacity="0.9"/>
+              <text x="${x}" y="${y+1}" text-anchor="middle" fill="#fff" font-size="10" font-weight="700" pointer-events="none">${c.note}${CHORDS[c.q].rom}</text>
+            </g>`;
+          }).join('')}
+          ${chords.map((c,i)=>{
+            const a=(i/7)*Math.PI*2-Math.PI/2;
+            const x=130+Math.cos(a)*62,y=105+Math.sin(a)*62;
+            return `<line x1="130" y1="105" x2="${x}" y2="${y}" stroke="${c.color}" stroke-width="2" opacity="0.35"/>`;
+          }).join('')}
+        </svg>
+      </div>
+      ${renderVisualization(previewNotes.map(note=>note.midi),'60px',previewNotes)}
+      <div class="seventh-row">
+        ${seventhMap.map(s=>`<div class="seventh-chip" style="background:${s.c}18;border-color:${s.c}40;color:${s.c}" onclick="selectChord('${root}','${s.q}',this)">${root}${s.s}</div>`).join('')}
+      </div>
+      <div class="extended-row">
+        <div class="extended-label" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">延伸和聲</div>
+        <div class="extended-content">
+          ${extTypes.map(t=>`<div class="ext-chip" style="color:${CHORDS[t].color}" onclick="event.stopPropagation();selectChord('${root}','${t}',this)">${root}${CHORDS[t].rom}</div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+  });
+  html+='</div>';
+  document.getElementById('mainView').innerHTML=html;
+  document.querySelectorAll('.extended-row').forEach((row,index)=>{
+    if(openStates[index]){
+      row.querySelector('.extended-label')?.classList.add('open');
+      row.querySelector('.extended-content')?.classList.add('show');
+    }
+  });
+  document.getElementById('contentHint').textContent='選擇和弦加入進行 • 再次點擊根音以取消選取';
+}
+
+function mascotCenter(el){
+  if(!el)return null;
+  const r=el.getBoundingClientRect();
+  return{x:r.left+r.width/2,y:r.top+r.height/2};
+}
+
+function findMascotTarget(note,q,sourceEl){
+  const matches=[...document.querySelectorAll('[data-chord-note][data-chord-quality]')]
+    .filter(el=>el.dataset.chordNote===note&&el.dataset.chordQuality===q);
+  if(sourceEl&&sourceEl.isConnected&&sourceEl.classList.contains('tree-node'))return sourceEl;
+  const visibleTree=matches.find(el=>{
+    if(!el.classList.contains('tree-node')||!el.isConnected)return false;
+    const r=el.getBoundingClientRect();
+    return r.width>0&&r.height>0;
+  });
+  return visibleTree||sourceEl||matches[0]||null;
+}
+
+function drawMascotTrail(from,to){
+  const svg=document.getElementById('mascotTrailSvg');
+  if(!svg||!from||!to)return;
+  const dx=to.x-from.x,dy=to.y-from.y,length=Math.max(1,Math.hypot(dx,dy));
+  const bend=Math.min(110,Math.max(34,length*0.22));
+  const controlX=(from.x+to.x)/2;
+  const controlY=(from.y+to.y)/2-bend;
+  svg.setAttribute('viewBox',`0 0 ${window.innerWidth} ${window.innerHeight}`);
+  const ns='http://www.w3.org/2000/svg';
+  const group=document.createElementNS(ns,'g');
+  group.setAttribute('class','mascot-trail-group');
+  const makeCurve=(className)=>{
+    const path=document.createElementNS(ns,'path');
+    path.setAttribute('class',className);
+    path.setAttribute('d',`M ${from.x} ${from.y} Q ${controlX} ${controlY} ${to.x} ${to.y}`);
+    path.setAttribute('vector-effect','non-scaling-stroke');
+    path.style.strokeDasharray='none';
+    path.style.strokeDashoffset='0';
+    path.style.opacity='1';
+    return path;
+  };
+  // 使用平滑二次貝茲弧線，保留原站風格的 5px 白色核心軌跡。
+  group.append(makeCurve('mascot-trail'));
+  // 在弧線兩側散布低透明度粒子，增加移動時的柔和光塵，不遮蓋核心線。
+  const particleCount=Math.min(9,Math.max(5,Math.round(length/52)));
+  const normalX=-dy/length,normalY=dx/length;
+  for(let i=0;i<particleCount;i++){
+    const t=(i+1)/(particleCount+1),inv=1-t;
+    const curveX=inv*inv*from.x+2*inv*t*controlX+t*t*to.x;
+    const curveY=inv*inv*from.y+2*inv*t*controlY+t*t*to.y;
+    const side=i%2===0?-1:1;
+    const offset=3+(i%3)*2;
+    const particle=document.createElementNS(ns,'circle');
+    particle.setAttribute('class','mascot-trail-particle');
+    particle.setAttribute('cx',String(curveX+normalX*side*offset));
+    particle.setAttribute('cy',String(curveY+normalY*side*offset));
+    particle.setAttribute('r',String(1.1+(i%3)*.35));
+    particle.style.animationDelay=`${i*110}ms`;
+    group.append(particle);
+  }
+  svg.appendChild(group);
+  setTimeout(()=>group.remove(),5600);
+}
+
+function setMascotPosition(point){
+  const mascot=document.getElementById('mascotTraveler');
+  if(!mascot||!point)return;
+  mascot.style.transform=`translate3d(${point.x-17}px,${point.y-17}px,0)`;
+  mascot.style.display='flex';
+  mascot.classList.add('show');
+  mascotPosition=point;
+}
+
+function syncMascotTraveler(){
+  if(!mascotPlaybackActive||!mascotTargetKey)return;
+  const target=findMascotTarget(mascotTargetKey.note,mascotTargetKey.q,mascotTargetEl);
+  if(!target)return;
+  const rect=target.getBoundingClientRect();
+  if(rect.width<=0||rect.height<=0)return;
+  mascotTargetEl=target;
+  const point=mascotCenter(target);
+  setMascotPosition(point);
+}
+
+let mascotScrollRaf=0;
+function keepMascotViewportPosition(){
+  if(mascotScrollRaf)return;
+  mascotScrollRaf=requestAnimationFrame(()=>{
+    mascotScrollRaf=0;
+    if(!mascotPlaybackActive||!mascotHasPosition||!mascotPosition)return;
+    // mascotPosition 與 trail 都使用 viewport 座標；捲動時只重套座標，避免跟著內容漂移。
+    setMascotPosition(mascotPosition);
+  });
+}
+
+function moveMascotTo(note,q,sourceEl){
+  const target=findMascotTarget(note,q,sourceEl);
+  if(!target)return;
+  const destination=mascotCenter(target);
+  const previous=mascotHasPosition?mascotPosition:null;
+  mascotTargetKey={note,q};
+  mascotTargetEl=target;
+  const mascot=document.getElementById('mascotTraveler');
+  if(mascot)mascot.textContent=selectedMascot;
+  if(previous&&destination&&Math.hypot(destination.x-previous.x,destination.y-previous.y)>2){
+    drawMascotTrail(previous,destination);
+  }
+  mascotHasPosition=true;
+  requestAnimationFrame(()=>setMascotPosition(destination));
+}
+
+function selectChord(note,q,sourceEl,midisOverride){
+  const staffNotes=spellChord(note,q);
+  const midis=Array.isArray(midisOverride)?midisOverride:staffNotes.map(item=>item.midi);
+  const svgCardRoot=sourceEl?.parentElement?.parentElement?.parentElement?.dataset?.cardRoot||null;
+  const cardRoot=sourceEl?.closest('.tree-card')?.dataset.cardRoot||svgCardRoot||note;
+  S.activeChord={note,q,midis,notes:staffNotes,cardRoot};
+  S.activeCardRoot=cardRoot;
+  playChord(midis);
+  addToProgression(note,q);
+  render();
+}
+
+function waitForChordSurface(){
+  return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+}
+
+function revealMascotPlaybackTargets(diatonic){
+  diatonic.forEach(c=>{
+    const target=findMascotTarget(c.note,c.q);
+    target?.closest('.chord-type-group')?.classList.add('open');
+  });
+}
+
+function render(){
+  const diatonicControls=document.getElementById('diatonicControls');
+  if(diatonicControls)diatonicControls.hidden=S.level!=='Diatonic';
+  if(S.level==='Beginner')renderBeginner();
+  else if(S.level==='Intermediate')renderIntermediate();
+  else renderDiatonic();
+  requestAnimationFrame(syncMascotTraveler);
+}
+
+// ===== MIDI EXPORT =====
+function downloadMIDI(){
+  const header=[0x4D,0x54,0x68,0x64,0x00,0x00,0x00,0x06,0x00,0x00,0x00,0x01,0x00,0x60];
+  const trackHeader=[0x4D,0x54,0x72,0x6B];
+  const trackEnd=[0x00,0xFF,0x2F,0x00];
+  const data=new Uint8Array([...header,...trackHeader,0x00,0x00,0x00,0x04,...trackEnd]);
+  const blob=new Blob([data],{type:'audio/midi'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='chord-trees.mid';a.click();URL.revokeObjectURL(url);
+  showToast('MIDI 已下載');
+}
+
+// ===== RECORDING =====
+let mediaRecorder=null,recordedChunks=[];
+function startRecording(){
+  if(isRecording){showToast('錄音已在進行中');return;}
+  const dest=ac().createMediaStreamDestination();
+  mediaRecorder=new MediaRecorder(dest.stream);
+  recordedChunks=[];
+  mediaRecorder.ondataavailable=e=>{if(e.data.size>0)recordedChunks.push(e.data);};
+  mediaRecorder.onstop=()=>{
+    const blob=new Blob(recordedChunks,{type:'audio/webm'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download='chord-trees-recording.webm';a.click();URL.revokeObjectURL(url);
+    showToast('錄音已儲存');
+    isRecording=false;
+  };
+  mediaRecorder.start();isRecording=true;
+  showToast('錄音已開始……');
+  setTimeout(()=>{if(isRecording&&mediaRecorder){mediaRecorder.stop();}},10000);
+}
+
+// ===== SIDEBAR TOGGLE =====
+function toggleSidebar(){
+  const sb=document.getElementById('sidebar');
+  const ov=document.getElementById('sidebarOverlay');
+  sb.classList.toggle('open');ov.classList.toggle('show');
+}
+
+// ===== EVENTS =====
+document.getElementById('levelSelect').onchange=function(){S.level=this.value;render();};
+document.getElementById('keySelect').onchange=function(){S.key=this.value;render();};
+document.getElementById('scaleSelect').onchange=function(){S.scale=this.value;render();};
+document.getElementById('modeSelect').onchange=function(){S.mode=this.value;render();};
+document.getElementById('instSelect').onchange=function(){S.inst=this.value;};
+document.getElementById('chordSlider').oninput=function(){S.chordVol=this.value/100;document.getElementById('chordVol').textContent=this.value+'%';};
+document.getElementById('arpSlider').oninput=function(){
+  S.arpVol=this.value/100;
+  document.getElementById('arpVol').textContent=this.value+'%';
+  if(S.arpVol<=0)clearArpeggioTimers();
+};
+document.getElementById('tempoSlider').oninput=function(){
+  S.tempo=Math.min(300,Math.max(30,parseInt(this.value)||72));
+  this.value=S.tempo;
+  document.getElementById('tempoVal').textContent=S.tempo;
+  if(document.getElementById('metronome').checked)startMetronome();
+};
+document.getElementById('generateBtn').onclick=function(){
+  const diatonic=getDiatonic(S.key,S.scale);
+  const indices=S.level==='Diatonic'?[5,4,1,3]:[0,2,5,4];
+  S.progression=indices.map(i=>diatonic[i]).filter(Boolean).map(c=>({name:c.note+CHORDS[c.q].rom,note:c.note,q:c.q}));
+  renderProgression();
+  render();
+  showToast('已依目前調性生成和弦進行');
+};
+
+function stopMascotPlayback(){
+  mascotPlaybackActive=false;
+  mascotPlaybackRun++;
+  mascotPlaybackTimers.forEach(clearTimeout);
+  mascotPlaybackTimers=[];
+}
+
+async function playDiatonicSequence(){
+  stopMascotPlayback();
+  const run=++mascotPlaybackRun;
+  // 播放前強制刷新目前調性／音階／調式所對應的和弦樹，
+  // 並等待瀏覽器完成 DOM layout，吉祥物才有可追蹤的節點座標。
+  render();
+  const diatonic=getDiatonic(S.key,S.scale);
+  revealMascotPlaybackTargets(diatonic);
+  await waitForChordSurface();
+  if(run!==mascotPlaybackRun)return;
+  mascotPlaybackActive=true;
+  diatonic.forEach((c,i)=>{
+    const timer=setTimeout(()=>{
+      if(!mascotPlaybackActive||run!==mascotPlaybackRun)return;
+      playChord(c.midi);
+      moveMascotTo(c.note,c.q);
+      if(i===diatonic.length-1){
+        mascotPlaybackActive=false;
+        mascotPlaybackTimers=[];
+      }
+    },i*500);
+    mascotPlaybackTimers.push(timer);
+  });
+}
+
+document.getElementById('playAllBtn').onclick=function(){
+  playDiatonicSequence();
+};
+
+document.getElementById('contentArea').addEventListener('scroll',keepMascotViewportPosition,{passive:true});
+window.addEventListener('scroll',keepMascotViewportPosition,{passive:true});
+
+document.getElementById('loopBtn').onclick=function(){
+  S.loop=!S.loop;this.classList.toggle('on');
+  if(S.loop){
+    this.textContent='🔁 循環開啟';
+    loopInterval=setInterval(()=>{
+      playDiatonicSequence();
+    },4000);
+  }else{
+    this.textContent='🔁';
+    if(loopInterval){clearInterval(loopInterval);loopInterval=null;}
+    stopMascotPlayback();
+  }
+};
+
+document.getElementById('randomChordsBtn').onclick=function(){
+  const roots=['C','D','E','F','G','A','B'];
+  const qs=['Major','Minor','Major 7','Minor 7','Dominant 7'];
+  S.progression=[];
+  for(let i=0;i<4;i++){
+    const r=roots[Math.floor(Math.random()*roots.length)];
+    const q=qs[Math.floor(Math.random()*qs.length)];
+    S.progression.push({name:r+CHORDS[q].rom,note:r,q});
+    setTimeout(()=>playChord(midi(r,CHORDS[q].f)),i*600);
+  }
+  renderProgression();
+  render();
+};
+
+document.getElementById('smartHarmonizeBtn').onclick=function(){
+  const diatonic=getDiatonic(S.key,S.scale);
+  const indices=[0,3,4,5];
+  S.progression=indices.map(i=>diatonic[i]).filter(Boolean).map(c=>({name:c.note+CHORDS[c.q].rom,note:c.note,q:c.q}));
+  renderProgression();
+  render();
+  showToast('智慧和聲已建立調內和弦進行');
+};
+
+// Note grid
+document.querySelectorAll('.note-chip').forEach((chip,i)=>{
+  chip.onclick=function(){this.classList.toggle('on');S.notes[i]=this.classList.contains('on')?1:0;};
+});
+
+// Mode toggle
+document.getElementById('modeRandom').onclick=function(){
+  document.getElementById('modeRandom').classList.add('on');
+  document.getElementById('modeManual').classList.remove('on');
+};
+document.getElementById('modeManual').onclick=function(){
+  document.getElementById('modeManual').classList.add('on');
+  document.getElementById('modeRandom').classList.remove('on');
+};
+
+// Earth 主題選單
+const themePicker=document.getElementById('themePicker');
+const themeBtn=document.getElementById('themeBtn');
+themeBtn.onclick=function(event){
+  event.stopPropagation();
+  const open=themePicker.classList.toggle('open');
+  themeBtn.setAttribute('aria-expanded',String(open));
+};
+document.querySelectorAll('.theme-option').forEach(option=>{
+  option.onclick=function(event){
+    event.stopPropagation();
+    applyTheme(this.dataset.theme);
+    themePicker.classList.remove('open');
+    themeBtn.setAttribute('aria-expanded','false');
+  };
+});
+document.addEventListener('click',event=>{
+  if(!themePicker.contains(event.target)){
+    themePicker.classList.remove('open');
+    themeBtn.setAttribute('aria-expanded','false');
+  }
+});
+
+// 月亮按鈕：不論目前是莫蘭迪或海洋色系，點擊後都回到全畫面深色模式。
+document.getElementById('darkModeBtn').onclick=function(){
+  applyTheme('dark');
+  themePicker.classList.remove('open');
+  themeBtn.setAttribute('aria-expanded','false');
+};
+
+// 問號操作說明
+document.getElementById('helpBtn').onclick=function(){setHelpModal(true);};
+document.getElementById('helpCloseBtn').onclick=function(){setHelpModal(false);};
+document.getElementById('helpModal').onclick=function(event){if(event.target===this)setHelpModal(false);};
+
+// Cycle buttons
+document.querySelectorAll('.cycle-btn').forEach(btn=>{
+  btn.onclick=function(){
+    document.querySelectorAll('.cycle-btn').forEach(b=>b.classList.remove('on'));
+    this.classList.add('on');
+  };
+});
+
+// Arpeggio mode
+document.querySelectorAll('#arpMode .mode-opt').forEach(btn=>{
+  btn.onclick=function(){
+    document.querySelectorAll('#arpMode .mode-opt').forEach(option=>option.classList.remove('on'));
+    this.classList.add('on');
+    S.arpMode=this.textContent.trim();
+    showToast(`${S.arpMode}琶音已啟用`);
+  };
+});
+
+// Mascot
+document.querySelectorAll('.mascot-btn').forEach(btn=>{
+  btn.onclick=function(){document.querySelectorAll('.mascot-btn').forEach(b=>b.classList.remove('on'));this.classList.add('on');selectedMascot=this.textContent.trim();const traveler=document.getElementById('mascotTraveler');if(traveler)traveler.textContent=selectedMascot;};
+});
+window.addEventListener('resize',syncMascotTraveler);
+document.getElementById('contentArea').addEventListener('scroll',syncMascotTraveler,{passive:true});
+
+// Metronome
+function stopMetronome(){
+  if(metroInterval){clearInterval(metroInterval);metroInterval=null;}
+  metroBeat=0;
+}
+function startMetronome(){
+  stopMetronome();
+  metroBeat=0;
+  playMetronomeBeat(true);
+  metroInterval=setInterval(()=>{
+    metroBeat=(metroBeat+1)%4;
+    playMetronomeBeat(metroBeat===0);
+  },60000/Math.min(300,Math.max(30,S.tempo)));
+}
+document.getElementById('metronome').onchange=function(){
+  if(this.checked)startMetronome();
+  else stopMetronome();
+};
+
+// Keyboard shortcuts
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT')return;
+  if(e.code==='Space'){e.preventDefault();document.getElementById('playAllBtn').click();}
+  if(e.key==='m'||e.key==='M')document.getElementById('metronome').click();
+  if(e.key==='l'||e.key==='L')document.getElementById('loopBtn').click();
+  if(e.key==='r'||e.key==='R')document.getElementById('randomChordsBtn').click();
+  if(e.key==='g'||e.key==='G')document.getElementById('generateBtn').click();
+});
+
+// Touch device audio unlock
+document.body.addEventListener('click',function unlockAudio(){
+  if(AC&&AC.state==='suspended')AC.resume();
+  document.body.removeEventListener('click',unlockAudio);
+},{once:true});
+
+// Init
+applyTheme(S.theme,false);
+render();
+</script>
+</body>
+</html>
