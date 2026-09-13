@@ -4,7 +4,6 @@ import react from "@vitejs/plugin-react";
 import fs from "node:fs";
 import path from "node:path";
 import { defineConfig, type Plugin, type ViteDevServer } from "vite";
-import { vitePluginManusRuntime } from "vite-plugin-manus-runtime";
 
 // =============================================================================
 // Manus Debug Collector - Vite Plugin
@@ -203,7 +202,23 @@ function vitePluginStorageProxy(): Plugin {
   };
 }
 
-const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime(), vitePluginManusDebugCollector(), vitePluginStorageProxy()];
+// 「Made with Manus」按鈕由 vite-plugin-manus-runtime 注入（<script id="manus-runtime">），
+// 已自 plugins 移除外掛，不再於網頁注入任何 Manus 標誌；遊戲邏輯、UI、關卡程式碼皆未更動。
+/**
+ * 建置後清理：自正式輸出移除開發用的 Manus 除錯收集器（client/public/__manus__/）。
+ * 該資料夾僅供開發模式收集瀏覽器日誌使用，production 頁面從未載入，不應出現在部署產物中。
+ */
+function removeManusDevAssets(): Plugin {
+  return {
+    name: "remove-manus-dev-assets",
+    closeBundle() {
+      const dir = path.resolve(import.meta.dirname, "dist", "public", "__manus__");
+      fs.rmSync(dir, { recursive: true, force: true });
+    },
+  };
+}
+
+const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusDebugCollector(), vitePluginStorageProxy(), removeManusDevAssets()];
 
 // GitHub Pages 專案站部署：設定 VITE_BASE=/Chordtrain/ 時，所有資源路徑會加上子路徑前綴
 const base = process.env.VITE_BASE || "/";

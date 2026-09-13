@@ -40,9 +40,9 @@ graph TD
 
     subgraph DevServer["Vite Dev Server（開發）"]
         Vite["vite dev（port 3000）"]
-        P1["vite-plugin-manus-runtime"]
-        P2["Manus Debug Collector（瀏覽器日誌 → .manus-logs/）"]
-        P3["Storage Proxy（/manus-storage）"]
+        P1["jsx-loc 插件"]
+        P2["Debug Collector（瀏覽器日誌 → .manus-logs/）"]
+        P3["Storage Proxy（開發用儲存代理）"]
         Vite --- P1 & P2 & P3
     end
 
@@ -151,6 +151,7 @@ pnpm start
 | 約 2026-08 中旬 | v17 | 光軌改二次貝茲弧線＋粒子；節拍器預設 72 BPM、第一拍木魚重音；琶音 0% 靜音 |
 | 2026-08-21 | v18 | Earth 淺灰背景強化白色光軌對比；圓弧光軌外加淡出粒子效果；通過型別檢查與 production build |
 | 2026-09-14 | 部署 | 開源至 GitHub 並上線 GitHub Pages：新增 Actions 自動部署工作流；vite 加入 `VITE_BASE` 子路徑支援、iframe 改用 `BASE_URL` 相對路徑，確保專案站 `/Chordtrain/` 下完整運行 |
+| 2026-09-14 | v19 | 移除「Made with Manus」按鈕：自 `vite.config.ts` 移除 runtime 注入外掛，建置輸出同時排除開發用除錯收集器；高音譜號由外部儲存圖片改為**內嵌公有領域 G clef**（Wikimedia Commons「GClef.svg」，Public domain），修復線上版譜號 404，並跟隨主題色顯示 |
 
 ## 相關連結
 
