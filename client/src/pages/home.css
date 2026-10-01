@@ -1,0 +1,3 @@
+/* Ground-truth wrapper: preserve the uploaded KIMIchord tool UI while giving it a stable app viewport. */
+.game-shell{height:100vh;width:100vw;overflow:hidden;background:#0d1117;}
+.game-frame{display:block;width:100%;height:100%;border:0;background:#0d1117;}
