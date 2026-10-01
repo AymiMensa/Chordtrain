@@ -1305,14 +1305,16 @@ function ensureGrooveMix(){
   // Groove 每個打擊樂聲部本身已以低峰值建模；先前 .50 × .82 的雙重衰減，
   // 再經主總線 headroom 後在桌面喇叭只剩輕微起音啵聲。一般模式提高此層的
   // 可聽動態，手機純淨模式則於 applyMobilePureAudioProfile 保持較保守值。
-  // 保留明確的鼓聲動態，但避免多個聲部同拍累積時把主總線推入可聽失真。
-  input.gain.value=1.08;
+  // 修正：Groove 子總線輸入 gain 從 1.08 降至 0.72，輸出從 0.92 降至 0.78，
+  // 確保多個打擊樂聲部同拍疊加時，到達主總線之前的訊號峰值不超過 1.0，
+  // 消除在 WaveShaper 產生的「逼哩逼哩」高諧波失真聲。
+  input.gain.value=0.72;
   dcBlock.type='highpass';
   dcBlock.frequency.value=42;
   dcBlock.Q.value=0.707;
   lowShelf.type='lowshelf';lowShelf.frequency.value=118;lowShelf.gain.value=0;
   toneFilter.type='lowpass';toneFilter.frequency.value=9000;toneFilter.Q.value=.45;
-  output.gain.value=.92;
+  output.gain.value=0.78;
   analyser.fftSize=512;
   analyser.smoothingTimeConstant=0.72;
   analyser.minDecibels=-80;
@@ -1330,12 +1332,15 @@ function ensureChordMix(){
   const dcBlock=ctx.createBiquadFilter();
   const output=ctx.createGain();
   const analyser=ctx.createAnalyser();
-  // 和弦層以更低增益合併多個振盪器，只做次聲濾除；所有動態控制交由主總線統一處理。
-  input.gain.value=1.08;
+  // 修正：和弦子總線 input gain 從 1.08 降至 0.68，output gain 從 1.02 降至 0.72。
+  // 多個振盪器音符同時發聲（4音和弦）時各自的 gain 疊加後很容易超過 1.0，
+  // 送到主總線 WaveShaper 之前就已進入截波區，造成「逼哩逼哩」失真。
+  // 降低子總線增益後讓主總線壓縮器有足夠空間平滑處理，不再截波。
+  input.gain.value=0.68;
   dcBlock.type='highpass';
   dcBlock.frequency.value=34;
   dcBlock.Q.value=.707;
-  output.gain.value=1.02;
+  output.gain.value=0.72;
   analyser.fftSize=512;
   analyser.smoothingTimeConstant=.7;
   input.connect(dcBlock);dcBlock.connect(output);output.connect(analyser);analyser.connect(ensureMasterMix().input);
@@ -1699,14 +1704,16 @@ function playNote(midi,dur,vol,inst,options){
       const attack=Math.min(.018,Math.max(.009,dur*.16));
       const body=Math.max(attack+.006,dur*.46);
       const fade=Math.max(body+.010,Math.min(dur*.78,Math.max(.018,dur-.006)));
-      master.gain.setValueAtTime(.0001,t);master.gain.linearRampToValueAtTime(Math.max(.0001,vol*.62),t+attack);
-      master.gain.setValueAtTime(Math.max(.0001,vol*.62),t+body);master.gain.exponentialRampToValueAtTime(.00001,t+fade);
+      // 音量乘數從 0.62 降至 0.48，避免多音疊加時子總線超載。
+      master.gain.setValueAtTime(.0001,t);master.gain.linearRampToValueAtTime(Math.max(.0001,vol*.48),t+attack);
+      master.gain.setValueAtTime(Math.max(.0001,vol*.48),t+body);master.gain.exponentialRampToValueAtTime(.00001,t+fade);
       releaseMs=(fade+.010)*1000;
     }else{
       const end=sustainSeconds||dur*2.5;
       const releaseStart=sustainSeconds?Math.max(.07,end-.075):.16;
-      master.gain.setValueAtTime(.0001,t);master.gain.linearRampToValueAtTime(Math.max(.0001,vol*.82),t+.022);
-      master.gain.exponentialRampToValueAtTime(Math.max(.0001,vol*.42),t+releaseStart);master.gain.exponentialRampToValueAtTime(.0001,t+end);
+      // 音量乘數從 0.82/0.42 降至 0.60/0.32，留出多音疊加餘裕。
+      master.gain.setValueAtTime(.0001,t);master.gain.linearRampToValueAtTime(Math.max(.0001,vol*.60),t+.022);
+      master.gain.exponentialRampToValueAtTime(Math.max(.0001,vol*.32),t+releaseStart);master.gain.exponentialRampToValueAtTime(.0001,t+end);
       releaseMs=(end+.1)*1000;
     }
     g1.gain.setValueAtTime(0.7,t);g2.gain.setValueAtTime(0.25,t);
@@ -1720,24 +1727,27 @@ function playNote(midi,dur,vol,inst,options){
       const attack=Math.min(.024,Math.max(.014,dur*.22));
       const body=Math.max(attack+.006,dur*.38);
       const fade=Math.max(body+.010,Math.min(dur*.72,Math.max(.030,dur-.007)));
-      master.gain.setValueAtTime(.0001,t);master.gain.linearRampToValueAtTime(Math.max(.0001,vol*.42),t+attack);
-      master.gain.setValueAtTime(Math.max(.0001,vol*.42),t+body);master.gain.exponentialRampToValueAtTime(.00001,t+fade);
+      // 音量乘數從 0.42 降至 0.34，減少琶音模式下的諧波疊加。
+      master.gain.setValueAtTime(.0001,t);master.gain.linearRampToValueAtTime(Math.max(.0001,vol*.34),t+attack);
+      master.gain.setValueAtTime(Math.max(.0001,vol*.34),t+body);master.gain.exponentialRampToValueAtTime(.00001,t+fade);
       releaseMs=(fade+.012)*1000;
     }else{
       const end=sustainSeconds||dur*1.65;
       const releaseStart=sustainSeconds?Math.max(.05,end-.070):dur*.68;
-      master.gain.setValueAtTime(.0001,t);master.gain.linearRampToValueAtTime(Math.max(.0001,vol*.52),t+.038);
-      master.gain.setValueAtTime(Math.max(.0001,vol*.52),t+releaseStart);master.gain.exponentialRampToValueAtTime(.00001,t+end);
+      // 音量乘數從 0.52 降至 0.40，減少和弦模式下多音疊加的失真。
+      master.gain.setValueAtTime(.0001,t);master.gain.linearRampToValueAtTime(Math.max(.0001,vol*.40),t+.038);
+      master.gain.setValueAtTime(Math.max(.0001,vol*.40),t+releaseStart);master.gain.exponentialRampToValueAtTime(.00001,t+end);
       releaseMs=(end+.012)*1000;
     }
     g1.gain.setValueAtTime(.78,t);g2.gain.setValueAtTime(.10,t);
     const stopAt=t+releaseMs/1000;sources.push(o1,o2);o1.start(t);o1.stop(stopAt);o2.start(t);o2.stop(stopAt);
   }else if(inst==='Guitar'){
+    // sawtooth 富含高諧波，需要更積極的低通濾波與更低的增益，避免多音疊加時刺耳。
     const o=ctx.createOscillator();o.type='sawtooth';o.frequency.value=freq;o.connect(filter);
-    filter.type='lowpass';filter.frequency.setValueAtTime(2200,t);filter.frequency.exponentialRampToValueAtTime(900,t+0.4);
+    filter.type='lowpass';filter.frequency.setValueAtTime(1800,t);filter.frequency.exponentialRampToValueAtTime(750,t+0.4);filter.Q.value=0.4;
     const end=sustainSeconds||dur*1.5;const releaseStart=sustainSeconds?Math.max(.06,end-.065):.11;
-    master.gain.setValueAtTime(.0001,t);master.gain.linearRampToValueAtTime(Math.max(.0001,vol*.46),t+.028);
-    master.gain.setValueAtTime(Math.max(.0001,vol*.37),t+releaseStart);master.gain.exponentialRampToValueAtTime(.0001,t+end);releaseMs=(end+.13)*1000;sources.push(o);o.start(t);o.stop(t+releaseMs/1000);
+    master.gain.setValueAtTime(.0001,t);master.gain.linearRampToValueAtTime(Math.max(.0001,vol*.32),t+.032);
+    master.gain.setValueAtTime(Math.max(.0001,vol*.26),t+releaseStart);master.gain.exponentialRampToValueAtTime(.0001,t+end);releaseMs=(end+.13)*1000;sources.push(o);o.start(t);o.stop(t+releaseMs/1000);
   }else if(inst==='Harp'){
     const o1=ctx.createOscillator(),o2=ctx.createOscillator();
     const g1=ctx.createGain(),g2=ctx.createGain();
@@ -1760,11 +1770,12 @@ function playNote(midi,dur,vol,inst,options){
     g1.gain.setValueAtTime(.72,t);g2.gain.setValueAtTime(.16,t);
     const stopAt=t+releaseMs/1000;sources.push(o1,o2);o1.start(t);o1.stop(stopAt);o2.start(t);o2.stop(stopAt);
   }else{
-    const o=ctx.createOscillator();o.type='square';o.frequency.value=freq;o.connect(filter);
-    filter.type='lowpass';filter.frequency.setValueAtTime(900,t);filter.frequency.linearRampToValueAtTime(1400,t+0.08);
+    // square 波最容易產生逼哩聲，改用 triangle 降低諧波量，並加低通濾波。
+    const o=ctx.createOscillator();o.type='triangle';o.frequency.value=freq;o.connect(filter);
+    filter.type='lowpass';filter.frequency.setValueAtTime(800,t);filter.frequency.linearRampToValueAtTime(1100,t+0.08);filter.Q.value=0.3;
     const end=sustainSeconds||dur*1.3;const releaseStart=sustainSeconds?Math.max(.07,end-.070):.12;
-    master.gain.setValueAtTime(.0001,t);master.gain.linearRampToValueAtTime(Math.max(.0001,vol*.32),t+.042);
-    master.gain.setValueAtTime(Math.max(.0001,vol*.25),t+releaseStart);master.gain.exponentialRampToValueAtTime(.0001,t+end);releaseMs=(end+.13)*1000;sources.push(o);o.start(t);o.stop(t+releaseMs/1000);
+    master.gain.setValueAtTime(.0001,t);master.gain.linearRampToValueAtTime(Math.max(.0001,vol*.26),t+.045);
+    master.gain.setValueAtTime(Math.max(.0001,vol*.20),t+releaseStart);master.gain.exponentialRampToValueAtTime(.0001,t+end);releaseMs=(end+.13)*1000;sources.push(o);o.start(t);o.stop(t+releaseMs/1000);
   }
   return{sources,gain:master,isArpeggio,releaseMs};
 }
