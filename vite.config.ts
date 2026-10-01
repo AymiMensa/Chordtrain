@@ -206,6 +206,7 @@ function vitePluginStorageProxy(): Plugin {
 const plugins = [react(), tailwindcss()];
 
 export default defineConfig({
+  base: '/Chordtrain/',
   plugins,
   resolve: {
     alias: {
