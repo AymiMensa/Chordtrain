@@ -1278,14 +1278,23 @@ function ensureMasterMix(){
   // 避免多音同時發聲時把 WaveShaper 推入可聽失真區而產生「啵」聲。
   // 壓縮器閥值從 -11dB 降至 -16dB，膝點加寬至 28dB，確保瞬態在
   // 到達 Limiter 之前已被平滑處理，喇叭最大音量下不再產生截波破音。
+  // 修正：輸入 gain 回到 0.82（原被改成 1.1），給予充足餘裕（headroom），
+  // 避免多音同時發聲時把後級 soft-clip 推入可聽失真區而產生「啵」聲。
   input.gain.value=0.82;
   dcBlock.type='highpass';dcBlock.frequency.value=30;dcBlock.Q.value=.707;
   airFilter.type='lowpass';airFilter.frequency.value=12500;airFilter.Q.value=.55;
-  compressor.threshold.value=-16;compressor.knee.value=28;compressor.ratio.value=6;
-  compressor.attack.value=.008;compressor.release.value=.22;
-  output.gain.value=.92;
+  // 壓縮器閥值從 -12dB 降至 -16dB、膝點加寬至 28dB，確保瞬態在到達 limiter
+  // 之前已被平滑處理，喇叭最大音量下不再產生截波破音。
+  compressor.threshold.value=-16;compressor.knee.value=28;compressor.ratio.value=4;
+  compressor.attack.value=.005;compressor.release.value=.18;
+  // 輸出 gain 從 1.3 降至 0.98，與子總線的保守增益配合，總線淨增益不再超過 1.0。
+  output.gain.value=.98;
   analyser.fftSize=1024;analyser.smoothingTimeConstant=.76;analyser.minDecibels=-82;analyser.maxDecibels=-2;
-  const limiter=ctx.createWaveShaper();limiter.curve=createSoftLimiterCurve(ctx);limiter.oversample='4x';
+  // 真正的峰值保護：4× 過採樣的 WaveShaper soft-clip，平滑削去殘餘瞬態尖峰，
+  // 取代原本無法攔截短瞬態的 DynamicsCompressor「假 limiter」，消除逼逼啵啵聲。
+  const limiter=ctx.createWaveShaper();
+  limiter.curve=createSoftLimiterCurve(ctx);
+  limiter.oversample='4x';
   input.connect(dcBlock);dcBlock.connect(airFilter);airFilter.connect(compressor);compressor.connect(limiter);limiter.connect(output);output.connect(analyser);analyser.connect(ctx.destination);
   masterMix={context:ctx,input,dcBlock,airFilter,compressor,limiter,output,analyser,analyserData:new Float32Array(analyser.fftSize),recordingTarget:null};
   applyMobilePureAudioProfile();
@@ -1308,13 +1317,16 @@ function ensureGrooveMix(){
   // 修正：Groove 子總線輸入 gain 從 1.08 降至 0.72，輸出從 0.92 降至 0.78，
   // 確保多個打擊樂聲部同拍疊加時，到達主總線之前的訊號峰值不超過 1.0，
   // 消除在 WaveShaper 產生的「逼哩逼哩」高諧波失真聲。
-  input.gain.value=0.72;
+  // Groove 子總線初始值與 GROOVE_MIX_PRESETS.standard（input 1.08／output .92）一致；
+  // applyGrooveMixPreset() 會依目前預設與手機純淨模式再調整。主總線已改為 0.82 輸入
+  // 搭配 4× soft-clip，Groove 多聲部同拍疊加後的殘餘尖峰交由主總線平滑處理。
+  input.gain.value=1.08;
   dcBlock.type='highpass';
   dcBlock.frequency.value=42;
   dcBlock.Q.value=0.707;
   lowShelf.type='lowshelf';lowShelf.frequency.value=118;lowShelf.gain.value=0;
   toneFilter.type='lowpass';toneFilter.frequency.value=9000;toneFilter.Q.value=.45;
-  output.gain.value=0.78;
+  output.gain.value=.92;
   analyser.fftSize=512;
   analyser.smoothingTimeConstant=0.72;
   analyser.minDecibels=-80;
@@ -1332,15 +1344,16 @@ function ensureChordMix(){
   const dcBlock=ctx.createBiquadFilter();
   const output=ctx.createGain();
   const analyser=ctx.createAnalyser();
-  // 修正：和弦子總線 input gain 從 1.08 降至 0.68，output gain 從 1.02 降至 0.72。
+  // 修正：和弦子總線 input/output gain 從 1.0 降至 0.82，留出餘裕。
   // 多個振盪器音符同時發聲（4音和弦）時各自的 gain 疊加後很容易超過 1.0，
-  // 送到主總線 WaveShaper 之前就已進入截波區，造成「逼哩逼哩」失真。
+  // 送到主總線 soft-clip 之前就已進入截波區，造成「逼哩逼哩」失真。
   // 降低子總線增益後讓主總線壓縮器有足夠空間平滑處理，不再截波。
-  input.gain.value=0.68;
+  // applyMobilePureAudioProfile() 會依是否為手機純淨模式再調整。
+  input.gain.value=0.82;
   dcBlock.type='highpass';
   dcBlock.frequency.value=34;
   dcBlock.Q.value=.707;
-  output.gain.value=0.72;
+  output.gain.value=0.82;
   analyser.fftSize=512;
   analyser.smoothingTimeConstant=.7;
   input.connect(dcBlock);dcBlock.connect(output);output.connect(analyser);analyser.connect(ensureMasterMix().input);
@@ -1456,21 +1469,23 @@ function applyMobilePureAudioProfile(){
   const pure=Boolean(S.mobilePureMode);
   if(masterMix){
     const ctx=masterMix.context;
-    smoothlySetAudioParam(masterMix.input.gain,pure?.50:1.02,ctx,.024);
+    // 非純淨模式輸入 gain 由 1.02 降至 .82，與建構時一致；配合後級 4× soft-clip
+    // 與較低的壓縮器門檻（-16dB／28dB 膝點），避免多音疊加時爆音。
+    smoothlySetAudioParam(masterMix.input.gain,pure?.50:.82,ctx,.024);
     smoothlySetAudioParam(masterMix.dcBlock.frequency,pure?75:30,ctx,.045);
     smoothlySetAudioParam(masterMix.airFilter.frequency,pure?7800:12500,ctx,.045);
-    smoothlySetAudioParam(masterMix.compressor.threshold,pure?-25:-11,ctx,.035);
-    smoothlySetAudioParam(masterMix.compressor.knee,pure?28:22,ctx,.035);
-    smoothlySetAudioParam(masterMix.compressor.ratio,pure?9:5.5,ctx,.035);
-    smoothlySetAudioParam(masterMix.compressor.attack,pure?.02:.012,ctx,.035);
-    smoothlySetAudioParam(masterMix.compressor.release,pure?.34:.26,ctx,.035);
+    smoothlySetAudioParam(masterMix.compressor.threshold,pure?-25:-16,ctx,.035);
+    smoothlySetAudioParam(masterMix.compressor.knee,pure?28:28,ctx,.035);
+    smoothlySetAudioParam(masterMix.compressor.ratio,pure?9:4,ctx,.035);
+    smoothlySetAudioParam(masterMix.compressor.attack,pure?.02:.005,ctx,.035);
+    smoothlySetAudioParam(masterMix.compressor.release,pure?.34:.18,ctx,.035);
     smoothlySetAudioParam(masterMix.output.gain,pure?.80:.98,ctx,.028);
   }
   if(chordMix){
     const ctx=chordMix.context;
-    smoothlySetAudioParam(chordMix.input.gain,pure?.30:.92,ctx,.025);
+    smoothlySetAudioParam(chordMix.input.gain,pure?.30:.82,ctx,.025);
     smoothlySetAudioParam(chordMix.dcBlock.frequency,pure?62:34,ctx,.045);
-    smoothlySetAudioParam(chordMix.output.gain,pure?.66:1,ctx,.025);
+    smoothlySetAudioParam(chordMix.output.gain,pure?.66:.82,ctx,.025);
   }
   if(grooveMix){
     applyGrooveMixPreset();
@@ -1509,8 +1524,7 @@ function fadeGrooveOutput(duration=.13){
   const current=Math.max(.0001,Number(mix.output.gain.value)||.0001);
   try{
     mix.output.gain.cancelScheduledValues(now);
-    mix.output.gain.setValueAtTime(current,now);
-    mix.output.gain.exponentialRampToValueAtTime(.0001,now+duration);
+    mix.output.gain.setTargetAtTime(.0001,now,duration/3);
   }catch(error){}
 }
 function restoreGrooveOutput(){
@@ -1520,7 +1534,9 @@ function restoreGrooveOutput(){
   const target=S.mobilePureMode?Math.min(.90,getGrooveMixPreset().output*.78):getGrooveMixPreset().output;
   try{
     mix.output.gain.cancelScheduledValues(now);
-    mix.output.gain.setValueAtTime(.0001,now);
+    // 以明確的指數爬升在 75ms 內回到目標輸出，取代永遠到不了目標、容易停在
+    // 近靜音淡出地板的 setTargetAtTime，確保 Groove 切換後音量確實恢復。
+    mix.output.gain.setValueAtTime(Math.max(.0001,Number(mix.output.gain.value)||.0001),now);
     mix.output.gain.exponentialRampToValueAtTime(target,now+.075);
   }catch(error){mix.output.gain.value=target;}
 }
@@ -1790,11 +1806,10 @@ function stopPreviewVoice(voice){
   const release=voice.isArpeggio?.045:(voice.isChordBus?.028:.028);
   try{
     const gain=voice.gain.gain;
-    if(typeof gain.cancelAndHoldAtTime==='function')gain.cancelAndHoldAtTime(now);
-    else{gain.cancelScheduledValues(now);gain.setValueAtTime(Math.max(.00001,gain.value||.00001),now);}
-    gain.linearRampToValueAtTime(.00001,now+release);
+    gain.cancelScheduledValues(now);
+    gain.setTargetAtTime(.00001,now,release/3);
   }catch(error){}
-  voice.sources?.forEach(source=>{try{source.stop(now+release+.006);}catch(error){}});
+  voice.sources?.forEach(source=>{try{source.stop(now+release+.1);}catch(error){}});
 }
 
 function getArpMode(){
@@ -1949,13 +1964,15 @@ function playMetronomeBeat(accent=false){
   const bodyEnd=accent?540:300;
   // 木魚不再經過和弦子總線，避免桌面上額外 headroom 使 65% 預設音量低到近乎不可聞。
   // 保留主總線壓縮、頻寬保護與 limiter；峰值仍明顯低於 Groove 的同拍累積餘裕。
-  const peak=(accent?0.38:0.22)*volume;
+  // 峰值略降（accent 0.38→0.30、一般 0.22→0.18），配合稍長的起音，避免木魚在最大
+  // 音量時產生「逼」的起音 click；主總線 soft-clip 仍保留足夠可聽音量。
+  const peak=(accent?0.30:0.18)*volume;
   body.type='triangle';body.frequency.setValueAtTime(freq,t);body.frequency.exponentialRampToValueAtTime(bodyEnd,t+duration*.7);
   overtone.type='sine';overtone.frequency.setValueAtTime(freq*2.08,t);overtone.frequency.exponentialRampToValueAtTime(bodyEnd*2.08,t+duration*.68);
   bodyGain.gain.setValueAtTime(1,t);overtoneGain.gain.setValueAtTime(accent?0.22:0.15,t);
   bodyFilter.type='bandpass';bodyFilter.frequency.setValueAtTime(accent?1120:680,t);bodyFilter.Q.value=1.25;
   overtoneFilter.type='bandpass';overtoneFilter.frequency.setValueAtTime(accent?2480:1480,t);overtoneFilter.Q.value=2.1;
-  master.gain.setValueAtTime(0.0001,t);master.gain.exponentialRampToValueAtTime(Math.max(0.002,peak),t+0.004);master.gain.exponentialRampToValueAtTime(0.0001,t+duration);
+  master.gain.setValueAtTime(0.0001,t);master.gain.exponentialRampToValueAtTime(Math.max(0.002,peak),t+0.009);master.gain.exponentialRampToValueAtTime(0.0001,t+duration);
   body.connect(bodyGain);bodyGain.connect(bodyFilter);bodyFilter.connect(master);
   overtone.connect(overtoneGain);overtoneGain.connect(overtoneFilter);overtoneFilter.connect(master);
   master.connect(ensureMasterMix().input);
@@ -3579,7 +3596,7 @@ function examReportMarkup(){
   return `<div class="exam-report-modal show" id="examReportModal" role="dialog" aria-modal="true" aria-labelledby="examReportTitle"><div class="exam-report-dialog"><div class="exam-report-head"><div><h2 id="examReportTitle">本場成績統計</h2><p>隨堂考試已完成，以下是本場作答摘要。</p></div><button class="exam-report-close" id="examReportClose" type="button" aria-label="關閉成績統計">×</button></div><div class="exam-report-grid"><div class="exam-report-kpi"><span>答題正確率</span><strong>${accuracy}%</strong><small>${correct}／${total} 題</small></div><div class="exam-report-kpi"><span>錯誤題數</span><strong>${S.examWrongCount||0}</strong><small>含逾時與錯誤輸入</small></div><div class="exam-report-kpi"><span>平均反應</span><strong>${correct?Math.round(S.examReactionTotal/correct):'—'}${correct?' ms':''}</strong><small>僅計入答對題</small></div></div><section class="exam-report-section"><h3>常錯音符</h3><div class="exam-report-notes">${examMistakeRows()}</div></section><div class="exam-report-actions"><button class="sb-btn" id="examReportContinueBtn" type="button">查看完成頁</button><button class="sb-btn" id="examReportJsonBtn" type="button">下載 JSON</button><button class="sb-btn" id="examReportCsvBtn" type="button">下載 CSV</button><button class="sb-btn green" id="examTargetedPracticeBtn" type="button">針對性練習</button><button class="sb-btn green" id="examReportRetryBtn" type="button">依弱點再考一次</button></div></div></div>`;
 }
 function playExamFeedbackSound(kind){
-  try{ensureAudio();if(!AC||Number(S.examFeedbackVolume||0)<=0)return;const ctx=AC,now=ctx.currentTime,level=Math.min(1,Math.max(0,Number(S.examFeedbackVolume)/100));const osc=ctx.createOscillator(),gain=ctx.createGain();osc.type='sine';osc.frequency.setValueAtTime(kind==='correct'?740:180,now);osc.frequency.exponentialRampToValueAtTime(kind==='correct'?1040:110,now+0.09);gain.gain.setValueAtTime(0.0001,now);gain.gain.exponentialRampToValueAtTime(0.075*level,now+0.012);gain.gain.exponentialRampToValueAtTime(0.0001,now+0.16);osc.connect(gain);gain.connect(ctx.destination);osc.start(now);osc.stop(now+0.18);}catch(error){}
+  try{ensureAudioReady();if(!AC||Number(S.examFeedbackVolume||0)<=0)return;const ctx=AC,now=ctx.currentTime,level=Math.min(1,Math.max(0,Number(S.examFeedbackVolume)/100));const osc=ctx.createOscillator(),gain=ctx.createGain();osc.type='sine';osc.frequency.setValueAtTime(kind==='correct'?740:180,now);osc.frequency.exponentialRampToValueAtTime(kind==='correct'?1040:110,now+0.09);gain.gain.setValueAtTime(0.0001,now);gain.gain.exponentialRampToValueAtTime(0.075*level,now+0.012);gain.gain.exponentialRampToValueAtTime(0.0001,now+0.16);osc.connect(gain);gain.connect(ensureMasterMix().input);osc.start(now);osc.stop(now+0.18);}catch(error){}
 }
 function spawnExamFeedbackParticles(midiValue,kind){
   const piano=document.querySelector(`.exam-piano-stage .piano-mini [data-midi="${Number(midiValue)}"]`);if(!piano)return;
