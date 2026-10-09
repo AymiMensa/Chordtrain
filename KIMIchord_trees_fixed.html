@@ -1235,6 +1235,10 @@ let selectedMascot='🌳',mascotHasPosition=false,mascotMoveTimer=null,mascotPos
 let mascotPlaybackActive=false,mascotPlaybackRun=0,mascotPlaybackTimers=[];
 let recordingDestination=null,recordedBlob=null,recordingUrl='',recordingMime='audio/webm',recordingClearRequested=false;
 let grooveMix=null,chordMix=null,masterMix=null,lastChordTriggerAt=0,grooveMeterRaf=0,grooveMeterActive=false,groovePeakHold=0,grooveClip=false,grooveClipHoldUntil=0,grooveVoiceStops=new Set(),tempoRestartTimer=0,grooveStartTimer=0,grooveRunId=0,playbackMonitorCollapsed=false,beatVisualTimers=[],beatIndicatorActive=false,grooveClipEvents=[],grooveLastClipEventAt=0;
+// 節拍時間軸：所有節奏相關排程（節拍器／木魚／Groove／和弦／琶音）共用同一個原點，
+// 以 AudioContext.currentTime 為基準，避免 JS timer 漂移造成各子系統逐漸錯拍。
+// originTime 為第 0 拍在 audio clock 上的絕對時間；isRunning 表示目前是否有節拍器在跑。
+let beatTimeline={originTime:0,isRunning:false,beatMs:0,runId:0};
 const PLAYBACK_MONITOR_LOCK_KEY='kimichord.playbackMonitor.lockHeight';
 const PLAYBACK_MONITOR_HEIGHT_KEY='kimichord.playbackMonitor.lockedHeight';
 const AUDIO_PREFERENCE_KEYS=[MOBILE_PURE_MODE_KEY,GROOVE_WAVEFORM_KEY,GROOVE_MIX_PRESET_KEY,GROOVE_CUSTOM_PRESETS_KEY,GROOVE_CUSTOM_PRESET_ID_KEY,GROOVE_HISTORY_VISIBLE_KEY,PLAYBACK_MONITOR_LOCK_KEY,PLAYBACK_MONITOR_HEIGHT_KEY];
@@ -1892,6 +1896,38 @@ function getArpIntervalMs(){
 }
 function getTempoBpm(){return Math.min(300,Math.max(30,Number(S.tempo)||72));}
 function getChordBeatIntervalMs(){return 60000/getTempoBpm();}
+// ===== 節拍時間軸（共用時脈）=====
+// 舊實作中節拍器／Groove 用 setInterval、和弦進行用 setTimeout，兩者各自以
+// performance.now() 為原點起算，從未對齊；只要不是在完全相同時間啟動就會固定偏移，
+// 且 setInterval 的累積漂移會讓差異越來越大。
+// 以下以 AudioContext.currentTime 為唯一基準，讓所有子系統共用同一個節拍原點。
+function getBeatMs(){return 60000/getTempoBpm();}
+function isBeatTimelineRunning(){return beatTimeline.isRunning&&AC;}
+// 目前 audio clock 距離最近一個「已過去」的節拍原點有幾拍（可為負，代表還沒到下一拍）。
+function getBeatsSinceTimelineOrigin(){return (AC.currentTime-beatTimeline.originTime)*1000/beatTimeline.beatMs;}
+// 下一個節拍邊界在 audio clock 上的絕對時間（供和弦進行對齊起拍用）。
+function getNextBeatBoundary(){
+  if(!AC)return null;
+  if(!isBeatTimelineRunning())return AC.currentTime+0.02;
+  const beats=getBeatsSinceTimelineOrigin();
+  const nextBeat=Math.ceil(beats-1e-6);
+  return beatTimeline.originTime+nextBeat*beatTimeline.beatMs/1000;
+}
+// 從現在起，等待下一個節拍邊界所需的毫秒數；未啟動節拍器時回傳 0（立即起拍）。
+function getMsUntilNextBeat(){
+  if(!isBeatTimelineRunning())return 0;
+  const boundary=getNextBeatBoundary();
+  if(boundary==null)return 0;
+  return Math.max(0,(boundary-AC.currentTime)*1000);
+}
+function startBeatTimeline(){
+  beatTimeline.runId++;
+  beatTimeline.originTime=AC.currentTime+0.02;
+  beatTimeline.beatMs=getBeatMs();
+  beatTimeline.isRunning=true;
+  return beatTimeline.runId;
+}
+function stopBeatTimeline(){beatTimeline.isRunning=false;beatTimeline.runId++;}
 function clearArpeggioTimers(){
   arpTimers.forEach(clearTimeout);
   arpTimers=[];
@@ -4252,6 +4288,8 @@ async function playDiatonicSequence(){
   const repeats=[1,2,4].includes(Number(S.cycleCount))?Number(S.cycleCount):2;
   const sequence=Array.from({length:repeats},()=>diatonic).flat();
   updateDiatonicPlaybackStatus(1,repeats,0,sequence.length,true);
+  // 將整個進行對齊到下一個節拍邊界，讓和弦／琶音與節拍器、木魚、Groove 落在同一拍點。
+  const beatAlignMs=getMsUntilNextBeat();
   sequence.forEach((c,i)=>{
     const timer=setTimeout(()=>{
       if(!mascotPlaybackActive||run!==mascotPlaybackRun)return;
@@ -4260,7 +4298,7 @@ async function playDiatonicSequence(){
       updateVisualizationHighlight(c.midi,c.note,c.q,c.note,true);
       playChord(c.midi);
       moveMascotTo(c.note,c.q);
-    },i*chordMs);
+    },beatAlignMs+i*chordMs);
     mascotPlaybackTimers.push(timer);
   });
   const lastChord=sequence[sequence.length-1];
@@ -4334,6 +4372,8 @@ function playSmartHarmony(progression){
   stopMascotPlayback();
   lastSmartHarmonyProgression=progression.map(chord=>({...chord}));
   const chordMs=getProgressionChordIntervalMs();
+  // 同樣對齊到下一個節拍邊界，確保智慧和聲與節拍器／Groove 同步。
+  const beatAlignMs=getMsUntilNextBeat();
   updateSmartHarmonyStatus(0,progression.length,true,progression[0]);
   progression.forEach((chord,index)=>{
     smartHarmonyTimers.push(setTimeout(()=>{
@@ -4352,7 +4392,7 @@ function playSmartHarmony(progression){
           if(finishRun===smartHarmonyRun)updateSmartHarmonyStatus(-1,0,false);
         },Math.max(120,playbackTailMs));
       }
-    },index*chordMs));
+    },beatAlignMs+index*chordMs));
   });
 }
 document.getElementById('smartHarmonizeBtn').onclick=function(){
@@ -4550,7 +4590,9 @@ function stopMetronome(){
   if(tempoRestartTimer){clearTimeout(tempoRestartTimer);tempoRestartTimer=0;}
   if(grooveStartTimer){clearTimeout(grooveStartTimer);grooveStartTimer=0;}
   grooveRunId++;
-  if(metroInterval){clearInterval(metroInterval);metroInterval=null;}
+  // metroInterval 現為自校正 setTimeout 的 handle，clearTimeout 才能正確取消。
+  if(metroInterval){clearTimeout(metroInterval);metroInterval=null;}
+  stopBeatTimeline();
   fadeGrooveOutput();
   fadeStopGrooveVoices();
   metroBeat=0;grooveStep=0;
@@ -4596,19 +4638,55 @@ function startMetronome(){
       if(runId!==grooveRunId||S.metroMode!=='groove'||!document.getElementById('metronome')?.checked)return;
       restoreGrooveOutput();
       beatIndicatorActive=true;metroBeat=0;updateBeatIndicator(0,true,'Groove');updatePlaybackMonitorVisibility();
+      const timelineRun=startBeatTimeline();
       playGrooveStep(0);
       startGrooveMeter();
-      metroInterval=setInterval(()=>{
-        grooveStep=(grooveStep+1)%pattern.steps;
-        const nextBeat=Math.floor(grooveStep/Math.max(1,pattern.division))%4;
-        if(nextBeat!==metroBeat){metroBeat=nextBeat;updateBeatIndicator(metroBeat,true,'Groove');}
-        playGrooveStep(grooveStep);
-      },60000/bpm/pattern.division);
+      // 以 beatTimeline 原點推算每次觸發的目標時刻，再用 setInterval 內自校正的
+      // setTimeout 觸發，取代裸 setInterval——消除累積漂移並與和弦進行共用同一原點。
+      const scheduleGroove=()=>{
+        const patternForSchedule=GROOVE_PATTERNS[S.groove]||GROOVE_PATTERNS.disco;
+        const stepMs=getBeatMs()/Math.max(1,patternForSchedule.division);
+        const triggerNext=()=>{
+          if(timelineRun!==beatTimeline.runId)return;
+          const now=AC.currentTime;
+          const elapsedBeats=(now-beatTimeline.originTime)*1000/beatTimeline.beatMs;
+          const targetStep=Math.max(1,Math.floor(elapsedBeats*Math.max(1,patternForSchedule.division)));
+          const targetTime=beatTimeline.originTime+targetStep*stepMs/1000;
+          const delay=Math.max(0,(targetTime-now)*1000);
+          metroInterval=setTimeout(()=>{
+            if(timelineRun!==beatTimeline.runId)return;
+            grooveStep=targetStep%patternForSchedule.steps;
+            const nextBeat=Math.floor(grooveStep/Math.max(1,patternForSchedule.division))%4;
+            if(nextBeat!==metroBeat){metroBeat=nextBeat;updateBeatIndicator(metroBeat,true,'Groove');}
+            playGrooveStep(grooveStep);
+            triggerNext();
+          },delay);
+        };
+        triggerNext();
+      };
+      scheduleGroove();
     },145);
   }else{
     beatIndicatorActive=true;updateBeatIndicator(0,true,'木魚');updatePlaybackMonitorVisibility();
+    const timelineRun=startBeatTimeline();
     playMetronomeBeat(true);
-    metroInterval=setInterval(()=>{metroBeat=(metroBeat+1)%4;updateBeatIndicator(metroBeat,true,'木魚');playMetronomeBeat(metroBeat===0);},60000/bpm);
+    // 同上：以 beatTimeline 原點推算目標拍號，setTimeout 自校正取代 setInterval。
+    const triggerNext=()=>{
+      if(timelineRun!==beatTimeline.runId)return;
+      const now=AC.currentTime;
+      const elapsedBeats=(now-beatTimeline.originTime)*1000/beatTimeline.beatMs;
+      const targetBeat=Math.max(1,Math.ceil(elapsedBeats-1e-6));
+      const targetTime=beatTimeline.originTime+targetBeat*beatTimeline.beatMs/1000;
+      const delay=Math.max(0,(targetTime-now)*1000);
+      metroInterval=setTimeout(()=>{
+        if(timelineRun!==beatTimeline.runId)return;
+        metroBeat=targetBeat%4;
+        updateBeatIndicator(metroBeat,true,'木魚');
+        playMetronomeBeat(metroBeat===0);
+        triggerNext();
+      },delay);
+    };
+    triggerNext();
   }
 }
 document.getElementById('metronome').onchange=function(){
