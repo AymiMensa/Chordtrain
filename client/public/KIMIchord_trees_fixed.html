@@ -1016,8 +1016,15 @@ function spellChord(root,q){
   return intervals.map((interval,index)=>spellNote(root,interval,steps[index]??index*2));
 }
 
+const LEGACY_INSTRUMENT_MAP={Flute:'TongueDrum',長笛:'TongueDrum',Guitar:'Kalimba',吉他:'Kalimba'};
+function normalizeInstrument(inst){return LEGACY_INSTRUMENT_MAP[inst]||inst;}
+
 // ===== STATE =====
 let S={level:'Beginner',key:'C',scale:'Major',mode:'1st (Ionian)',modeScaleEnabled:true,inst:'TongueDrum',chordVol:0.5,arpVol:0.7,chordEnabled:false,arpEnabled:true,tempo:72,metroVol:0.65,arpMode:'四分音符',cycleCount:2,theme:'earth',harmonyStyle:'popular',harmonyDensity:4,harmonySubstitution:'none',harmonyCadence:'authentic',metroMode:'woodblock',grooveCategory:'four',groove:'disco',grooveWaveform:'triangle',grooveMixPreset:'standard',noteMode:'random',notes:[1,1,1,1,1,1,1],loop:false,progression:[],vis:'piano',activeChord:null,activeCardRoot:null,intermediateOpenGroups:{},intermediateRoot:'C',intermediateType:'Major',customProgression:[{note:'C',q:'Major'},{note:'G',q:'Major'},{note:'A',q:'Minor'},{note:'F',q:'Major'}],examActive:false,examPaused:false,examPauseCount:0,examPauseStartedAt:0,examPauseTotalMs:0,examQuestion:null,examSelected:[],examFeedback:{},examQuestionCount:0,examCorrectCount:0,examWrongCount:0,examReactionTotal:0,examBeat:0,examStartedAt:0,examDifficulty:'triad',examKeys:[],examChordTypes:[],examHistoryVisible:false,examHistory:[],examKeyboardHint:false,examAnswerReference:false,examStaffNotes:[],examCombo:0,examQuestionTransition:0,examMistakeNotes:{},examSettingsCollapsed:false,examFullscreen:false,examScoreSeries:[],examReportVisible:false,examBeatsPerQuestion:4,examQuestionBpm:72,examPreviousTempo:72 ,beginnerInputWindow:[],beginnerRecentInput:[],beginnerRecommendations:[],beginnerPinned:false,beginnerInputTimer:null,beginnerPreviewTimer:null,beginnerPreviewIndex:null,beginnerKeyInfo:{name:'C',confidence:0,modulationProbability:0},beginnerPracticeLog:[],progressionSearch:'',progressionFavorites:[]};
+// 舊版曾以 Flute（長笛）與 Guitar（吉他）命名樂器。所有難度共用同一個樂器選項，
+// 這裡在初始化時正規化一次，確保之後每個讀取點都是 TongueDrum（空靈鼓）／Kalimba（拇指琴），
+// 讓選項文字與實際合成音色永遠一致。
+S.inst=normalizeInstrument(S.inst);
 const BEGINNER_INPUT_WINDOW_MS=1200;
 const BEGINNER_RECOMMENDATION_HOLD_MS=6000;
 let AC=null,loopInterval=null,metroInterval=null,isRecording=false,arpTimers=[];
@@ -1136,7 +1143,6 @@ function getChordDegreeDetails(chord){
 }
 
 function getInstrumentReleaseMs(dur,isArpeggio=false){
-  if(S.inst==='Guitar')S.inst='Kalimba';
   const seconds=Number.isFinite(Number(dur))?Number(dur):1.2;
   // 空靈鼓為敲擊式金屬共鳴音，延音中等偏長、自然漸弱；釋放時間相應較長。
   if(isArpeggio&&S.inst==='TongueDrum')return(Math.max(.1,seconds*1.1)+.03)*1000;
@@ -1709,8 +1715,7 @@ function createPolyChordBus(ctx,inst,startAt){
 
 function playNote(midi,dur,vol,inst,options){
   if(dur==null)dur=0.5;if(vol==null)vol=S.chordVol;if(inst==null)inst=S.inst;
-  if(inst==='Guitar')inst='Kalimba';
-  if(S.inst==='Guitar')S.inst='Kalimba';
+  inst=normalizeInstrument(inst);
   const ctx=ac();
   if(ctx.state==='suspended')ctx.resume();
   const t=Number.isFinite(options?.startAt)?options.startAt:ctx.currentTime+.008,freq=mtof(midi);
@@ -4145,7 +4150,7 @@ document.getElementById('scaleSelect').onchange=function(){
   render();
 };
 document.getElementById('modeSelect').onchange=function(){stopIntermediatePreview(false);stopScalePreview();S.mode=this.value;S.modeScaleEnabled=true;render();};
-document.getElementById('instSelect').onchange=function(){S.inst=this.value==='Guitar'?'Kalimba':this.value;};
+document.getElementById('instSelect').onchange=function(){S.inst=normalizeInstrument(this.value);};
 document.getElementById('harmonyStyleSelect').onchange=function(){S.harmonyStyle=this.value;populateCommonProgressions();showToast(`智慧和聲風格：${HARMONY_STYLE_LABELS[S.harmonyStyle]||'流行'}`);};
 const examHintToggle=document.getElementById('examKeyboardHintToggle');function updateExamHintToggle(){if(!examHintToggle)return;examHintToggle.setAttribute('aria-pressed',String(Boolean(S.examKeyboardHint)));examHintToggle.textContent=S.examKeyboardHint?'隱藏藍色鍵盤提示':'顯示藍色鍵盤提示';}if(examHintToggle){updateExamHintToggle();examHintToggle.onclick=function(){S.examKeyboardHint=!S.examKeyboardHint;saveExamSettings();updateExamHintToggle();if(S.level==='Exam')renderExam();};}
 const examAnswerReferenceToggle=document.getElementById('examAnswerReferenceToggle');function updateExamAnswerReferenceToggle(){if(!examAnswerReferenceToggle)return;examAnswerReferenceToggle.setAttribute('aria-pressed',String(Boolean(S.examAnswerReference)));examAnswerReferenceToggle.textContent=S.examAnswerReference?'隱藏答案參考':'顯示答案參考';}if(examAnswerReferenceToggle){updateExamAnswerReferenceToggle();examAnswerReferenceToggle.onclick=function(){S.examAnswerReference=!S.examAnswerReference;saveExamSettings();updateExamAnswerReferenceToggle();if(S.level==='Exam')renderExam();};}
