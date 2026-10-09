@@ -1025,6 +1025,10 @@ let S={level:'Beginner',key:'C',scale:'Major',mode:'1st (Ionian)',modeScaleEnabl
 // 這裡在初始化時正規化一次，確保之後每個讀取點都是 TongueDrum（空靈鼓）／Kalimba（拇指琴），
 // 讓選項文字與實際合成音色永遠一致。
 S.inst=normalizeInstrument(S.inst);
+// 一個和弦固定佔一整小節＝四拍。節拍器的 metroBeat=targetBeat%4 與 Groove 的
+// nextBeat%4===0 都以「beat 序號為四的倍數」作為小節第一拍（下拍），
+// 理音與根音必須落在該拍，否則會「有對上拍但錯拍」。
+const BEATS_PER_MEASURE=4;
 const BEGINNER_INPUT_WINDOW_MS=1200;
 const BEGINNER_RECOMMENDATION_HOLD_MS=6000;
 let AC=null,loopInterval=null,metroInterval=null,isRecording=false,arpTimers=[];
@@ -1169,7 +1173,7 @@ function getArpeggioNoteDuration(intervalMs){
   return Math.max(.024,intervalSeconds*.66);
 }
 function getChordHoldSeconds(){return Math.max(.16,(getChordBeatIntervalMs()*4)/1000);}
-function getProgressionChordIntervalMs(){return getChordBeatIntervalMs()*4;}
+function getProgressionChordIntervalMs(){return getChordBeatIntervalMs()*BEATS_PER_MEASURE;}
 function getChordVoiceDuration(){
   const hold=getChordHoldSeconds();
   const multiplier=S.inst==='TongueDrum'?1.7:S.inst==='Harp'?1.42:String(S.inst||'').includes('Piano')?2.5:S.inst==='Kalimba'?1.6:S.inst==='Vibraphone'?1.9:1.3;
@@ -1907,13 +1911,15 @@ function getBeatMs(){return 60000/getTempoBpm();}
 function isBeatTimelineRunning(){return beatTimeline.isRunning&&AC;}
 // 目前 audio clock 距離最近一個「已過去」的節拍原點有幾拍（可為負，代表還沒到下一拍）。
 function getBeatsSinceTimelineOrigin(){return (AC.currentTime-beatTimeline.originTime)*1000/beatTimeline.beatMs;}
-// 下一個節拍邊界在 audio clock 上的絕對時間（供和弦進行對齊起拍用）。
-function getNextBeatBoundary(){
+// 下一個小節第一拍（下拍）在 audio clock 上的絕對時間。
+// 注意：不可用 Math.ceil(beats) 對齊「任意拍界」——那樣只保證落在拍上，
+// 不保證是第一拍，根音會落在第 2／3／4 拍而形成錯拍。
+function getNextDownbeatBoundary(){
   if(!AC)return null;
   if(!isBeatTimelineRunning())return AC.currentTime+0.02;
   const beats=getBeatsSinceTimelineOrigin();
-  const nextBeat=Math.ceil(beats-1e-6);
-  return beatTimeline.originTime+nextBeat*beatTimeline.beatMs/1000;
+  const nextDownbeat=Math.ceil(beats/BEATS_PER_MEASURE-1e-6)*BEATS_PER_MEASURE;
+  return beatTimeline.originTime+nextDownbeat*beatTimeline.beatMs/1000;
 }
 // 確保共用時脈存在。和弦／智慧和聲／自訂進行可能在尚未開啟節拍器時就起拍；
 // 此時由進行先建立原點，之後開啟的節拍器沿用同一原點，
@@ -1937,10 +1943,10 @@ function adoptBeatTimeline(preserved){
   beatTimeline.isRunning=true;
   return beatTimeline.runId;
 }
-// 從現在起，等待下一個節拍邊界所需的毫秒數；時脈尚未建立時先建立（原點即為現在）。
-function getMsUntilNextBeat(){
+// 從現在起，等待下一個小節第一拍所需的毫秒數；時脈尚未建立時先建立（原點即為下拍）。
+function getMsUntilNextDownbeat(){
   ensureBeatTimeline();
-  const boundary=getNextBeatBoundary();
+  const boundary=getNextDownbeatBoundary();
   if(boundary==null)return 0;
   return Math.max(0,(boundary-AC.currentTime)*1000);
 }
@@ -3312,6 +3318,9 @@ function playCustomProgression(){
   stopIntermediatePreview(false);stopScalePreview();clearSmartHarmonyTimers();stopMascotPlayback();
   const run=++customProgressionRun,cycles=Math.max(1,Number(S.cycleCount)||1),chordMs=getProgressionChordIntervalMs();
   customProgressionActive=true;customProgressionCurrentSlot=0;customProgressionTimers=[];updateCustomProgressionPlaybackUi();
+  // 自訂進行先前完全沒有對齊時脈（一律從 0ms 起算），根音必然落在任意位置。
+  // 現與其他兩條進行一致，從下一個小節第一拍起拍。
+  const beatAlignMs=getMsUntilNextDownbeat();
   for(let cycle=0;cycle<cycles;cycle++)sequence.forEach((chord,index)=>{
     const absoluteIndex=cycle*sequence.length+index;
     customProgressionTimers.push(setTimeout(()=>{
@@ -3324,7 +3333,7 @@ function playCustomProgression(){
         const tail=Math.max(160,getChordPlaybackDurationMs(midis));
         customProgressionFinishTimer=setTimeout(()=>{if(run===customProgressionRun)stopCustomProgression();},tail);
       }
-    },absoluteIndex*chordMs));
+    },beatAlignMs+absoluteIndex*chordMs));
   });
   showToast(`開始播放自訂和弦進行：${cycles} 輪`);
 }
@@ -4318,8 +4327,9 @@ async function playDiatonicSequence(){
   const repeats=[1,2,4].includes(Number(S.cycleCount))?Number(S.cycleCount):2;
   const sequence=Array.from({length:repeats},()=>diatonic).flat();
   updateDiatonicPlaybackStatus(1,repeats,0,sequence.length,true);
-  // 將整個進行對齊到下一個節拍邊界，讓和弦／琶音與節拍器、木魚、Groove 落在同一拍點。
-  const beatAlignMs=getMsUntilNextBeat();
+  // 將整個進行對齊到下一個小節的「第一拍」，讓理音與根音落在下拍，
+  // 與節拍器／木魚／Groove 的 beat%4===0 定義一致。
+  const beatAlignMs=getMsUntilNextDownbeat();
   sequence.forEach((c,i)=>{
     const timer=setTimeout(()=>{
       if(!mascotPlaybackActive||run!==mascotPlaybackRun)return;
@@ -4402,8 +4412,8 @@ function playSmartHarmony(progression){
   stopMascotPlayback();
   lastSmartHarmonyProgression=progression.map(chord=>({...chord}));
   const chordMs=getProgressionChordIntervalMs();
-  // 同樣對齊到下一個節拍邊界，確保智慧和聲與節拍器／Groove 同步。
-  const beatAlignMs=getMsUntilNextBeat();
+  // 同樣對齊到下一個小節第一拍，確保智慧和聲的根音落在下拍。
+  const beatAlignMs=getMsUntilNextDownbeat();
   updateSmartHarmonyStatus(0,progression.length,true,progression[0]);
   progression.forEach((chord,index)=>{
     smartHarmonyTimers.push(setTimeout(()=>{
