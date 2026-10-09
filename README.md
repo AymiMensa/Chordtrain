@@ -40,13 +40,54 @@ Chord_Train/
 3. **音階與調性切換**：利用上方的音階導航條可以切換不同的調性進行綜合練習。
 4. **介面主題切換**：可透過系統設定切換不同的視覺主題（Earth/Morandi/Ocean/Dark），在長時間訓練下保護眼睛並提供最佳對比。
 
+## 部署方式
+
+本專案**沒有 CI/CD**（無 GitHub Actions）。線上網站由 `gh-pages` 分支提供，
+該分支存放的是**扁平化的 build 產物**（等同 `dist/public/*` 的內容），而非原始碼。
+因此每次改動都需要手動部署，且必須同時更新兩個分支：
+
+```bash
+# 1. 先建置產物
+npx vite build
+
+# 2. 提交原始碼至 main
+git add -A && git commit -m "..."
+git push origin main
+
+# 3. 用臨時 worktree 取出 gh-pages，以 build 產物全量覆蓋
+git worktree add --detach ../_gh_pages_deploy origin/gh-pages
+Copy-Item dist\public\* ..\_gh_pages_deploy\ -Recurse -Force
+
+# 4. 提交並推送部署版本
+cd ..\_gh_pages_deploy
+git add -A
+git commit -m "Deploy: ..."
+git push origin HEAD:gh-pages
+
+# 5. 驗證遠端已更新，並移除臨時 worktree
+cd ..\Chord_Train
+git fetch origin --prune
+git worktree remove --force ../_gh_pages_deploy
+```
+
+> 注意事項：
+> - 本機 build 產物使用 LF 換行，而 `gh-pages` 上的檔案是 CRLF，
+>   `git add -A` 前會看到多個檔案的「換行符差異」；
+>   提交後請用 `git diff --numstat` 確認真正有內容變更的檔案是否為預期範圍。
+> - `dist/` 已在 `.gitignore` 中排除，build 產物只存在本機，不會進版控。
+> - GitHub Pages 佈建通常需要 1–3 分鐘；若瀏覽器有快取，強制重新整理（Ctrl+F5）即可。
+
 ## 更新歷史 (Date Sorted)
+
 - **2026-10-09 (當前)**:
   - 全難度樂器文字統一為 `空靈鼓、鋼琴、拇指琴、豎琴或鐵琴`。
   - 樂器「吉他」改為「拇指琴」：選單、說明文字與音色合成同步更換；舊 `Guitar` 值自動轉為 `Kalimba`。
-  - 拇指琴採金屬簧片撥奏模型（基頻＋高八度＋微量高泛音、約 6ms 起音、自然衰減、4200Hz 低通）；「長笛」早已是空靈鼓，本次不另動。
+  - 拇指琴採金屬簧片撥奏模型（基頻＋高八度＋微量高泛音、約 6ms 起音、自然衰減、4200Hz 低通）；空靈鼓採敲擊式金屬共鳴模型（基頻＋2.02× 八度＋3.01× 高泛音、約 4ms 起音、3600Hz 低通，泛音較基頻更快衰減，尾音溫潤不刺耳）。
+  - 舊樂器名稱改由單一 `normalizeInstrument()` 統一轉換：`Flute`／長笛 → `TongueDrum`（空靈鼓）、`Guitar`／吉他 → `Kalimba`（拇指琴）。轉換點涵蓋初始化、`playNote()` 與樂器選單的 `change` 事件，移除先前散落三處、且未處理 `Flute` 的權宜判斷。
+  - 由於樂器選單是各難度共用的單一控制項，上述文字與音色變更對初學者、調內、和弦種類圖與隨堂考試四種難度一致生效。
 - **歷史版本**:
   - 移除全站右下角 Made with Manus 標籤按鈕，確保無干擾的訓練環境。
   - 將專案全面更新推送至 GitHub (`AymiMensa/Chordtrain`)，涵蓋所有最新程式碼。
   - 重構 README.md，更新為符合當前 React 封裝 iframe 結構的說明。
   - 重新確認所有素材（包含內嵌 SVG 高音譜記號等）可正常運作，確保系統 100% 穩定。
+  - 手動部署至 `gh-pages`：以 `dist/public/*` 全量覆蓋該分支內容（`fae5a03` → `0c6af20`），同步本次樂器正規化重構至線上網站。
