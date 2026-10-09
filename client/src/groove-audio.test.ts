@@ -52,8 +52,26 @@ describe("Groove audio safety contracts", () => {
     expect(html).toContain("function getMsUntilNextBeat()");
 
     // 木魚與 Groove 都必須以自校正 setTimeout 取代裸 setInterval，避免累積漂移。
-    expect(html).toContain("const timelineRun=startBeatTimeline();");
     expect(html).not.toContain("metroInterval=setInterval(");
+
+    // 節拍器／Groove 啟動時必須沿用進行已建立的拍點。startMetronome 會先呼叫
+    // stopMetronome（內部 stopBeatTimeline 拆除時脈），因此兩條排程都要走
+    // acquireBeatTimelineForPlayback() 沿用原點，不可一律以「當下」為新原點，
+    // 否則與和弦進行形成 0–1 拍的固定相位差（聽感即「差半拍」）。
+    expect(html).toContain("function acquireBeatTimelineForPlayback()");
+    expect(html).toContain("const timelineRun=acquireBeatTimelineForPlayback();");
+    expect(html).not.toContain("const timelineRun=startBeatTimeline();");
+
+    // 重複宣告會被 JS 函式宣告的 hoisting 覆蓋（以最後一個定義為準）；
+    // 若舊版實作殘留在後面，前面正確的版本會被靜默蓋掉，必須限制只能有一個。
+    const matches=html.match(/function acquireBeatTimelineForPlayback\(/g)||[];
+    expect(matches.length).toBe(1);
+    // 舊版實作不查 preserved，出現即代表修補被覆蓋。
+    expect(html).not.toContain("function acquireBeatTimelineForPlayback(){\n  if(isBeatTimelineRunning()&&beatTimeline.beatMs===getBeatMs())return adoptBeatTimeline(beatTimeline);\n  return startBeatTimeline();\n}");
+
+    // stopBeatTimeline 必須保留原點，否則後啟動的節拍器接不回既有拍點。
+    expect(html).toContain("beatTimelinePreserved={originTime:beatTimeline.originTime,beatMs:beatTimeline.beatMs}");
+    expect(html).toContain("return adoptBeatTimeline(beatTimelinePreserved);");
 
     // metroInterval 改為 setTimeout handle，必須用 clearTimeout 取消。
     expect(html).toContain("if(metroInterval){clearTimeout(metroInterval);metroInterval=null;}");
