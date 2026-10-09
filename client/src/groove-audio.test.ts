@@ -43,4 +43,27 @@ describe("Groove audio safety contracts", () => {
     expect(html).toContain("limiter.oversample='4x'");
     expect(html).toContain("output.gain.value=.98");
   });
+
+  it("drives metronome, Groove, chords and arpeggio from one AudioContext beat timeline", () => {
+    // 共用時脈的宣告與輔助函式必須存在。
+    expect(html).toContain("let beatTimeline={originTime:0,isRunning:false,beatMs:0,runId:0};");
+    expect(html).toContain("function startBeatTimeline()");
+    expect(html).toContain("function stopBeatTimeline()");
+    expect(html).toContain("function getMsUntilNextBeat()");
+
+    // 木魚與 Groove 都必須以自校正 setTimeout 取代裸 setInterval，避免累積漂移。
+    expect(html).toContain("const timelineRun=startBeatTimeline();");
+    expect(html).not.toContain("metroInterval=setInterval(");
+
+    // metroInterval 改為 setTimeout handle，必須用 clearTimeout 取消。
+    expect(html).toContain("if(metroInterval){clearTimeout(metroInterval);metroInterval=null;}");
+
+    // 兩條進行排程都必須對齊節拍邊界，而非自原點立即起拍。
+    expect(html).toContain("const beatAlignMs=getMsUntilNextBeat();");
+    expect(html).toContain("},beatAlignMs+i*chordMs);");
+    expect(html).toContain("},beatAlignMs+index*chordMs));");
+
+    // 排程觸發點都要以 runId 守衛，舊排程不得在新時間軸上繼續發聲。
+    expect(html).toContain("if(timelineRun!==beatTimeline.runId)return;");
+  });
 });
