@@ -1239,6 +1239,8 @@ let grooveMix=null,chordMix=null,masterMix=null,lastChordTriggerAt=0,grooveMeter
 // 以 AudioContext.currentTime 為基準，避免 JS timer 漂移造成各子系統逐漸錯拍。
 // originTime 為第 0 拍在 audio clock 上的絕對時間；isRunning 表示目前是否有節拍器在跑。
 let beatTimeline={originTime:0,isRunning:false,beatMs:0,runId:0};
+// 停止節拍器時保留的拍點，讓隨後啟動的節拍器／Groove 能沿用進行已建立的原點。
+let beatTimelinePreserved=null;
 const PLAYBACK_MONITOR_LOCK_KEY='kimichord.playbackMonitor.lockHeight';
 const PLAYBACK_MONITOR_HEIGHT_KEY='kimichord.playbackMonitor.lockedHeight';
 const AUDIO_PREFERENCE_KEYS=[MOBILE_PURE_MODE_KEY,GROOVE_WAVEFORM_KEY,GROOVE_MIX_PRESET_KEY,GROOVE_CUSTOM_PRESETS_KEY,GROOVE_CUSTOM_PRESET_ID_KEY,GROOVE_HISTORY_VISIBLE_KEY,PLAYBACK_MONITOR_LOCK_KEY,PLAYBACK_MONITOR_HEIGHT_KEY];
@@ -1913,21 +1915,49 @@ function getNextBeatBoundary(){
   const nextBeat=Math.ceil(beats-1e-6);
   return beatTimeline.originTime+nextBeat*beatTimeline.beatMs/1000;
 }
-// 從現在起，等待下一個節拍邊界所需的毫秒數；未啟動節拍器時回傳 0（立即起拍）。
+// 確保共用時脈存在。和弦／智慧和聲／自訂進行可能在尚未開啟節拍器時就起拍；
+// 此時由進行先建立原點，之後開啟的節拍器沿用同一原點，
+// 兩者才不會各自為政而固定差半拍。
+// 優先沿用「執行中」的原點；否則沿用上一次保留的拍點（stopBeatTimeline 會保留，
+// 因為 startMetronome 會先呼叫 stopMetronome 內部拆除時脈）；
+// 速度已變更（beatMs 不同）時才以現在為原點重新建立。
+function ensureBeatTimeline(){
+  if(isBeatTimelineRunning()&&beatTimeline.beatMs===getBeatMs())return beatTimeline.runId;
+  if(beatTimelinePreserved&&beatTimelinePreserved.beatMs===getBeatMs())return adoptBeatTimeline(beatTimelinePreserved);
+  return startBeatTimeline();
+}
+// 節拍器／Groove 啟動時必須沿用進行已建立的拍點；stopMetronome 會先拆除時脈，
+// 因此不可一律以「當下」為新原點，否則兩個子系統各持無關原點而形成 0–1 拍的固定相位差。
+function acquireBeatTimelineForPlayback(){return ensureBeatTimeline();}
+// 沿用呼叫方保存的原點（速度未變時），讓後啟動的子系統接上既有拍點。
+function adoptBeatTimeline(preserved){
+  beatTimeline.runId++;
+  beatTimeline.originTime=preserved.originTime;
+  beatTimeline.beatMs=preserved.beatMs;
+  beatTimeline.isRunning=true;
+  return beatTimeline.runId;
+}
+// 從現在起，等待下一個節拍邊界所需的毫秒數；時脈尚未建立時先建立（原點即為現在）。
 function getMsUntilNextBeat(){
-  if(!isBeatTimelineRunning())return 0;
+  ensureBeatTimeline();
   const boundary=getNextBeatBoundary();
   if(boundary==null)return 0;
   return Math.max(0,(boundary-AC.currentTime)*1000);
 }
 function startBeatTimeline(){
+  ensureAudioReady();
   beatTimeline.runId++;
   beatTimeline.originTime=AC.currentTime+0.02;
   beatTimeline.beatMs=getBeatMs();
   beatTimeline.isRunning=true;
   return beatTimeline.runId;
 }
-function stopBeatTimeline(){beatTimeline.isRunning=false;beatTimeline.runId++;}
+function stopBeatTimeline(){
+  // 保留原點：startMetronome 會先呼叫 stopMetronome 拆除時脈，若不保留，
+  // 後啟動的節拍器就會以「當下」為新原點，與進行已排定的拍點形成固定相位差。
+  if(beatTimeline.isRunning)beatTimelinePreserved={originTime:beatTimeline.originTime,beatMs:beatTimeline.beatMs};
+  beatTimeline.isRunning=false;beatTimeline.runId++;
+}
 function clearArpeggioTimers(){
   arpTimers.forEach(clearTimeout);
   arpTimers=[];
@@ -4638,7 +4668,7 @@ function startMetronome(){
       if(runId!==grooveRunId||S.metroMode!=='groove'||!document.getElementById('metronome')?.checked)return;
       restoreGrooveOutput();
       beatIndicatorActive=true;metroBeat=0;updateBeatIndicator(0,true,'Groove');updatePlaybackMonitorVisibility();
-      const timelineRun=startBeatTimeline();
+      const timelineRun=acquireBeatTimelineForPlayback();
       playGrooveStep(0);
       startGrooveMeter();
       // 以 beatTimeline 原點推算每次觸發的目標時刻，再用 setInterval 內自校正的
@@ -4668,7 +4698,7 @@ function startMetronome(){
     },145);
   }else{
     beatIndicatorActive=true;updateBeatIndicator(0,true,'木魚');updatePlaybackMonitorVisibility();
-    const timelineRun=startBeatTimeline();
+    const timelineRun=acquireBeatTimelineForPlayback();
     playMetronomeBeat(true);
     // 同上：以 beatTimeline 原點推算目標拍號，setTimeout 自校正取代 setInterval。
     const triggerNext=()=>{
