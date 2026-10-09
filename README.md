@@ -54,9 +54,11 @@ npx vite build
 git add -A && git commit -m "..."
 git push origin main
 
-# 3. 用臨時 worktree 取出 gh-pages，以 build 產物全量覆蓋
+# 3. 用臨時 worktree 取出 gh-pages，以 build 產物覆蓋
+#    務必排除 dist/public/.git（詳見下方注意事項），否則會毀掉 worktree 指標檔
 git worktree add --detach ../_gh_pages_deploy origin/gh-pages
-Copy-Item dist\public\* ..\_gh_pages_deploy\ -Recurse -Force
+Get-ChildItem dist\public -Force | Where-Object { $_.Name -ne '.git' } |
+  ForEach-Object { Copy-Item $_.FullName ..\_gh_pages_deploy\ -Recurse -Force }
 
 # 4. 提交並推送部署版本
 cd ..\_gh_pages_deploy
@@ -71,6 +73,10 @@ git worktree remove --force ../_gh_pages_deploy
 ```
 
 > 注意事項：
+> - **切勿直接 `Copy-Item dist\public\*`**：`dist/public/` 底下殘留一個舊部署方式遺留的
+>   `.git` **目錄**（內含 gh-pages 提交歷史、**無 remote**）。用 `-Recurse` 複製會用該目錄
+>   蓋掉 worktree 的 `.git` 指標檔，導致 `fatal: invalid gitfile format` 而無法操作 worktree。
+>   複製前必須以 `.Name -ne '.git'` 排除（Vite 的 `emptyOutDir` 會保留 `.git`，因此每次 build 都在）。
 > - 本機 build 產物使用 LF 換行，而 `gh-pages` 上的檔案是 CRLF，
 >   `git add -A` 前會看到多個檔案的「換行符差異」；
 >   提交後請用 `git diff --numstat` 確認真正有內容變更的檔案是否為預期範圍。
@@ -85,6 +91,9 @@ git worktree remove --force ../_gh_pages_deploy
   - 拇指琴採金屬簧片撥奏模型（基頻＋高八度＋微量高泛音、約 6ms 起音、自然衰減、4200Hz 低通）；空靈鼓採敲擊式金屬共鳴模型（基頻＋2.02× 八度＋3.01× 高泛音、約 4ms 起音、3600Hz 低通，泛音較基頻更快衰減，尾音溫潤不刺耳）。
   - 舊樂器名稱改由單一 `normalizeInstrument()` 統一轉換：`Flute`／長笛 → `TongueDrum`（空靈鼓）、`Guitar`／吉他 → `Kalimba`（拇指琴）。轉換點涵蓋初始化、`playNote()` 與樂器選單的 `change` 事件，移除先前散落三處、且未處理 `Flute` 的權宜判斷。
   - 由於樂器選單是各難度共用的單一控制項，上述文字與音色變更對初學者、調內、和弦種類圖與隨堂考試四種難度一致生效。
+  - 修正節拍器與和弦進行「差半拍」的固定相位差：`startMetronome()` 會先呼叫 `stopMetronome()` 拆除共用時脈，使後啟動的節拍器一律以「當下」為新原點，與先播放的和弦進行各持無關原點。現由 `stopBeatTimeline()` 停止時保留原點至 `beatTimelinePreserved`，`ensureBeatTimeline()` 優先沿用執行中原點、其次沿用保留原點（速度未變時），木魚與 Groove 兩條排程改走 `acquireBeatTimelineForPlayback()`；原本從未被呼叫的 `adoptBeatTimeline()` 成為沿用原點的實際路徑。
+  - 部署文件補上必須排除 `dist/public/.git` 的警告：`Copy-Item -Recurse` 會用該目錄蓋掉 worktree 的 `.git` 指標檔，造成 `fatal: invalid gitfile format`。
+  - 部署至 `gh-pages`（`f5dd045` → `d79842f`），同步本次節拍同步修正至線上網站。
 - **歷史版本**:
   - 移除全站右下角 Made with Manus 標籤按鈕，確保無干擾的訓練環境。
   - 將專案全面更新推送至 GitHub (`AymiMensa/Chordtrain`)，涵蓋所有最新程式碼。
