@@ -77,20 +77,35 @@ describe("Groove audio safety contracts", () => {
     // metroInterval 改為 setTimeout handle，必須用 clearTimeout 取消。
     expect(html).toContain("if(metroInterval){clearTimeout(metroInterval);metroInterval=null;}");
 
-    // 三條進行排程都必須對齊「小節第一拍（下拍）」，而非任意拍界或自原點立即起拍。
+    // 四條進行排程（調內、智慧和聲、自訂、隨機和弦）都必須對齊「小節第一拍」。
     // 若只 Math.ceil(beats) 對齊任意拍界，根音會落在第 2／3／4 拍而形成錯拍。
-    expect(html).toContain("const beatAlignMs=getMsUntilNextDownbeat();");
+    const alignCount=(html.match(/const beatAlignMs=getMsUntilNextDownbeat\(\);/g)||[]).length;
+    expect(alignCount).toBe(4);
     expect(html).toContain("const nextDownbeat=Math.ceil(beats/BEATS_PER_MEASURE-1e-6)*BEATS_PER_MEASURE;");
     expect(html).toContain("},beatAlignMs+i*chordMs);");
     expect(html).toContain("},beatAlignMs+index*chordMs));");
     // 自訂進行原本完全沒有對齊，必須一併補上。
     expect(html).toContain("},beatAlignMs+absoluteIndex*chordMs));");
+    // 隨機和弦（randomChordsBtn）原本也沒有對齊。
+    expect(html).toContain("beatAlignMs+i*getProgressionChordIntervalMs()");
     // 下拍定義必須與節拍器／Groove 一致。
-    expect(html).toContain("metroBeat=targetBeat%4;");
+    expect(html).toContain("metroBeat=((targetBeat%BEATS_PER_MEASURE)+BEATS_PER_MEASURE)%BEATS_PER_MEASURE;");
     expect(html).toContain("const BEATS_PER_MEASURE=4;");
     // 舊的「對齊任意拍界」版本不得殘留。
     expect(html).not.toContain("function getNextBeatBoundary()");
     expect(html).not.toContain("getMsUntilNextBeat()");
+
+    // 木魚／Groove 的下一個觸發點必須取「嚴格位於 now 之後」的拍界（floor+1）。
+    // 舊的 Math.max(1,Math.ceil(...)) 會在原點處漏掉 beat 0；
+    // 舊的 Math.max(1,Math.floor(...)) 取到「目前所在的 step」，其 targetTime 必在過去，
+    // 於是 delay=0 在該 step 剩餘區間內無限重複觸發（實測 4 秒 37,917 次，正確應為 21 次）。
+    expect(html).toContain("const targetBeat=Math.floor(elapsedBeats+1e-6)+1;");
+    expect(html).toContain("const targetStep=Math.floor(elapsedBeats*division+1e-6)+1;");
+    expect(html).not.toContain("Math.max(1,Math.ceil(elapsedBeats");
+    expect(html).not.toContain("Math.max(1,Math.floor(elapsedBeats");
+    // 首拍不可在原點之前立即發聲，否則重音會落在網格外（或落在非下拍）。
+    expect(html).not.toContain("playMetronomeBeat(true);");
+    expect(html).not.toContain("playGrooveStep(0);");
 
     // 排程觸發點都要以 runId 守衛，舊排程不得在新時間軸上繼續發聲。
     expect(html).toContain("if(timelineRun!==beatTimeline.runId)return;");
