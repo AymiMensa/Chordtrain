@@ -49,7 +49,8 @@ describe("Groove audio safety contracts", () => {
     expect(html).toContain("let beatTimeline={originTime:0,isRunning:false,beatMs:0,runId:0};");
     expect(html).toContain("function startBeatTimeline()");
     expect(html).toContain("function stopBeatTimeline()");
-    expect(html).toContain("function getMsUntilNextBeat()");
+    expect(html).toContain("function getMsUntilNextDownbeat()");
+    expect(html).toContain("function getNextDownbeatBoundary()");
 
     // 木魚與 Groove 都必須以自校正 setTimeout 取代裸 setInterval，避免累積漂移。
     expect(html).not.toContain("metroInterval=setInterval(");
@@ -76,10 +77,20 @@ describe("Groove audio safety contracts", () => {
     // metroInterval 改為 setTimeout handle，必須用 clearTimeout 取消。
     expect(html).toContain("if(metroInterval){clearTimeout(metroInterval);metroInterval=null;}");
 
-    // 兩條進行排程都必須對齊節拍邊界，而非自原點立即起拍。
-    expect(html).toContain("const beatAlignMs=getMsUntilNextBeat();");
+    // 三條進行排程都必須對齊「小節第一拍（下拍）」，而非任意拍界或自原點立即起拍。
+    // 若只 Math.ceil(beats) 對齊任意拍界，根音會落在第 2／3／4 拍而形成錯拍。
+    expect(html).toContain("const beatAlignMs=getMsUntilNextDownbeat();");
+    expect(html).toContain("const nextDownbeat=Math.ceil(beats/BEATS_PER_MEASURE-1e-6)*BEATS_PER_MEASURE;");
     expect(html).toContain("},beatAlignMs+i*chordMs);");
     expect(html).toContain("},beatAlignMs+index*chordMs));");
+    // 自訂進行原本完全沒有對齊，必須一併補上。
+    expect(html).toContain("},beatAlignMs+absoluteIndex*chordMs));");
+    // 下拍定義必須與節拍器／Groove 一致。
+    expect(html).toContain("metroBeat=targetBeat%4;");
+    expect(html).toContain("const BEATS_PER_MEASURE=4;");
+    // 舊的「對齊任意拍界」版本不得殘留。
+    expect(html).not.toContain("function getNextBeatBoundary()");
+    expect(html).not.toContain("getMsUntilNextBeat()");
 
     // 排程觸發點都要以 runId 守衛，舊排程不得在新時間軸上繼續發聲。
     expect(html).toContain("if(timelineRun!==beatTimeline.runId)return;");
