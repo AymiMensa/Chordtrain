@@ -92,8 +92,9 @@ git worktree remove --force ../_gh_pages_deploy
   - 舊樂器名稱改由單一 `normalizeInstrument()` 統一轉換：`Flute`／長笛 → `TongueDrum`（空靈鼓）、`Guitar`／吉他 → `Kalimba`（拇指琴）。轉換點涵蓋初始化、`playNote()` 與樂器選單的 `change` 事件，移除先前散落三處、且未處理 `Flute` 的權宜判斷。
   - 由於樂器選單是各難度共用的單一控制項，上述文字與音色變更對初學者、調內、和弦種類圖與隨堂考試四種難度一致生效。
   - 修正節拍器與和弦進行「差半拍」的固定相位差：`startMetronome()` 會先呼叫 `stopMetronome()` 拆除共用時脈，使後啟動的節拍器一律以「當下」為新原點，與先播放的和弦進行各持無關原點。現由 `stopBeatTimeline()` 停止時保留原點至 `beatTimelinePreserved`，`ensureBeatTimeline()` 優先沿用執行中原點、其次沿用保留原點（速度未變時），木魚與 Groove 兩條排程改走 `acquireBeatTimelineForPlayback()`；原本從未被呼叫的 `adoptBeatTimeline()` 成為沿用原點的實際路徑。
+  - 修正「有對上拍但錯拍」：原本 `getNextBeatBoundary()` 以 `Math.ceil(beats)` 對齊**任意拍界**，只保證落在拍上、不保證是第一拍，根音會落在第 2／3／4 拍。現新增 `BEATS_PER_MEASURE=4` 與 `getNextDownbeatBoundary()`（`Math.ceil(beats/4)*4`），與節拍器 `metroBeat=targetBeat%4`、Groove `nextBeat%4===0` 的下拍定義一致；`getMsUntilNextBeat` 更名為 `getMsUntilNextDownbeat`。三條進行排程（調內、智慧和聲、自訂）全部改用，其中**自訂進行原本完全沒有對齊時脈**（一律從 0ms 起算），一併補上。
   - 部署文件補上必須排除 `dist/public/.git` 的警告：`Copy-Item -Recurse` 會用該目錄蓋掉 worktree 的 `.git` 指標檔，造成 `fatal: invalid gitfile format`。
-  - 部署至 `gh-pages`（`f5dd045` → `d79842f`），同步本次節拍同步修正至線上網站。
+  - 部署至 `gh-pages`：`f5dd045` → `d79842f`（相位差修正）、`d79842f` → `103cbec`（下拍對齊修正）。
 - **歷史版本**:
   - 移除全站右下角 Made with Manus 標籤按鈕，確保無干擾的訓練環境。
   - 將專案全面更新推送至 GitHub (`AymiMensa/Chordtrain`)，涵蓋所有最新程式碼。
