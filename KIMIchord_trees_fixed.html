@@ -735,7 +735,7 @@ body{background:var(--bg);font-family:'Inter',-apple-system,BlinkMacSystemFont,'
 
     <div class="sb-section" id="soundControlsSection">
       <h4>♫ 聲音</h4>
-      <div class="sb-row exam-irrelevant"><label>樂器</label><select class="sb-select" id="instSelect"><option value="TongueDrum">空靈鼓</option><option value="Piano">鋼琴</option><option value="Kalimba">拇指琴</option><option value="Harp">豎琴</option><option value="Vibraphone">鐵琴</option></select></div>
+      <div class="sb-row exam-irrelevant"><label>樂器</label><select class="sb-select" id="instSelect"><option value="TongueDrum">長笛</option><option value="Piano">鋼琴</option><option value="Kalimba">吉他</option><option value="Harp">豎琴</option><option value="Vibraphone">鐵琴</option></select></div>
       <div class="slider-row sound-slider-row exam-irrelevant"><button class="sound-toggle" id="chordToggle" type="button" aria-label="開啟和弦音" aria-pressed="false" title="開啟／關閉和弦音">關</button><div class="slider-stack"><label><span>和弦</span><span id="chordVol">50%</span></label><input type="range" min="0" max="100" value="50" id="chordSlider"></div></div>
       <div class="slider-row sound-slider-row exam-irrelevant"><button class="sound-toggle on" id="arpToggle" type="button" aria-label="關閉琶音音" aria-pressed="true" title="開啟／關閉琶音音">開</button><div class="slider-stack"><label><span>琶音</span><span id="arpVol">70%</span></label><input type="range" min="0" max="100" value="70" id="arpSlider"></div></div>
        <div class="slider-row"><label><span>速度（30–300 BPM）</span><span id="tempoVal">72</span></label><input type="range" min="30" max="300" value="72" id="tempoSlider"></div>
@@ -4709,8 +4709,6 @@ function startMetronome(){
   }else{
     beatIndicatorActive=true;updateBeatIndicator(0,true,'木魚');updatePlaybackMonitorVisibility();
     const timelineRun=acquireBeatTimelineForPlayback();
-    playMetronomeBeat(true);
-    // 同上：以 beatTimeline 原點推算目標拍號，setTimeout 自校正取代 setInterval。
     const triggerNext=()=>{
       if(timelineRun!==beatTimeline.runId)return;
       const now=AC.currentTime;
@@ -4726,7 +4724,13 @@ function startMetronome(){
         triggerNext();
       },delay);
     };
-    triggerNext();
+    // schedule first beat on next downbeat
+    const firstDelay=getMsUntilNextDownbeat();
+    setTimeout(()=>{
+      if(timelineRun!==beatTimeline.runId)return;
+      playMetronomeBeat(true);
+      triggerNext();
+    },firstDelay);
   }
 }
 document.getElementById('metronome').onchange=function(){
