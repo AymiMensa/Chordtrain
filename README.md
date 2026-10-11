@@ -86,6 +86,7 @@ git worktree remove --force ../_gh_pages_deploy
 ## 更新歷史 (Date Sorted)
 
 - **2026-10-12 (當前)**:
+  - 將 React 網頁入口與互動主頁的 HTML 語言標記統一為 `zh-TW`，確保 GitHub Pages 與內嵌介面均宣告繁體中文（台灣）。
   - 「所有難度」樂器選項與音色一致：長笛改為空靈鼓（`TongueDrum`），吉他改為拇指琴（`Kalimba`）；保留舊名稱正規化，避免既有呼叫播放錯誤音色。
   - 恢復共用 AudioContext beat timeline 與四拍下拍對齊；節拍器、木魚、Groove、調內／智慧／自訂／隨機和弦與琶音沿用同一拍點，Groove 採用以音訊時鐘校正的遞迴排程。
   - 新增桌面、手機、耳機裝置音量快速設定；設定只調整總線增益與手機保護音訊配置，不改變節拍排程。
