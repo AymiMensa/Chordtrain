@@ -1292,7 +1292,8 @@ function ensureMasterMix(){
   dcBlock.type='highpass';dcBlock.frequency.value=30;dcBlock.Q.value=.707;
   airFilter.type='lowpass';airFilter.frequency.value=12500;airFilter.Q.value=.55;
   compressor.threshold.value=-11;compressor.knee.value=22;compressor.ratio.value=5.5;
-  compressor.attack.value=.012;compressor.release.value=.26;
+  // 快速抓住多個鼓聲／和弦同拍疊加的瞬態，減少啪聲；保留柔和 knee 與長 release。
+  compressor.attack.value=.003;compressor.release.value=.26;
   output.gain.value=.98;
   analyser.fftSize=1024;analyser.smoothingTimeConstant=.76;analyser.minDecibels=-82;analyser.maxDecibels=-2;
   const limiter=ctx.createWaveShaper();limiter.curve=createSoftLimiterCurve(ctx);limiter.oversample='4x';
@@ -1321,7 +1322,8 @@ function ensureGrooveMix(){
   dcBlock.frequency.value=42;
   dcBlock.Q.value=0.707;
   lowShelf.type='lowshelf';lowShelf.frequency.value=118;lowShelf.gain.value=0;
-  toneFilter.type='lowpass';toneFilter.frequency.value=9000;toneFilter.Q.value=.45;
+  // 限制寬頻打擊樂噪音的最終高頻帶寬，降低鈸／沙鈴像底噪一樣持續嘶響。
+  toneFilter.type='lowpass';toneFilter.frequency.value=7200;toneFilter.Q.value=.45;
   output.gain.value=.92;
   analyser.fftSize=512;
   analyser.smoothingTimeConstant=0.72;
@@ -1469,7 +1471,7 @@ function applyMobilePureAudioProfile(){
     smoothlySetAudioParam(masterMix.compressor.threshold,pure?-25:-11,ctx,.035);
     smoothlySetAudioParam(masterMix.compressor.knee,pure?28:22,ctx,.035);
     smoothlySetAudioParam(masterMix.compressor.ratio,pure?9:5.5,ctx,.035);
-    smoothlySetAudioParam(masterMix.compressor.attack,pure?.02:.012,ctx,.035);
+    smoothlySetAudioParam(masterMix.compressor.attack,pure?.02:.003,ctx,.035);
     smoothlySetAudioParam(masterMix.compressor.release,pure?.34:.26,ctx,.035);
     smoothlySetAudioParam(masterMix.output.gain,pure?.80:headphones?.78:.98,ctx,.028);
   }
@@ -2124,7 +2126,12 @@ function playDrumVoice(kind,when,accent=false){
     const safeQ=nightSafe?Math.min(q,.48):q;
     const filter=ctx.createBiquadFilter();filter.type=nightNoiseFilter;filter.frequency.setValueAtTime(safeFrequency,now);filter.Q.value=safeQ;filter.connect(master);
     const buffer=ctx.createBuffer(1,Math.ceil(ctx.sampleRate*duration),ctx.sampleRate);const data=buffer.getChannelData(0);
-    for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1)*Math.pow(1-i/data.length,decay);
+    const edgeFade=Math.min(Math.floor(data.length*.012),Math.max(8,Math.floor(ctx.sampleRate*.003)));
+    for(let i=0;i<data.length;i++){
+      const fadeIn=Math.min(1,i/edgeFade);
+      const fadeOut=Math.min(1,(data.length-1-i)/edgeFade);
+      data[i]=(Math.random()*2-1)*Math.pow(1-i/data.length,decay)*Math.min(fadeIn,fadeOut);
+    }
     const noise=trackSource(ctx.createBufferSource());noise.buffer=buffer;const gain=ctx.createGain();
     gain.gain.setValueAtTime(Math.max(.0001,level),now);noise.connect(gain);gain.connect(filter);noise.start(now);noise.stop(now+duration+.105);
   };

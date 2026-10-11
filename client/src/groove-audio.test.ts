@@ -34,6 +34,14 @@ describe("Groove audio safety contracts", () => {
     expect(html).toContain("(S.grooveWaveform==='sawtooth'||S.grooveWaveform==='square')?1050:1800");
   });
 
+  it("softens broadband noise edges and catches stacked transient peaks", () => {
+    expect(html).toContain("compressor.attack.value=.003;compressor.release.value=.26;");
+    expect(html).toContain("toneFilter.frequency.value=7200");
+    expect(html).toContain("const edgeFade=Math.min(Math.floor(data.length*.012),Math.max(8,Math.floor(ctx.sampleRate*.003)))");
+    expect(html).toContain("Math.min(fadeIn,fadeOut)");
+    expect(html).toContain("limiter.oversample='4x'");
+  });
+
   it("records recent Groove clipping events with a readable cause and level snapshot", () => {
     expect(html).toContain('id="grooveClipHistory"');
     expect(html).toContain("function grooveClipReason(peak,rms)");

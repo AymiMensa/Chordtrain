@@ -268,7 +268,7 @@ describe("隨堂考試模式契約", () => {
 
   it("Groove 聲部使用單層零起音包絡，減少疊音瞬態", () => {
     expect(html).toContain("input.gain.value=1.08");
-    expect(html).toContain("toneFilter.frequency.value=9000");
+    expect(html).toContain("toneFilter.frequency.value=7200");
     expect(html).toContain("master.gain.setValueAtTime(0,now);");
     expect(html).toContain("const attack=Math.min(.022,Math.max(.016,duration*.16));");
     expect(html).toContain("master.gain.linearRampToValueAtTime(0,releaseEnd);");
