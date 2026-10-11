@@ -6,7 +6,7 @@ export default function Home() {
       <iframe
         className="game-frame"
         title="KIMIchord 和弦樹遊戲"
-        src={`${import.meta.env.BASE_URL}KIMIchord_trees_fixed.html`}
+        src="/KIMIchord_trees_fixed.html"
       />
     </main>
   );

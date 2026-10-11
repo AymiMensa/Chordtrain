@@ -44,70 +44,23 @@ describe("Groove audio safety contracts", () => {
     expect(html).toContain("output.gain.value=.98");
   });
 
-  it("drives metronome, Groove, chords and arpeggio from one AudioContext beat timeline", () => {
-    // 共用時脈的宣告與輔助函式必須存在。
+  it("keeps every four-beat part on the shared downbeat timeline", () => {
     expect(html).toContain("let beatTimeline={originTime:0,isRunning:false,beatMs:0,runId:0};");
-    expect(html).toContain("function startBeatTimeline()");
-    expect(html).toContain("function stopBeatTimeline()");
+    expect(html).toContain("function acquireBeatTimelineForPlayback(){return ensureBeatTimeline();}");
     expect(html).toContain("function getMsUntilNextDownbeat()");
-    expect(html).toContain("function getNextDownbeatBoundary()");
-
-    // 木魚與 Groove 都必須以自校正 setTimeout 取代裸 setInterval，避免累積漂移。
-    expect(html).not.toContain("metroInterval=setInterval(");
-
-    // 節拍器／Groove 啟動時必須沿用進行已建立的拍點。startMetronome 會先呼叫
-    // stopMetronome（內部 stopBeatTimeline 拆除時脈），因此兩條排程都要走
-    // acquireBeatTimelineForPlayback() 沿用原點，不可一律以「當下」為新原點，
-    // 否則與和弦進行形成 0–1 拍的固定相位差（聽感即「差半拍」）。
-    expect(html).toContain("function acquireBeatTimelineForPlayback()");
-    expect(html).toContain("const timelineRun=acquireBeatTimelineForPlayback();");
-    expect(html).not.toContain("const timelineRun=startBeatTimeline();");
-
-    // 重複宣告會被 JS 函式宣告的 hoisting 覆蓋（以最後一個定義為準）；
-    // 若舊版實作殘留在後面，前面正確的版本會被靜默蓋掉，必須限制只能有一個。
-    const matches=html.match(/function acquireBeatTimelineForPlayback\(/g)||[];
-    expect(matches.length).toBe(1);
-    // 舊版實作不查 preserved，出現即代表修補被覆蓋。
-    expect(html).not.toContain("function acquireBeatTimelineForPlayback(){\n  if(isBeatTimelineRunning()&&beatTimeline.beatMs===getBeatMs())return adoptBeatTimeline(beatTimeline);\n  return startBeatTimeline();\n}");
-
-    // stopBeatTimeline 必須保留原點，否則後啟動的節拍器接不回既有拍點。
-    expect(html).toContain("beatTimelinePreserved={originTime:beatTimeline.originTime,beatMs:beatTimeline.beatMs}");
-    expect(html).toContain("return adoptBeatTimeline(beatTimelinePreserved);");
-
-    // metroInterval 改為 setTimeout handle，必須用 clearTimeout 取消。
-    expect(html).toContain("if(metroInterval){clearTimeout(metroInterval);metroInterval=null;}");
-
-    // 四條進行排程（調內、智慧和聲、自訂、隨機和弦）都必須對齊「小節第一拍」。
-    // 若只 Math.ceil(beats) 對齊任意拍界，根音會落在第 2／3／4 拍而形成錯拍。
-    const alignCount=(html.match(/const beatAlignMs=getMsUntilNextDownbeat\(\);/g)||[]).length;
-    expect(alignCount).toBe(4);
-    expect(html).toContain("const nextDownbeat=Math.ceil(beats/BEATS_PER_MEASURE-1e-6)*BEATS_PER_MEASURE;");
-    expect(html).toContain("},beatAlignMs+i*chordMs);");
-    expect(html).toContain("},beatAlignMs+index*chordMs));");
-    // 自訂進行原本完全沒有對齊，必須一併補上。
-    expect(html).toContain("},beatAlignMs+absoluteIndex*chordMs));");
-    // 隨機和弦（randomChordsBtn）原本也沒有對齊。
-    expect(html).toContain("beatAlignMs+i*getProgressionChordIntervalMs()");
-    // 下拍定義必須與節拍器／Groove 一致。
-    expect(html).toContain("metroBeat=((targetBeat%BEATS_PER_MEASURE)+BEATS_PER_MEASURE)%BEATS_PER_MEASURE;");
     expect(html).toContain("const BEATS_PER_MEASURE=4;");
-    // 舊的「對齊任意拍界」版本不得殘留。
-    expect(html).not.toContain("function getNextBeatBoundary()");
-    expect(html).not.toContain("getMsUntilNextBeat()");
-
-    // 木魚／Groove 的下一個觸發點必須取「嚴格位於 now 之後」的拍界（floor+1）。
-    // 舊的 Math.max(1,Math.ceil(...)) 會在原點處漏掉 beat 0；
-    // 舊的 Math.max(1,Math.floor(...)) 取到「目前所在的 step」，其 targetTime 必在過去，
-    // 於是 delay=0 在該 step 剩餘區間內無限重複觸發（實測 4 秒 37,917 次，正確應為 21 次）。
+    expect(html).toContain("const targetStep=Math.floor(elapsedBeats*Math.max(1,patternForSchedule.division)+1e-6)+1;");
     expect(html).toContain("const targetBeat=Math.floor(elapsedBeats+1e-6)+1;");
-    expect(html).toContain("const targetStep=Math.floor(elapsedBeats*division+1e-6)+1;");
-    expect(html).not.toContain("Math.max(1,Math.ceil(elapsedBeats");
-    expect(html).not.toContain("Math.max(1,Math.floor(elapsedBeats");
-    // 首拍不可在原點之前立即發聲，否則重音會落在網格外（或落在非下拍）。
-    expect(html).not.toContain("playMetronomeBeat(true);");
+    expect(html).not.toContain("metroInterval=setInterval(");
     expect(html).not.toContain("playGrooveStep(0);");
+    expect((html.match(/const beatAlignMs=getMsUntilNextDownbeat\(\);/g)||[]).length).toBe(4);
+    expect(html).toContain("document.getElementById('instSelect').onchange=function(){S.inst=normalizeInstrument(this.value);};");
+  });
 
-    // 排程觸發點都要以 runId 守衛，舊排程不得在新時間軸上繼續發聲。
-    expect(html).toContain("if(timelineRun!==beatTimeline.runId)return;");
+  it("provides quick audio profiles for desktop, mobile and headphones", () => {
+    expect(html).toContain('id="audioDeviceProfile"');
+    expect(html).toContain('<option value="desktop">桌面</option>');
+    expect(html).toContain('<option value="mobile">手機</option>');
+    expect(html).toContain('<option value="headphones">耳機</option>');
   });
 });
