@@ -2105,20 +2105,17 @@ function playDrumVoice(kind,when,accent=false){
   // 桌面輸出先前將每一聲部限制到約 0.02 的最終可聽峰值，節奏本體被起音瞬態掩蓋。
   // 一般模式保留足夠的鼓組動態，手機純淨模式仍採較低上限；總線壓縮與 4× limiter
   // 繼續處理同一細分拍的多聲部累積。
-  const peak=Math.min(S.mobilePureMode?0.16:0.28,(accent?0.22:0.16)*volume*voiceGain);
+  const peak=Math.min(S.mobilePureMode?0.14:0.22,(accent?0.22:0.16)*volume*voiceGain);
   const envelope=(duration,level=peak)=>{
-    // source 自身的 tone／noise gain 已承載 level。若此處再依 level 比例壓低 master，
-    // 會形成二次增益衰減，尤其 Hi-hat、刷鈸與拉丁細節在桌面端幾乎只剩 click。
-    // master 僅負責所有同一步進聲部共用的平滑起收音，實際音色比例維持在來源 gain。
-    const normalizedLevel=S.mobilePureMode ? .72 : .88;
-    master.gain.setValueAtTime(0.0001,now);
-    // 所有聲部再使用同一條較緩母線淡入與較長收尾；先前過短起音會讓低鼓、
-    // 噪聲與方波樂器的首個非零樣本在筆電／手機揚聲器上反覆聽成啵聲。
-    const attack=Math.min(.028,Math.max(.020,duration*.20));
-    const releaseStart=Math.max(now+attack,now+Math.max(.066,duration*.66));
-    master.gain.exponentialRampToValueAtTime(normalizedLevel,now+attack);
+    // 音源 gain 只設定音色比例；起音與收尾由這條聲部總包絡統一控制，避免雙重曲線疊乘產生瞬態。
+    const normalizedLevel=S.mobilePureMode ? .72 : .82;
+    const attack=Math.min(.022,Math.max(.016,duration*.16));
+    const releaseStart=Math.max(now+attack,now+Math.max(.055,duration*.68));
+    const releaseEnd=now+Math.max(duration,.075)+.090;
+    master.gain.setValueAtTime(0,now);
+    master.gain.linearRampToValueAtTime(normalizedLevel,now+attack);
     master.gain.setValueAtTime(normalizedLevel,releaseStart);
-    master.gain.exponentialRampToValueAtTime(0.0001,now+Math.max(duration,.075)+.090);
+    master.gain.linearRampToValueAtTime(0,releaseEnd);
   };
   const nightSafe=S.grooveMixPreset==='night';
   const noiseBurst=(duration,filterType,frequency,q=0.7,level=peak,decay=1.4)=>{
@@ -2128,8 +2125,8 @@ function playDrumVoice(kind,when,accent=false){
     const filter=ctx.createBiquadFilter();filter.type=nightNoiseFilter;filter.frequency.setValueAtTime(safeFrequency,now);filter.Q.value=safeQ;filter.connect(master);
     const buffer=ctx.createBuffer(1,Math.ceil(ctx.sampleRate*duration),ctx.sampleRate);const data=buffer.getChannelData(0);
     for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1)*Math.pow(1-i/data.length,decay);
-    const noise=trackSource(ctx.createBufferSource());noise.buffer=buffer;const gain=ctx.createGain();const attack=Math.min(.024,Math.max(.016,duration*.18));
-    gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(Math.max(.0001,level),now+attack);gain.gain.exponentialRampToValueAtTime(.0001,now+duration+.050);noise.connect(gain);gain.connect(filter);noise.start(now);noise.stop(now+duration+.105);
+    const noise=trackSource(ctx.createBufferSource());noise.buffer=buffer;const gain=ctx.createGain();
+    gain.gain.setValueAtTime(Math.max(.0001,level),now);noise.connect(gain);gain.connect(filter);noise.start(now);noise.stop(now+duration+.105);
   };
   const tone=(type,freq,startFreq=freq,duration=0.2,level=peak,filterType='lowpass',filterFreq=3200)=>{
     const safeFilterFreq=nightSafe?Math.min(filterFreq,1500):filterFreq;
@@ -2138,8 +2135,7 @@ function playDrumVoice(kind,when,accent=false){
     // 低頻鼓需具可辨識的下滑音高與足夠的中低頻延續；若只固定在單一高頻率，
     // 桌面小喇叭往往只留下像啵聲的起音瞬態。
     if(Math.abs(startFreq-freq)>.5)osc.frequency.exponentialRampToValueAtTime(Math.max(1,freq),now+Math.min(.095,Math.max(.025,duration*.62)));
-    const attack=Math.min(.024,Math.max(.016,duration*.18));
-    filter.type=filterType;filter.frequency.setValueAtTime(safeFilterFreq,now);filter.Q.value=nightSafe?0.52:0.65;gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(Math.max(.0001,level),now+attack);gain.gain.exponentialRampToValueAtTime(.0001,now+duration+.050);osc.connect(gain);gain.connect(filter);filter.connect(master);osc.start(now);osc.stop(now+duration+.105);
+    filter.type=filterType;filter.frequency.setValueAtTime(safeFilterFreq,now);filter.Q.value=nightSafe?0.52:0.65;gain.gain.setValueAtTime(Math.max(.0001,level),now);osc.connect(gain);gain.connect(filter);filter.connect(master);osc.start(now);osc.stop(now+duration+.105);
   };
   switch(kind){
     case 'kick':
@@ -2189,9 +2185,9 @@ function playDrumVoice(kind,when,accent=false){
       envelope(0.2,peak*0.4);tone('sine',860,860,0.2,peak*0.3,'bandpass',1800);break;
     case 'electricBass':
     case 'synthBass':
-      envelope(kind==='synthBass'?0.44:0.52,peak*0.62);tone(getGrooveSynthWaveform(),kind==='synthBass'?67:76,kind==='synthBass'?112:126,kind==='synthBass'?0.44:0.52,peak*0.60*getGrooveWaveformGain(),'lowpass',kind==='synthBass'?720:920);break;
+      envelope(kind==='synthBass'?0.44:0.52,peak*0.62);tone(getGrooveSynthWaveform(),kind==='synthBass'?67:76,kind==='synthBass'?112:126,kind==='synthBass'?0.44:0.52,peak*0.60*getGrooveWaveformGain(),'lowpass',kind==='synthBass'?((S.grooveWaveform==='sawtooth'||S.grooveWaveform==='square')?520:720):((S.grooveWaveform==='sawtooth'||S.grooveWaveform==='square')?680:920));break;
     case 'synthPluck':
-      envelope(0.16,peak*0.54);tone(getGrooveSynthWaveform(),accent?440:330,accent?440:330,0.16,peak*0.46*getGrooveWaveformGain(),'lowpass',1800);break;
+      envelope(0.16,peak*0.54);tone(getGrooveSynthWaveform(),accent?440:330,accent?440:330,0.16,peak*0.46*getGrooveWaveformGain(),'lowpass',(S.grooveWaveform==='sawtooth'||S.grooveWaveform==='square')?1050:1800);break;
     case 'logDrum':
       // Amapiano 標誌性的低木鼓：快速下滑的中低頻，但保留圓潤尾音以在桌面喇叭可辨識。
       envelope(0.34,peak*0.74);tone('sine',68,178,0.34,peak*0.68,'bandpass',780);tone('triangle',138,186,0.21,peak*0.21,'lowpass',1150);break;

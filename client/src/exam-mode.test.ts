@@ -266,10 +266,12 @@ describe("隨堂考試模式契約", () => {
     expect(html).not.toContain("${renderMiniPiano(target,'112px')}");
   });
 
-  it("Groove 總線與聲部使用較長平滑包絡，避免瞬態逼逼與啵啵雜音", () => {
+  it("Groove 聲部使用單層零起音包絡，減少疊音瞬態", () => {
     expect(html).toContain("input.gain.value=1.08");
     expect(html).toContain("toneFilter.frequency.value=9000");
-    expect(html).toContain("const attack=Math.min(.028,Math.max(.020,duration*.20))");
+    expect(html).toContain("master.gain.setValueAtTime(0,now);");
+    expect(html).toContain("const attack=Math.min(.022,Math.max(.016,duration*.16));");
+    expect(html).toContain("master.gain.linearRampToValueAtTime(0,releaseEnd);");
     expect(html).toContain("const fadeSeconds=.16");
   });
 

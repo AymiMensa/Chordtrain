@@ -25,6 +25,15 @@ describe("Groove audio safety contracts", () => {
     expect(html).toContain("source.stop(now+fadeSeconds+.035)");
   });
 
+  it("uses one smooth Groove voice envelope and keeps bright-wave peaks under control", () => {
+    expect(html).toContain("master.gain.setValueAtTime(0,now);");
+    expect(html).toContain("master.gain.linearRampToValueAtTime(normalizedLevel,now+attack);");
+    expect(html).toContain("master.gain.linearRampToValueAtTime(0,releaseEnd);");
+    expect(html).toContain("gain.gain.setValueAtTime(Math.max(.0001,level),now);");
+    expect(html).toContain("S.mobilePureMode?0.14:0.22");
+    expect(html).toContain("(S.grooveWaveform==='sawtooth'||S.grooveWaveform==='square')?1050:1800");
+  });
+
   it("records recent Groove clipping events with a readable cause and level snapshot", () => {
     expect(html).toContain('id="grooveClipHistory"');
     expect(html).toContain("function grooveClipReason(peak,rms)");
