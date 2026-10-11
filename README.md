@@ -86,6 +86,8 @@ git worktree remove --force ../_gh_pages_deploy
 ## 更新歷史 (Date Sorted)
 
 - **2026-10-12 (當前)**:
+  - 修正所有難度的節拍同步：木魚、Groove、和弦與琶音共用 AudioContext 預定發聲時間；Groove 啟動固定從下一小節第一拍起，不再因淡出等待而跳過起拍。和弦進行中的和弦音與琶音音也依同一個預定拍點播放。
+  - 驗證：58 項測試通過；TypeScript 檢查與 production build 通過。瀏覽器互動檢查四種難度在節拍器先啟動時均可播放；初學者、調內與和弦種類圖亦檢查樂器先啟動再開節拍器。此環境未錄取音訊波形作逐樣本比對。
   - 將 React 網頁入口與互動主頁的 HTML 語言標記統一為 `zh-TW`，確保 GitHub Pages 與內嵌介面均宣告繁體中文（台灣）。
   - 「所有難度」樂器選項與音色一致：長笛改為空靈鼓（`TongueDrum`），吉他改為拇指琴（`Kalimba`）；保留舊名稱正規化，避免既有呼叫播放錯誤音色。
   - 恢復共用 AudioContext beat timeline 與四拍下拍對齊；節拍器、木魚、Groove、調內／智慧／自訂／隨機和弦與琶音沿用同一拍點，Groove 採用以音訊時鐘校正的遞迴排程。

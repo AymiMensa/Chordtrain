@@ -2009,7 +2009,7 @@ function setSoundLayerEnabled(layer,enabled){
   }
   if(layer==='arp'&&!S.arpEnabled)clearArpeggioTimers();
 }
-function playChord(midis,dur,vol,capture){
+function playChord(midis,dur,vol,capture,startAt){
   if(!Array.isArray(midis)||midis.length===0)return;
   const triggerAt=performance.now();
   // 行動瀏覽器可能在單次觸控附近送出重複事件；36ms 內的同一瞬態不再建立第二批振盪器。
@@ -2024,10 +2024,10 @@ function playChord(midis,dur,vol,capture){
   const startPolyChord=(notes,duration,volume,noteOptions={})=>{
     const useSharedEnvelope=(S.inst==='TongueDrum'||S.inst==='Harp');
     if(!useSharedEnvelope){notes.forEach(m=>captureVoice(playNote(m,duration,volume,S.inst,noteOptions)));return;}
-    const ctx=ac(),startAt=ctx.currentTime+.012;
-    const chordBus=createPolyChordBus(ctx,S.inst,startAt);
+    const ctx=ac(),voiceStartAt=Number.isFinite(noteOptions.startAt)?noteOptions.startAt:ctx.currentTime+.012;
+    const chordBus=createPolyChordBus(ctx,S.inst,voiceStartAt);
     notes.forEach(m=>{
-      const voice=playNote(m,duration,volume,S.inst,{...noteOptions,output:chordBus.gain,startAt});
+      const voice=playNote(m,duration,volume,S.inst,{...noteOptions,output:chordBus.gain,startAt:voiceStartAt});
       chordBus.sources.push(...(voice?.sources||[]));
       chordBus.releaseMs=Math.max(chordBus.releaseMs,Number(voice?.releaseMs)||0);
     });
@@ -2035,27 +2035,28 @@ function playChord(midis,dur,vol,capture){
   };
   if(interval>0){
     // 每個和弦固定佔四拍；和弦與逐拍琶音仍可由左側開關獨立控制。
-    if(S.chordEnabled&&S.chordVol>0)startPolyChord(midis,dur==null?getChordVoiceDuration():dur,S.chordVol,{sustainSeconds});
+    if(S.chordEnabled&&S.chordVol>0)startPolyChord(midis,dur==null?getChordVoiceDuration():dur,S.chordVol,{sustainSeconds,...(Number.isFinite(startAt)?{startAt}: {})});
     // 琶音音量為 0% 或被關閉時完全靜音；每個音的尾韻短於一拍，避免音重疊。
     if(!S.arpEnabled||S.arpVol<=0)return;
     const noteDur=getArpeggioNoteDuration(interval);
     getArpeggioMidiSequence(midis).forEach((m,i)=>{
-      arpTimers.push(setTimeout(()=>{
-        if(S.arpEnabled&&S.arpVol>0)captureVoice(playNote(m,noteDur,S.arpVol,S.inst,{arpeggio:true}));
-      },i*interval));
+      if(S.arpEnabled&&S.arpVol>0){
+        const noteStartAt=(Number.isFinite(startAt)?startAt:ac().currentTime+.012)+i*interval/1000;
+        captureVoice(playNote(m,noteDur,S.arpVol,S.inst,{arpeggio:true,startAt:noteStartAt}));
+      }
     });
     return;
   }
   if(!S.chordEnabled||S.chordVol<=0)return;
-  startPolyChord(midis,dur==null?getChordVoiceDuration():dur,vol==null?S.chordVol:vol,{sustainSeconds});
+  startPolyChord(midis,dur==null?getChordVoiceDuration():dur,vol==null?S.chordVol:vol,{sustainSeconds,...(Number.isFinite(startAt)?{startAt}: {})});
 }
 function playArpeggio(midis){playChord(midis);}
 
-function playMetronomeBeat(accent=false){
+function playMetronomeBeat(accent=false,when){
   const volume=Math.min(1,Math.max(0,Number(S.metroVol)||0));
   if(volume<=0)return;
   const ctx=ensureAudioReady();
-  const t=ctx.currentTime;
+  const t=Number.isFinite(when)?when:ctx.currentTime;
   // 木魚：短促敲擊瞬態 + 三角形木質共鳴 + 高次泛音；第一拍使用較高音域，後三拍使用較低音域。
   const master=ctx.createGain();
   const bodyFilter=ctx.createBiquadFilter();
@@ -2204,13 +2205,13 @@ function playDrumVoice(kind,when,accent=false){
   }
   setTimeout(()=>grooveVoiceStops.delete(voiceHandle),1500);
 }
-function playGrooveStep(step){
+function playGrooveStep(step,when){
   const pattern=GROOVE_PATTERNS[S.groove]||GROOVE_PATTERNS.disco;
-  const when=ac().currentTime+0.008;
+  const startAt=Number.isFinite(when)?when:ac().currentTime+0.008;
   Object.keys(pattern).forEach(instrument=>{
     if(!Array.isArray(pattern[instrument])||!pattern[instrument].includes(step))return;
     const kind=instrument==='hat'?'closedHat':instrument;
-    playDrumVoice(kind,when,step===0&&instrument==='kick');
+    playDrumVoice(kind,startAt,step===0&&instrument==='kick');
   });
 }
 function nn(s){return NOTES[s%12];}
@@ -3276,6 +3277,7 @@ function playCustomProgression(){
   // 自訂進行先前完全沒有對齊時脈（一律從 0ms 起算），根音必然落在任意位置。
   // 現與其他兩條進行一致，從下一個小節第一拍起拍。
   const beatAlignMs=getMsUntilNextDownbeat();
+  const beatStartAt=getNextDownbeatBoundary();
   for(let cycle=0;cycle<cycles;cycle++)sequence.forEach((chord,index)=>{
     const absoluteIndex=cycle*sequence.length+index;
     customProgressionTimers.push(setTimeout(()=>{
@@ -3283,7 +3285,7 @@ function playCustomProgression(){
       customProgressionCurrentSlot=index;updateCustomProgressionPlaybackUi();
       if(!validCustomChord(chord))return;
       const midis=spellChord(chord.note,chord.q).map(note=>note.midi);
-      updateVisualizationHighlight(midis,chord.note,chord.q,chord.note,true);playChord(midis);
+      updateVisualizationHighlight(midis,chord.note,chord.q,chord.note,true);playChord(midis,undefined,undefined,undefined,beatStartAt+absoluteIndex*chordMs/1000);
       if(absoluteIndex===cycles*sequence.length-1){
         const tail=Math.max(160,getChordPlaybackDurationMs(midis));
         customProgressionFinishTimer=setTimeout(()=>{if(run===customProgressionRun)stopCustomProgression();},tail);
@@ -4283,13 +4285,14 @@ async function playDiatonicSequence(){
   // 將整個進行對齊到下一個小節的「第一拍」，讓理音與根音落在下拍，
   // 與節拍器／木魚／Groove 的 beat%4===0 定義一致。
   const beatAlignMs=getMsUntilNextDownbeat();
+  const beatStartAt=getNextDownbeatBoundary();
   sequence.forEach((c,i)=>{
     const timer=setTimeout(()=>{
       if(!mascotPlaybackActive||run!==mascotPlaybackRun)return;
       const round=Math.floor(i/Math.max(1,diatonic.length))+1;
       updateDiatonicPlaybackStatus(round,repeats,i,sequence.length,true);
       updateVisualizationHighlight(c.midi,c.note,c.q,c.note,true);
-      playChord(c.midi);
+      playChord(c.midi,undefined,undefined,undefined,beatStartAt+i*chordMs/1000);
       moveMascotTo(c.note,c.q);
     },beatAlignMs+i*chordMs);
     mascotPlaybackTimers.push(timer);
@@ -4341,12 +4344,13 @@ document.getElementById('randomChordsBtn').onclick=function(){
   const roots=['C','D','E','F','G','A','B'];
   const qs=['Major','Minor','Major 7','Minor 7','Dominant 7'];
   const beatAlignMs=getMsUntilNextDownbeat();
+  const beatStartAt=getNextDownbeatBoundary();
   S.progression=[];
   for(let i=0;i<4;i++){
     const r=roots[Math.floor(Math.random()*roots.length)];
     const q=qs[Math.floor(Math.random()*qs.length)];
     S.progression.push({name:r+CHORDS[q].rom,note:r,q});
-    setTimeout(()=>playChord(midi(r,CHORDS[q].f)),beatAlignMs+i*getProgressionChordIntervalMs());
+    setTimeout(()=>playChord(midi(r,CHORDS[q].f),undefined,undefined,undefined,beatStartAt+i*getProgressionChordIntervalMs()/1000),beatAlignMs+i*getProgressionChordIntervalMs());
   }
   renderProgression();
   render();
@@ -4368,6 +4372,7 @@ function playSmartHarmony(progression){
   const chordMs=getProgressionChordIntervalMs();
   // 同樣對齊到下一個小節第一拍，確保智慧和聲的根音落在下拍。
   const beatAlignMs=getMsUntilNextDownbeat();
+  const beatStartAt=getNextDownbeatBoundary();
   updateSmartHarmonyStatus(0,progression.length,true,progression[0]);
   progression.forEach((chord,index)=>{
     smartHarmonyTimers.push(setTimeout(()=>{
@@ -4375,7 +4380,7 @@ function playSmartHarmony(progression){
       const midis=midi(chord.note,CHORDS[chord.q].f);
       updateSmartHarmonyStatus(index,progression.length,true,chord);
       updateVisualizationHighlight(midis,chord.note,chord.q,chord.note,true);
-      playChord(midis);
+      playChord(midis,undefined,undefined,undefined,beatStartAt+index*chordMs/1000);
       moveMascotTo(chord.note,chord.q);
       if(index===progression.length-1){
         smartHarmonyTimers=[];
@@ -4623,6 +4628,7 @@ function startMetronome(){
   // 讓淡出後的 restoreGrooveOutput 不會因舊的 checked=false 而跳過，避免輸出永久停在 0.0001。
   if(input){input.checked=true;input.setAttribute('aria-label',`關閉節拍器（${S.tempo} BPM）`);input.setAttribute('aria-checked','true');}
   const bpm=getTempoBpm();
+  const timelineRun=acquireBeatTimelineForPlayback();
   const pattern=GROOVE_PATTERNS[S.groove]||GROOVE_PATTERNS.disco;
   if(S.metroMode==='groove'){
     const runId=++grooveRunId;
@@ -4632,18 +4638,20 @@ function startMetronome(){
       if(runId!==grooveRunId||S.metroMode!=='groove'||!document.getElementById('metronome')?.checked)return;
       restoreGrooveOutput();
       beatIndicatorActive=true;metroBeat=0;updateBeatIndicator(0,true,'Groove');updatePlaybackMonitorVisibility();
-      const timelineRun=acquireBeatTimelineForPlayback();
       startGrooveMeter();
       // 以 beatTimeline 原點推算每次觸發的目標時刻，再用 setInterval 內自校正的
       // setTimeout 觸發，取代裸 setInterval——消除累積漂移並與和弦進行共用同一原點。
       const scheduleGroove=()=>{
         const patternForSchedule=GROOVE_PATTERNS[S.groove]||GROOVE_PATTERNS.disco;
         const stepMs=getBeatMs()/Math.max(1,patternForSchedule.division);
+        const firstGrooveStep=Math.ceil(Math.max(0,(AC.currentTime-beatTimeline.originTime)*1000/beatTimeline.beatMs)/(BEATS_PER_MEASURE*patternForSchedule.division))*(BEATS_PER_MEASURE*patternForSchedule.division);
+        let lastScheduledStep=firstGrooveStep-1;
         const triggerNext=()=>{
           if(timelineRun!==beatTimeline.runId)return;
           const now=AC.currentTime;
           const elapsedBeats=(now-beatTimeline.originTime)*1000/beatTimeline.beatMs;
-          const targetStep=Math.floor(elapsedBeats*Math.max(1,patternForSchedule.division)+1e-6)+1;
+          const targetStep=Math.max(firstGrooveStep,lastScheduledStep+1,Math.floor(elapsedBeats*Math.max(1,patternForSchedule.division)+1e-6)+1);
+          lastScheduledStep=targetStep;
           const targetTime=beatTimeline.originTime+targetStep*stepMs/1000;
           const delay=Math.max(0,(targetTime-now)*1000);
           metroInterval=setTimeout(()=>{
@@ -4651,7 +4659,7 @@ function startMetronome(){
             grooveStep=targetStep%patternForSchedule.steps;
             const nextBeat=Math.floor(grooveStep/Math.max(1,patternForSchedule.division))%4;
             if(nextBeat!==metroBeat){metroBeat=nextBeat;updateBeatIndicator(metroBeat,true,'Groove');}
-            playGrooveStep(grooveStep);
+            playGrooveStep(grooveStep,targetTime);
             triggerNext();
           },delay);
         };
@@ -4673,15 +4681,16 @@ function startMetronome(){
         if(timelineRun!==beatTimeline.runId)return;
         metroBeat=targetBeat%4;
         updateBeatIndicator(metroBeat,true,'木魚');
-        playMetronomeBeat(metroBeat===0);
+        playMetronomeBeat(metroBeat===0,targetTime);
         triggerNext();
       },delay);
     };
     // schedule first beat on next downbeat
-    const firstDelay=getMsUntilNextDownbeat();
+    const firstBeatAt=getNextDownbeatBoundary();
+    const firstDelay=Math.max(0,(firstBeatAt-AC.currentTime)*1000);
     setTimeout(()=>{
       if(timelineRun!==beatTimeline.runId)return;
-      playMetronomeBeat(true);
+      playMetronomeBeat(true,firstBeatAt);
       triggerNext();
     },firstDelay);
   }
