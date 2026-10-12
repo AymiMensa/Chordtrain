@@ -743,7 +743,7 @@ body.scale-degree-quiz-mode .sidebar{display:none!important}body.scale-degree-qu
        <div class="slider-row"><label><span>節拍器音量</span><span id="metroVol">65%</span></label><input type="range" min="0" max="100" value="65" id="metroSlider" aria-label="節拍器音量 65%"></div>
         <div class="sb-row exam-irrelevant"><label for="audioDeviceProfile">裝置音量</label><select class="sb-select" id="audioDeviceProfile" aria-label="裝置音量設定"><option value="desktop">桌面</option><option value="mobile">手機</option><option value="headphones">耳機</option></select></div>
       <button class="sb-btn exam-irrelevant" id="resetAudioPreferencesBtn" type="button" title="清除本機儲存的音訊、Groove 與播放監視器偏好並恢復安全預設">↺ 重設所有音訊偏好</button>
-      <div class="sb-row" style="margin-top:8px"><label><input type="checkbox" id="metronome"> 節拍器</label></div>
+      <div class="sb-row" style="margin-top:8px"><label><input type="checkbox" id="metronome" checked> 節拍器</label></div>
       <div class="sb-row"><label>節拍器音色</label></div>
        <div class="mode-toggle metro-mode-toggle" id="metronomeMode" role="group" aria-label="節拍器音色模式"><button class="mode-opt on" id="woodblockModeBtn" type="button" aria-pressed="true">木魚</button><button class="mode-opt" id="grooveModeBtn" type="button" aria-pressed="false">Groove</button></div>
       <div class="groove-controls" id="grooveControls" hidden>
@@ -1565,13 +1565,15 @@ function updateBeatIndicator(beatIndex=0,active=false,label='四拍待機'){
   if(labelNode)labelNode.textContent=active?`${label}・第 ${beat+1} 拍`:'四拍待機';
   document.querySelectorAll('#beatIndicator .beat-indicator-dot').forEach((dot,index)=>dot.classList.toggle('active',Boolean(active)&&index===beat));
 }
-function startBeatIndicator(label='和弦'){
+function startBeatIndicator(label='和弦',startAt){
   clearBeatIndicatorTimers();
   beatIndicatorActive=true;
   const beatMs=getChordBeatIntervalMs();
-  for(let beat=0;beat<4;beat++)beatVisualTimers.push(setTimeout(()=>updateBeatIndicator(beat,true,label),beat*beatMs));
-  beatVisualTimers.push(setTimeout(()=>{beatIndicatorActive=false;updateBeatIndicator(0,false);updatePlaybackMonitorVisibility();},beatMs*4+90));
-  updateBeatIndicator(0,true,label);updatePlaybackMonitorVisibility();
+  const delayMs=Number.isFinite(startAt)&&AC?Math.max(0,(startAt-AC.currentTime)*1000):0;
+  for(let beat=0;beat<4;beat++)beatVisualTimers.push(setTimeout(()=>updateBeatIndicator(beat,true,label),delayMs+beat*beatMs));
+  beatVisualTimers.push(setTimeout(()=>{if(metroInterval!==null||grooveStartTimer)return;beatIndicatorActive=false;updateBeatIndicator(0,false);updatePlaybackMonitorVisibility();},delayMs+beatMs*4+90));
+  if(delayMs===0)updateBeatIndicator(0,true,label);
+  updatePlaybackMonitorVisibility();
 }
 function stopBeatIndicator(){clearBeatIndicatorTimers();beatIndicatorActive=false;updateBeatIndicator(0,false);updatePlaybackMonitorVisibility();}
 function syncGrooveHistoryControls(){
@@ -1901,7 +1903,8 @@ function getNextDownbeatBoundary(){
   const beats=getBeatsSinceTimelineOrigin();
   let nextDownbeat=Math.ceil(beats/BEATS_PER_MEASURE-1e-6)*BEATS_PER_MEASURE;
   let boundary=beatTimeline.originTime+nextDownbeat*beatTimeline.beatMs/1000;
-  while(boundary<AC.currentTime+BEAT_SCHEDULE_AHEAD_SECONDS){nextDownbeat+=BEATS_PER_MEASURE;boundary=beatTimeline.originTime+nextDownbeat*beatTimeline.beatMs/1000;}
+  // 排程提前量只用來預排音源，不能拿來跨過即將到來的第一拍；否則新時脈在 +150ms 起拍時會被整整延後一小節。
+  while(boundary<AC.currentTime+0.005){nextDownbeat+=BEATS_PER_MEASURE;boundary=beatTimeline.originTime+nextDownbeat*beatTimeline.beatMs/1000;}
   return boundary;
 }
 // 確保共用時脈存在。和弦／智慧和聲／自訂進行可能在尚未開啟節拍器時就起拍；
@@ -1929,9 +1932,14 @@ function adoptBeatTimeline(preserved){
 // 從現在起，等待下一個小節第一拍所需的毫秒數；時脈尚未建立時先建立（原點即為下拍）。
 function getMsUntilNextDownbeat(){
   ensureBeatTimeline();
+  ensureMetronomeForMusicalPlayback();
   const boundary=getNextDownbeatBoundary();
   if(boundary==null)return 0;
   return Math.max(0,(boundary-AC.currentTime)*1000);
+}
+function ensureMetronomeForMusicalPlayback(){
+  const input=document.getElementById('metronome');
+  if(input?.checked&&metroInterval===null&&!grooveStartTimer)startMetronome();
 }
 function startBeatTimeline(){
   ensureAudioReady();
@@ -2038,7 +2046,7 @@ function playChord(midis,dur,vol,capture,startAt){
   if(triggerAt-lastChordTriggerAt<36)return;
   lastChordTriggerAt=triggerAt;
   clearArpeggioTimers();
-  startBeatIndicator('和弦');
+  startBeatIndicator('和弦',startAt);
   const interval=getArpIntervalMs();
   const sustainSeconds=S.chordEnabled&&!S.arpEnabled?Math.max(.16,getChordHoldSeconds()-.028):0;
   const captureVoice=voice=>{if(capture&&voice)capture.add(voice);return voice;};
@@ -4377,6 +4385,7 @@ function stopMascotPlayback(){
 async function playDiatonicSequence(){
   clearSmartHarmonyTimers();
   stopMascotPlayback();
+  ensureMetronomeForMusicalPlayback();
   const run=++mascotPlaybackRun;
   // 播放前強制刷新目前調性／音階／調式所對應的和弦樹，
   // 並等待瀏覽器完成 DOM layout，吉祥物才有可追蹤的節點座標。
@@ -4449,6 +4458,7 @@ document.getElementById('loopBtn').onclick=function(){
 document.getElementById('randomChordsBtn').onclick=function(){
   stopScalePreview();
   clearSmartHarmonyTimers();
+  ensureMetronomeForMusicalPlayback();
   const run=smartHarmonyRun;
   const roots=['C','D','E','F','G','A','B'];
   const qs=['Major','Minor','Major 7','Minor 7','Dominant 7'];
@@ -4749,7 +4759,7 @@ function startMetronome(){
       grooveStartTimer=0;
       if(runId!==grooveRunId||S.metroMode!=='groove'||!document.getElementById('metronome')?.checked)return;
       restoreGrooveOutput();
-      beatIndicatorActive=true;metroBeat=0;updateBeatIndicator(0,true,'Groove');updatePlaybackMonitorVisibility();
+      beatIndicatorActive=true;updatePlaybackMonitorVisibility();
       startGrooveMeter();
       // 排入 AudioContext 前方 120ms 的音訊佇列；JS timer 只負責補佇列，不能再決定發聲瞬間。
       const patternForSchedule=GROOVE_PATTERNS[S.groove]||GROOVE_PATTERNS.disco;
@@ -4760,6 +4770,9 @@ function startMetronome(){
       // 不要等到下一小節，否則剛啟動的 Groove 會漏掉目前小節剩餘的拍點。
       let nextStep=Math.max(0,Math.ceil(elapsedSteps-1e-6));
       while(beatTimeline.originTime+nextStep*stepSeconds<AC.currentTime+0.005)nextStep++;
+      const firstStep=nextStep%patternForSchedule.steps;
+      metroBeat=Math.floor(firstStep/division)%4;
+      updateBeatIndicator(metroBeat,true,'Groove');
       const scheduleGroove=()=>{
         if(timelineRun!==beatTimeline.runId)return;
         const now=AC.currentTime;
@@ -4772,7 +4785,7 @@ function startMetronome(){
           const beat=Math.floor(step/division)%4;
           playGrooveStep(step,targetTime);
           const uiDelay=Math.max(0,(targetTime-now)*1000);
-          setTimeout(()=>{if(timelineRun===beatTimeline.runId){grooveStep=step;if(beat!==metroBeat){metroBeat=beat;updateBeatIndicator(beat,true,'Groove');}}},uiDelay);
+          setTimeout(()=>{if(runId===grooveRunId&&timelineRun===beatTimeline.runId){grooveStep=step;if(beat!==metroBeat){metroBeat=beat;updateBeatIndicator(beat,true,'Groove');}}},uiDelay);
         }
       };
       scheduleGroove();
@@ -4781,12 +4794,15 @@ function startMetronome(){
     if(restartDelayMs)grooveStartTimer=setTimeout(startGrooveScheduler,restartDelayMs);
     else startGrooveScheduler();
   }else{
-    beatIndicatorActive=true;updateBeatIndicator(0,true,'木魚');updatePlaybackMonitorVisibility();
+    beatIndicatorActive=true;updatePlaybackMonitorVisibility();
     // 木魚與所有樂器共用絕對 beat index，提前 120ms 排入音訊時鐘。
     // 木魚加入已播放的樂器時，接續同一時脈的下一拍，維持當下小節的拍號。
     // 使用絕對拍 index，因此之後的第一至第四拍都與和弦／琶音共用同一原點。
     let nextBeatIndex=Math.max(0,Math.ceil((AC.currentTime-beatTimeline.originTime)*1000/beatTimeline.beatMs-1e-6));
     while(beatTimeline.originTime+nextBeatIndex*beatTimeline.beatMs/1000<AC.currentTime+0.005)nextBeatIndex++;
+    const runId=grooveRunId;
+    metroBeat=nextBeatIndex%BEATS_PER_MEASURE;
+    updateBeatIndicator(metroBeat,true,'木魚');
     const scheduleWoodblock=()=>{
       if(timelineRun!==beatTimeline.runId)return;
       const now=AC.currentTime,horizon=now+BEAT_SCHEDULE_AHEAD_SECONDS;
@@ -4797,7 +4813,7 @@ function startMetronome(){
         const beat=beatIndex%BEATS_PER_MEASURE;
         playMetronomeBeat(beat===0,targetTime);
         const uiDelay=Math.max(0,(targetTime-now)*1000);
-        setTimeout(()=>{if(timelineRun===beatTimeline.runId){metroBeat=beat;updateBeatIndicator(beat,true,'木魚');}},uiDelay);
+        setTimeout(()=>{if(runId===grooveRunId&&timelineRun===beatTimeline.runId){metroBeat=beat;updateBeatIndicator(beat,true,'木魚');}},uiDelay);
       }
     };
     scheduleWoodblock();

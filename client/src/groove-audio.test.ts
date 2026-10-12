@@ -78,6 +78,10 @@ describe("Groove audio safety contracts", () => {
     expect(html).toContain("function acquireBeatTimelineForPlayback(){return ensureBeatTimeline();}");
     expect(html).toContain("function getMsUntilNextDownbeat()");
     expect(html).toContain("const BEATS_PER_MEASURE=4;");
+    expect(html).toContain('<input type="checkbox" id="metronome" checked>');
+    expect(html).toContain("function ensureMetronomeForMusicalPlayback()");
+    expect(html).toContain("while(boundary<AC.currentTime+0.005)");
+    expect(html).toContain("function startBeatIndicator(label='和弦',startAt)");
     expect(html).toContain("const BEAT_SCHEDULE_AHEAD_SECONDS=.25;");
     expect(html).toContain("const horizon=now+BEAT_SCHEDULE_AHEAD_SECONDS;");
     expect(html).toContain("const now=AC.currentTime,horizon=now+BEAT_SCHEDULE_AHEAD_SECONDS;");
@@ -89,6 +93,7 @@ describe("Groove audio safety contracts", () => {
     expect(html).toContain("const noteStartAt=(Number.isFinite(startAt)?startAt:ac().currentTime+.012)+i*interval/1000;");
     expect(html).toContain("playMetronomeBeat(beat===0,targetTime)");
     expect(html).toContain("playGrooveStep(step,targetTime)");
+    expect(html).toContain("if(runId===grooveRunId&&timelineRun===beatTimeline.runId)");
     expect(html).toContain("const elapsedSteps=(AC.currentTime-beatTimeline.originTime)/stepSeconds;");
     expect(html).toContain("let nextStep=Math.max(0,Math.ceil(elapsedSteps-1e-6));");
     expect(html).toContain("let nextBeatIndex=Math.max(0,Math.ceil((AC.currentTime-beatTimeline.originTime)*1000/beatTimeline.beatMs-1e-6));");
