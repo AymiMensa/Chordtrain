@@ -7,7 +7,7 @@ describe("Groove audio safety contracts", () => {
 
   it("restores output after a direct Groove start instead of remaining at the fade floor", () => {
     expect(html).toContain("if(input){input.checked=true;input.setAttribute('aria-label',`關閉節拍器（${S.tempo} BPM）`);input.setAttribute('aria-checked','true');}");
-    expect(html).toContain("mix.output.gain.exponentialRampToValueAtTime(target,now+.075)");
+    expect(html).toContain("mix.output.gain.exponentialRampToValueAtTime(target,now+.025)");
   });
 
   it("keeps built-in Groove preset output gains audible", () => {
@@ -66,16 +66,21 @@ describe("Groove audio safety contracts", () => {
     expect(html).toContain("function acquireBeatTimelineForPlayback(){return ensureBeatTimeline();}");
     expect(html).toContain("function getMsUntilNextDownbeat()");
     expect(html).toContain("const BEATS_PER_MEASURE=4;");
-    expect(html).toContain("const targetStep=Math.max(firstGrooveStep,lastScheduledStep+1,Math.floor(elapsedBeats*Math.max(1,patternForSchedule.division)+1e-6)+1);");
-    expect(html).toContain("const targetBeat=Math.floor(elapsedBeats+1e-6)+1;");
+    expect(html).toContain("const horizon=now+0.12;");
+    expect(html).toContain("while(beatTimeline.originTime+nextStep*stepSeconds<=horizon)");
+    expect(html).toContain("while(beatTimeline.originTime+nextBeatIndex*beatTimeline.beatMs/1000<=horizon)");
+    expect(html).toContain("metroInterval=setInterval(scheduleGroove,25);");
+    expect(html).toContain("metroInterval=setInterval(scheduleWoodblock,25);");
     expect(html).toContain("function playChord(midis,dur,vol,capture,startAt)");
     expect(html).toContain("const noteStartAt=(Number.isFinite(startAt)?startAt:ac().currentTime+.012)+i*interval/1000;");
-    expect(html).toContain("playMetronomeBeat(metroBeat===0,targetTime)");
-    expect(html).toContain("playGrooveStep(grooveStep,targetTime)");
-    expect(html).toContain("const firstGrooveStep=Math.ceil(");
-    expect(html).not.toContain("metroInterval=setInterval(");
+    expect(html).toContain("playMetronomeBeat(beat===0,targetTime)");
+    expect(html).toContain("playGrooveStep(step,targetTime)");
+    expect(html).toContain("const elapsedSteps=(AC.currentTime-beatTimeline.originTime)/stepSeconds;");
+    expect(html).not.toContain("metroInterval=setTimeout(");
     expect(html).not.toContain("playGrooveStep(0);");
-    expect((html.match(/const beatAlignMs=getMsUntilNextDownbeat\(\);/g)||[]).length).toBe(4);
+    expect((html.match(/const beatAlignMs=getMsUntilNextDownbeat\(\);/g)||[]).length).toBe(3);
+    expect(html).toContain("function scheduleChordAudio(midis,startAt,guard=()=>true)");
+    expect(html).toContain("const leadSeconds=.12;");
     expect(html).toContain("document.getElementById('instSelect').onchange=function(){S.inst=normalizeInstrument(this.value);};");
   });
 

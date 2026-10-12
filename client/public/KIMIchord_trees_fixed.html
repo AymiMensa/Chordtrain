@@ -543,6 +543,7 @@ body{background:var(--bg);font-family:'Inter',-apple-system,BlinkMacSystemFont,'
 .exam-settings-toggle{margin:4px 0;width:100%;}.exam-hint-toggle{display:flex;align-items:center;gap:5px;color:var(--text3);font-size:8px;margin-top:5px}.exam-hint-toggle input{accent-color:var(--accent)}.exam-score-chart{height:64px;display:flex;align-items:flex-end;gap:3px;padding:6px;border:1px solid var(--border);border-radius:4px;background:var(--bg);margin:6px 0}.exam-score-chart span{flex:1;min-width:2px;background:var(--accent);border-radius:2px 2px 0 0}.exam-completion{margin-top:6px;padding:6px;border:1px solid var(--green);border-radius:5px;background:color-mix(in srgb,var(--green) 8%,var(--bg));font-size:9px}.exam-completion-stats{display:flex;flex-wrap:wrap;gap:5px 12px;margin:6px 0;color:var(--text2)}.exam-completion-stats span{white-space:nowrap}.exam-completion-stats strong{color:var(--text)}.progression-tools,.progression-io{display:grid;grid-template-columns:minmax(0,1fr) repeat(2,minmax(0,auto));gap:4px;margin-top:5px}.progression-io{grid-template-columns:repeat(2,minmax(0,1fr))}.progression-summary{margin-top:5px;padding:5px;border:1px solid var(--border);border-radius:4px;color:var(--text2);font-size:8px;line-height:1.35;max-height:56px;overflow:auto;word-break:break-word}.piano-mini:has(.exam-hint){min-height:224px}.p-mini-w.exam-hint,.p-mini-b.exam-hint{box-shadow:inset 0 0 0 3px #4c8df7;background:#dbeafe;color:#123}.p-mini-b.exam-hint{background:#2563eb;color:#fff}.piano-mini .piano{min-height:100%}.exam-stage{width:100%;min-width:0}.exam-stage .exam-piano-stage{width:calc(100% + 18px);margin-left:-9px;padding-left:0;padding-right:0}.exam-stage .exam-piano-stage .piano-mini{width:100%;max-width:none;margin-left:0;margin-right:0;border-left:0;border-right:0;border-radius:0}.exam-stage .exam-piano-stage .visual-label{padding-left:9px;padding-right:9px}.exam-panel-actions{display:flex;justify-content:center;margin-top:7px}.exam-fullscreen-btn{min-width:132px}.exam-focus-active{background:var(--bg)}.exam-focus-active .topbar,.exam-focus-active .sidebar,.exam-focus-active .sidebar-overlay,.exam-focus-active .copyright{display:none!important}.exam-focus-active .main-layout{height:100vh}.exam-focus-active .content{padding:0;overflow-x:hidden;overflow-y:auto;background:var(--bg)}.exam-focus-active .exam-panel{margin:0;border-left:0;border-right:0;border-top:0;border-radius:0;padding:clamp(10px,2vw,18px)}.exam-focus-active .exam-stage .exam-piano-stage{width:100%;margin-left:0;min-height:0}.exam-focus-active .exam-stage .exam-piano-stage .visual-label{padding:10px clamp(10px,2vw,18px)}.exam-focus-active .exam-stage .exam-piano-stage .piano-mini{height:clamp(220px,52svh,500px)!important;min-height:0}.exam-focus-active .exam-history-panel{display:none}@media(max-width:700px){.progression-tools,.progression-io{grid-template-columns:1fr 1fr}.progression-tools .sb-input{grid-column:1/-1}.exam-completion{font-size:8px}.piano-mini{max-width:100%;overflow:hidden}.exam-stage .exam-piano-stage{width:calc(100% + 24px);margin-left:-12px}.exam-stage .exam-piano-stage .visual-label{padding-left:12px;padding-right:12px}}
 .exam-focus-active .exam-panel{width:100%;max-width:none}
 .exam-paused-notice{display:flex;align-items:center;justify-content:center;gap:7px;margin:8px 0;padding:9px 12px;border:1px solid var(--accent);border-radius:7px;background:color-mix(in srgb,var(--accent) 12%,var(--panel));color:var(--text);font-size:12px;font-weight:700}.exam-paused-notice[hidden]{display:none}.exam-focus-active .exam-paused-notice{margin:12px max(12px,env(safe-area-inset-right)) 8px;min-height:40px;font-size:clamp(12px,1.2vw,16px)}
+body.scale-degree-quiz-mode .sidebar{display:none!important}body.scale-degree-quiz-mode .content{width:100%;min-width:0}.degree-quiz-page{width:min(100%,960px);margin:0 auto;padding:clamp(12px,3vw,28px);color:var(--text)}.degree-quiz-card{padding:clamp(14px,3vw,24px);border:1px solid color-mix(in srgb,var(--accent) 42%,var(--border));border-radius:14px;background:var(--panel);box-shadow:0 12px 34px rgba(15,23,42,.1);min-width:0}.degree-quiz-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}.degree-quiz-head h2{font-size:clamp(19px,3vw,28px);color:var(--white);overflow-wrap:anywhere}.degree-quiz-head p{margin-top:4px;color:var(--text2);font-size:clamp(12px,1.5vw,14px);line-height:1.55}.degree-quiz-setup{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:end;gap:10px;margin:18px 0;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--bg)}.degree-quiz-field{display:grid;gap:6px;min-width:0}.degree-quiz-field label{font-size:12px;color:var(--text2)}.degree-quiz-field input,.degree-quiz-answer{width:100%;min-width:0;height:42px;padding:8px 10px;border:1px solid var(--border-hover);border-radius:7px;background:var(--panel);color:var(--text);font:600 16px inherit}.degree-quiz-btn{min-height:42px;padding:8px 14px;border:1px solid var(--border-hover);border-radius:7px;background:var(--panel-hover);color:var(--text);font:700 13px inherit;cursor:pointer}.degree-quiz-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}.degree-quiz-btn:hover{filter:brightness(1.08)}.degree-quiz-score{margin:12px 0;padding:12px;border-radius:8px;background:color-mix(in srgb,var(--accent) 10%,var(--bg));color:var(--text);font-weight:700;font-size:15px;overflow-wrap:anywhere}.degree-quiz-list{display:grid;gap:10px;margin:12px 0}.degree-quiz-question{display:grid;grid-template-columns:minmax(0,1fr) minmax(110px,180px);align-items:center;gap:10px;min-width:0;padding:12px;border:1px solid var(--border);border-radius:9px;background:var(--bg)}.degree-quiz-question.is-wrong{border:2px solid var(--red);background:color-mix(in srgb,var(--red) 8%,var(--bg))}.degree-quiz-question.is-correct{border-color:var(--green)}.degree-quiz-prompt{min-width:0;line-height:1.6;font-size:clamp(13px,1.7vw,16px);overflow-wrap:anywhere}.degree-quiz-answer{font-weight:700}.degree-quiz-feedback{grid-column:1/-1;color:var(--text2);font-size:12px;overflow-wrap:anywhere}.degree-quiz-question.is-wrong .degree-quiz-feedback{color:var(--red)}.degree-quiz-question.is-correct .degree-quiz-feedback{color:var(--green)}.degree-quiz-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.degree-quiz-actions .degree-quiz-btn{flex:1 1 180px}@media(max-width:600px){.degree-quiz-page{padding:8px}.degree-quiz-card{border-radius:10px}.degree-quiz-setup{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.degree-quiz-field{grid-column:1/-1}.degree-quiz-setup .degree-quiz-btn{width:100%;padding:8px}.degree-quiz-question{grid-template-columns:minmax(0,1fr);gap:7px;padding:10px}.degree-quiz-feedback{grid-column:auto}.degree-quiz-actions{display:grid;grid-template-columns:1fr}.degree-quiz-actions .degree-quiz-btn{width:100%}}
 .exam-pause-overlay{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:max(20px,env(safe-area-inset-top)) max(20px,env(safe-area-inset-right)) max(20px,env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left));background:rgba(11,22,39,.58);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}.exam-pause-overlay-card{width:min(440px,100%);padding:clamp(22px,5vw,38px);border:1px solid color-mix(in srgb,var(--accent) 55%,#fff);border-radius:16px;background:color-mix(in srgb,var(--panel) 94%,#10213d);box-shadow:0 24px 70px rgba(0,0,0,.35);text-align:center}.exam-pause-overlay-title{margin:0;color:var(--text);font-size:clamp(24px,5vw,38px);font-weight:800;letter-spacing:.04em}.exam-pause-overlay-copy{margin:10px 0 20px;color:var(--text2);font-size:clamp(13px,2vw,16px);line-height:1.55}.exam-pause-overlay .sb-btn{min-width:180px;min-height:44px;font-size:15px}.exam-hint-btn[aria-pressed="true"]{border-color:#2563eb;background:#2563eb;color:#fff}
 </style>
 </head>
@@ -663,7 +664,7 @@ body{background:var(--bg);font-family:'Inter',-apple-system,BlinkMacSystemFont,'
   <div class="sidebar" id="sidebar">
     <div class="sb-section">
       <h4>設定</h4>
-      <div class="sb-row"><label>難度</label><select class="sb-select" id="levelSelect"><option value="Beginner">初學者</option><option value="Diatonic">調內</option><option value="Intermediate">和弦種類圖</option><option value="Exam">隨堂考試</option></select></div>
+      <div class="sb-row"><label>難度</label><select class="sb-select" id="levelSelect"><option value="Beginner">初學者</option><option value="Diatonic">調內</option><option value="Intermediate">和弦種類圖</option><option value="Exam">隨堂考試</option><option value="ScaleDegreeQuiz">音級換算題庫</option></select></div>
       <div id="examControls" class="exam-controls" hidden>
         <div class="exam-card-title">隨堂考試</div>
         <button class="sb-btn exam-settings-toggle" id="examSettingsToggle" type="button" aria-expanded="true">設定（可收合）</button>
@@ -1019,6 +1020,10 @@ function spellChord(root,q){
 const LEGACY_INSTRUMENT_MAP={Flute:'TongueDrum',長笛:'TongueDrum',Guitar:'Kalimba',吉他:'Kalimba'};
 function normalizeInstrument(inst){return LEGACY_INSTRUMENT_MAP[inst]||inst;}
 let S={level:'Beginner',key:'C',scale:'Major',mode:'1st (Ionian)',modeScaleEnabled:true,inst:'TongueDrum',chordVol:0.5,arpVol:0.7,chordEnabled:false,arpEnabled:true,tempo:72,metroVol:0.65,arpMode:'四分音符',cycleCount:2,theme:'earth',harmonyStyle:'popular',harmonyDensity:4,harmonySubstitution:'none',harmonyCadence:'authentic',metroMode:'woodblock',grooveCategory:'four',groove:'disco',grooveWaveform:'triangle',grooveMixPreset:'standard',noteMode:'random',notes:[1,1,1,1,1,1,1],loop:false,progression:[],vis:'piano',activeChord:null,activeCardRoot:null,intermediateOpenGroups:{},intermediateRoot:'C',intermediateType:'Major',customProgression:[{note:'C',q:'Major'},{note:'G',q:'Major'},{note:'A',q:'Minor'},{note:'F',q:'Major'}],examActive:false,examPaused:false,examPauseCount:0,examPauseStartedAt:0,examPauseTotalMs:0,examQuestion:null,examSelected:[],examFeedback:{},examQuestionCount:0,examCorrectCount:0,examWrongCount:0,examReactionTotal:0,examBeat:0,examStartedAt:0,examDifficulty:'triad',examKeys:[],examChordTypes:[],examHistoryVisible:false,examHistory:[],examKeyboardHint:false,examAnswerReference:false,examStaffNotes:[],examCombo:0,examQuestionTransition:0,examMistakeNotes:{},examSettingsCollapsed:false,examFullscreen:false,examScoreSeries:[],examReportVisible:false,examBeatsPerQuestion:4,examQuestionBpm:72,examPreviousTempo:72 ,beginnerInputWindow:[],beginnerRecentInput:[],beginnerRecommendations:[],beginnerPinned:false,beginnerInputTimer:null,beginnerPreviewTimer:null,beginnerPreviewIndex:null,beginnerKeyInfo:{name:'C',confidence:0,modulationProbability:0},beginnerPracticeLog:[],progressionSearch:'',progressionFavorites:[]};
+const SCALE_DEGREE_NAMES=['主音','上主音','中音','下屬音','屬音','下中音','導音'];
+const MAJOR_SCALE_INTERVALS=[0,2,4,5,7,9,11];
+const SCALE_DEGREE_KEYS=['C','C#','D','Eb','E','F','F#','G','Ab','A','Bb','B'];
+let scaleDegreeQuiz={count:8,questions:[],checked:false};
 const BEGINNER_INPUT_WINDOW_MS=1200;
 const BEGINNER_RECOMMENDATION_HOLD_MS=6000;
 let AC=null,loopInterval=null,metroInterval=null,isRecording=false,arpTimers=[];
@@ -1528,9 +1533,10 @@ function restoreGrooveOutput(){
   // Groove 啟動時因此拋出 ReferenceError，排程在第一個打擊樂聲部前中斷。採用與目前設定一致的目標值。
   const target=S.mobilePureMode?Math.min(.90,getGrooveMixPreset().output*.78):getGrooveMixPreset().output;
   try{
+    const current=Math.max(.0001,Math.min(target,Number(mix.output.gain.value)||target));
     mix.output.gain.cancelScheduledValues(now);
-    mix.output.gain.setValueAtTime(.0001,now);
-    mix.output.gain.exponentialRampToValueAtTime(target,now+.075);
+    mix.output.gain.setValueAtTime(current,now);
+    mix.output.gain.exponentialRampToValueAtTime(target,now+.025);
   }catch(error){mix.output.gain.value=target;}
 }
 function updatePlaybackMonitorVisibility(){
@@ -1880,10 +1886,12 @@ function getBeatsSinceTimelineOrigin(){return (AC.currentTime-beatTimeline.origi
 // 不保證是第一拍，根音會落在第 2／3／4 拍而形成錯拍。
 function getNextDownbeatBoundary(){
   if(!AC)return null;
-  if(!isBeatTimelineRunning())return AC.currentTime+0.02;
+  if(!isBeatTimelineRunning())return AC.currentTime+0.15;
   const beats=getBeatsSinceTimelineOrigin();
-  const nextDownbeat=Math.ceil(beats/BEATS_PER_MEASURE-1e-6)*BEATS_PER_MEASURE;
-  return beatTimeline.originTime+nextDownbeat*beatTimeline.beatMs/1000;
+  let nextDownbeat=Math.ceil(beats/BEATS_PER_MEASURE-1e-6)*BEATS_PER_MEASURE;
+  let boundary=beatTimeline.originTime+nextDownbeat*beatTimeline.beatMs/1000;
+  while(boundary<AC.currentTime+0.12){nextDownbeat+=BEATS_PER_MEASURE;boundary=beatTimeline.originTime+nextDownbeat*beatTimeline.beatMs/1000;}
+  return boundary;
 }
 // 確保共用時脈存在。和弦／智慧和聲／自訂進行可能在尚未開啟節拍器時就起拍；
 // 此時由進行先建立原點，之後開啟的節拍器沿用同一原點，
@@ -1917,7 +1925,7 @@ function getMsUntilNextDownbeat(){
 function startBeatTimeline(){
   ensureAudioReady();
   beatTimeline.runId++;
-  beatTimeline.originTime=AC.currentTime+0.02;
+  beatTimeline.originTime=AC.currentTime+0.15;
   beatTimeline.beatMs=getBeatMs();
   beatTimeline.isRunning=true;
   return beatTimeline.runId;
@@ -2053,6 +2061,12 @@ function playChord(midis,dur,vol,capture,startAt){
   startPolyChord(midis,dur==null?getChordVoiceDuration():dur,vol==null?S.chordVol:vol,{sustainSeconds,...(Number.isFinite(startAt)?{startAt}: {})});
 }
 function playArpeggio(midis){playChord(midis);}
+function scheduleChordAudio(midis,startAt,guard=()=>true){
+  const ctx=ensureAudioReady();
+  const leadSeconds=.12;
+  const delay=Math.max(0,(startAt-ctx.currentTime-leadSeconds)*1000);
+  return setTimeout(()=>{if(guard())playChord(midis,undefined,undefined,undefined,startAt);},delay);
+}
 
 function playMetronomeBeat(accent=false,when){
   const volume=Math.min(1,Math.max(0,Number(S.metroVol)||0));
@@ -3283,12 +3297,13 @@ function playCustomProgression(){
   const beatStartAt=getNextDownbeatBoundary();
   for(let cycle=0;cycle<cycles;cycle++)sequence.forEach((chord,index)=>{
     const absoluteIndex=cycle*sequence.length+index;
+    const midis=validCustomChord(chord)?spellChord(chord.note,chord.q).map(note=>note.midi):null;
+    if(midis)customProgressionTimers.push(scheduleChordAudio(midis,beatStartAt+absoluteIndex*chordMs/1000,()=>run===customProgressionRun&&customProgressionActive));
     customProgressionTimers.push(setTimeout(()=>{
       if(run!==customProgressionRun)return;
       customProgressionCurrentSlot=index;updateCustomProgressionPlaybackUi();
-      if(!validCustomChord(chord))return;
-      const midis=spellChord(chord.note,chord.q).map(note=>note.midi);
-      updateVisualizationHighlight(midis,chord.note,chord.q,chord.note,true);playChord(midis,undefined,undefined,undefined,beatStartAt+absoluteIndex*chordMs/1000);
+      if(!midis)return;
+      updateVisualizationHighlight(midis,chord.note,chord.q,chord.note,true);
       if(absoluteIndex===cycles*sequence.length-1){
         const tail=Math.max(160,getChordPlaybackDurationMs(midis));
         customProgressionFinishTimer=setTimeout(()=>{if(run===customProgressionRun)stopCustomProgression();},tail);
@@ -3752,6 +3767,69 @@ function renderExam(){
   const fullscreenBtn=document.getElementById('examFullscreenBtn');if(fullscreenBtn)fullscreenBtn.onclick=toggleExamFullscreen;
   updateExamStats();
 }
+function scaleDegreeNote(key,degree){return spellNote(key,MAJOR_SCALE_INTERVALS[degree],degree).name;}
+function normalizeQuizNote(value){
+  const match=/^([A-G])([#b]{0,2})$/i.exec(String(value||'').trim().replace(/♯/g,'#').replace(/♭/g,'b'));
+  if(!match)return null;
+  const name=match[1].toUpperCase()+match[2];
+  return{name,pitch:notePitchClass(name)};
+}
+function createScaleDegreeQuizQuestion(){
+  let key,sourceDegree,sourceNote;
+  for(let attempt=0;attempt<48;attempt++){
+    key=SCALE_DEGREE_KEYS[Math.floor(Math.random()*SCALE_DEGREE_KEYS.length)];
+    const candidates=MAJOR_SCALE_INTERVALS.map((_,degree)=>({degree,note:scaleDegreeNote(key,degree)})).filter(item=>/^[A-G]$/.test(item.note));
+    if(candidates.length){const picked=candidates[Math.floor(Math.random()*candidates.length)];sourceDegree=picked.degree;sourceNote=picked.note;break;}
+  }
+  if(!sourceNote){key='C';sourceDegree=0;sourceNote='C';}
+  let targetDegree=Math.floor(Math.random()*6);
+  if(targetDegree>=sourceDegree)targetDegree++;
+  const answer=scaleDegreeNote(key,targetDegree);
+  return{key,sourceDegree,sourceNote,targetDegree,answer,attempts:0,status:'pending',firstTryCorrect:false,value:''};
+}
+function startScaleDegreeQuiz(count){
+  const parsed=Math.floor(Number(count));
+  if(!Number.isFinite(parsed)||parsed<1){showToast('請輸入至少 1 題');return;}
+  scaleDegreeQuiz={count:Math.min(200,parsed),questions:Array.from({length:Math.min(200,parsed)},createScaleDegreeQuizQuestion),checked:false};
+  renderScaleDegreeQuiz();
+}
+function checkScaleDegreeQuiz(){
+  if(!scaleDegreeQuiz.questions.length)return;
+  scaleDegreeQuiz.questions.forEach(question=>{
+    if(question.status==='correct'||question.status==='revealed')return;
+    const entered=normalizeQuizNote(question.value);
+    if(entered&&entered.pitch===notePitchClass(question.answer)){
+      question.status='correct';question.firstTryCorrect=question.attempts===0;
+    }else{
+      question.attempts++;
+      question.status=question.attempts>=3?'revealed':'wrong';
+    }
+  });
+  scaleDegreeQuiz.checked=true;
+  renderScaleDegreeQuiz();
+}
+function renderScaleDegreeQuiz(){
+  const area=document.getElementById('contentArea');if(!area)return;
+  const questions=scaleDegreeQuiz.questions;
+  const correct=questions.filter(question=>question.firstTryCorrect).length;
+  const resolved=questions.length>0&&questions.every(question=>question.status==='correct'||question.status==='revealed');
+  const score=scaleDegreeQuiz.checked?`<div class="degree-quiz-score" role="status">首次答對 ${correct}／${questions.length} 題・得分 ${Math.round(correct/Math.max(1,questions.length)*100)}%${resolved?'・本回合完成，錯題答案已訂正或顯示':''}</div>`:'';
+  const list=questions.length?`<div class="degree-quiz-list">${questions.map((question,index)=>{
+    const rowClass=question.status==='wrong'?' is-wrong':question.status==='correct'?' is-correct':'';
+    let feedback='請輸入音名，例如 C、F# 或 Bb。';
+    if(question.status==='wrong')feedback=`答案不正確，請重新輸入（已錯 ${question.attempts} 次，最多 3 次）。`;
+    if(question.status==='correct')feedback=`答對：${question.answer}。`;
+    if(question.status==='revealed')feedback=`已連續答錯 3 次，正確答案是 ${question.answer}。`;
+    const disabled=question.status==='correct'||question.status==='revealed'?' disabled':'';
+    return `<article class="degree-quiz-question${rowClass}" data-question-index="${index}"><div class="degree-quiz-prompt"><strong>${index+1}.</strong> 已知 ${question.key} 大調的「${SCALE_DEGREE_NAMES[question.sourceDegree]}」音為 ${question.sourceNote}，請寫出同一調的「${SCALE_DEGREE_NAMES[question.targetDegree]}」音。</div><input class="degree-quiz-answer" data-quiz-answer="${index}" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" maxlength="3" placeholder="音名" aria-label="第 ${index+1} 題答案" value="${question.value}"${disabled}><div class="degree-quiz-feedback" aria-live="polite">${feedback}</div></article>`;
+  }).join('')}</div>`:'';
+  area.innerHTML=`<section class="degree-quiz-page"><div class="degree-quiz-card"><header class="degree-quiz-head"><div><h2>亂數樂理產生器・音階音級換算</h2><p>依大調七個音級練習音名。答案請輸入音名；同音異名（例如 C#／Db）視為正確。</p></div></header><div class="degree-quiz-setup"><div class="degree-quiz-field"><label for="degreeQuizCount">本回合題數（1–200）</label><input id="degreeQuizCount" type="number" min="1" max="200" step="1" value="${scaleDegreeQuiz.count}" inputmode="numeric"></div><button class="degree-quiz-btn primary" id="degreeQuizGenerateBtn" type="button">${questions.length?'產生新題':'開始出題'}</button><button class="degree-quiz-btn" id="degreeQuizExitBtn" type="button">返回練習</button></div>${score}${list}${questions.length?`<div class="degree-quiz-actions"><button class="degree-quiz-btn primary" id="degreeQuizSubmitBtn" type="button"${resolved?' disabled':''}>${scaleDegreeQuiz.checked?'交卷／檢查訂正':'交卷／檢查答案'}</button><button class="degree-quiz-btn" id="degreeQuizNewBtn" type="button">重新產生題目</button></div>`:''}</div></section>`;
+  area.querySelectorAll('[data-quiz-answer]').forEach(input=>input.addEventListener('input',event=>{const index=Number(event.currentTarget.dataset.quizAnswer);if(scaleDegreeQuiz.questions[index])scaleDegreeQuiz.questions[index].value=event.currentTarget.value;}));
+  document.getElementById('degreeQuizGenerateBtn')?.addEventListener('click',()=>startScaleDegreeQuiz(document.getElementById('degreeQuizCount')?.value));
+  document.getElementById('degreeQuizNewBtn')?.addEventListener('click',()=>startScaleDegreeQuiz(document.getElementById('degreeQuizCount')?.value));
+  document.getElementById('degreeQuizSubmitBtn')?.addEventListener('click',checkScaleDegreeQuiz);
+  document.getElementById('degreeQuizExitBtn')?.addEventListener('click',()=>{S.level='Beginner';document.body.classList.remove('scale-degree-quiz-mode');const select=document.getElementById('levelSelect');if(select)select.value=S.level;render();});
+}
 function applyExamFullscreenState(){
   document.body.classList.toggle('exam-focus-active',Boolean(S.examFullscreen));
 }
@@ -3901,6 +3979,7 @@ function restoreStandardContentShell(){
 }
 function render(){
   const sidebar=document.getElementById('sidebar');
+  document.body.classList.toggle('scale-degree-quiz-mode',S.level==='ScaleDegreeQuiz');
   if(sidebar)sidebar.classList.toggle('exam-mode-active',S.level==='Exam');
   const diatonicControls=document.getElementById('diatonicControls');
   const examControls=document.getElementById('examControls');
@@ -3920,6 +3999,7 @@ const particleCountInput=document.getElementById('examParticleCount');if(particl
   if(S.level==='Beginner')renderBeginner();
   else if(S.level==='Intermediate')renderIntermediate();
   else if(S.level==='Exam')renderExam();
+  else if(S.level==='ScaleDegreeQuiz')renderScaleDegreeQuiz();
   else renderDiatonic();
   requestAnimationFrame(syncMascotTraveler);
 }
@@ -4153,6 +4233,11 @@ document.getElementById('levelSelect').onchange=function(){
     const metronome=document.getElementById('metronome');
     if(metronome?.checked){metronome.checked=false;metronome.dispatchEvent(new Event('change'));}
   }
+  if(nextLevel==='ScaleDegreeQuiz'){
+    stopMascotPlayback();clearSmartHarmonyTimers();stopCustomProgression();
+    if(loopInterval){clearInterval(loopInterval);loopInterval=null;}S.loop=false;const loopButton=document.getElementById('loopBtn');if(loopButton){loopButton.classList.remove('on');loopButton.textContent='🔁';}
+    const metronome=document.getElementById('metronome');if(metronome?.checked){metronome.checked=false;metronome.dispatchEvent(new Event('change'));}
+  }
   if(S.beginnerInputTimer)clearTimeout(S.beginnerInputTimer);
   S.beginnerInputTimer=null;S.beginnerInputWindow=[];S.beginnerRecentInput=[];S.beginnerRecommendations=[];S.beginnerPinned=false;
   S.level=nextLevel;
@@ -4290,12 +4375,12 @@ async function playDiatonicSequence(){
   const beatAlignMs=getMsUntilNextDownbeat();
   const beatStartAt=getNextDownbeatBoundary();
   sequence.forEach((c,i)=>{
+    mascotPlaybackTimers.push(scheduleChordAudio(c.midi,beatStartAt+i*chordMs/1000,()=>mascotPlaybackActive&&run===mascotPlaybackRun));
     const timer=setTimeout(()=>{
       if(!mascotPlaybackActive||run!==mascotPlaybackRun)return;
       const round=Math.floor(i/Math.max(1,diatonic.length))+1;
       updateDiatonicPlaybackStatus(round,repeats,i,sequence.length,true);
       updateVisualizationHighlight(c.midi,c.note,c.q,c.note,true);
-      playChord(c.midi,undefined,undefined,undefined,beatStartAt+i*chordMs/1000);
       moveMascotTo(c.note,c.q);
     },beatAlignMs+i*chordMs);
     mascotPlaybackTimers.push(timer);
@@ -4344,16 +4429,17 @@ document.getElementById('loopBtn').onclick=function(){
 document.getElementById('randomChordsBtn').onclick=function(){
   stopScalePreview();
   clearSmartHarmonyTimers();
+  const run=smartHarmonyRun;
   const roots=['C','D','E','F','G','A','B'];
   const qs=['Major','Minor','Major 7','Minor 7','Dominant 7'];
-  const beatAlignMs=getMsUntilNextDownbeat();
   const beatStartAt=getNextDownbeatBoundary();
   S.progression=[];
   for(let i=0;i<4;i++){
     const r=roots[Math.floor(Math.random()*roots.length)];
     const q=qs[Math.floor(Math.random()*qs.length)];
     S.progression.push({name:r+CHORDS[q].rom,note:r,q});
-    setTimeout(()=>playChord(midi(r,CHORDS[q].f),undefined,undefined,undefined,beatStartAt+i*getProgressionChordIntervalMs()/1000),beatAlignMs+i*getProgressionChordIntervalMs());
+    const midis=midi(r,CHORDS[q].f),startAt=beatStartAt+i*getProgressionChordIntervalMs()/1000;
+    smartHarmonyTimers.push(scheduleChordAudio(midis,startAt,()=>run===smartHarmonyRun));
   }
   renderProgression();
   render();
@@ -4378,12 +4464,12 @@ function playSmartHarmony(progression){
   const beatStartAt=getNextDownbeatBoundary();
   updateSmartHarmonyStatus(0,progression.length,true,progression[0]);
   progression.forEach((chord,index)=>{
+    const midis=midi(chord.note,CHORDS[chord.q].f),startAt=beatStartAt+index*chordMs/1000;
+    smartHarmonyTimers.push(scheduleChordAudio(midis,startAt,()=>run===smartHarmonyRun));
     smartHarmonyTimers.push(setTimeout(()=>{
       if(run!==smartHarmonyRun)return;
-      const midis=midi(chord.note,CHORDS[chord.q].f);
       updateSmartHarmonyStatus(index,progression.length,true,chord);
       updateVisualizationHighlight(midis,chord.note,chord.q,chord.note,true);
-      playChord(midis,undefined,undefined,undefined,beatStartAt+index*chordMs/1000);
       moveMascotTo(chord.note,chord.q);
       if(index===progression.length-1){
         smartHarmonyTimers=[];
@@ -4589,14 +4675,14 @@ function setMetronomeMode(mode){
   }
 }
 function stopMetronome(){
+  const hadScheduledMetronome=metroInterval!==null||Boolean(grooveStartTimer);
   if(tempoRestartTimer){clearTimeout(tempoRestartTimer);tempoRestartTimer=0;}
   if(grooveStartTimer){clearTimeout(grooveStartTimer);grooveStartTimer=0;}
   grooveRunId++;
   // metroInterval 現為自校正 setTimeout 的 handle，clearTimeout 才能正確取消。
-  if(metroInterval){clearTimeout(metroInterval);metroInterval=null;}
+  if(metroInterval){clearInterval(metroInterval);metroInterval=null;}
   stopBeatTimeline();
-  fadeGrooveOutput();
-  fadeStopGrooveVoices();
+  if(hadScheduledMetronome){fadeGrooveOutput();fadeStopGrooveVoices();}
   metroBeat=0;grooveStep=0;
   stopBeatIndicator();
   stopGrooveMeter();
@@ -4622,6 +4708,8 @@ function fadeStopGrooveVoices(){
   setTimeout(()=>handles.forEach(handle=>grooveVoiceStops.delete(handle)),Math.ceil((fadeSeconds+.16)*1000));
 }
 function startMetronome(){
+  // 只有原本就有節拍器排程時才等待舊聲部淡出；樂器單獨播放後首次開節拍器不可延遲跳過起拍。
+  const restartDelayMs=metroInterval!==null||grooveStartTimer?145:0;
   stopMetronome();
   ensureAudioReady();
   metroBeat=0;
@@ -4636,66 +4724,60 @@ function startMetronome(){
   if(S.metroMode==='groove'){
     const runId=++grooveRunId;
     // 先讓舊聲部與總線完成交叉淡出，再建立新排程；避免 tempo／Groove 切換時在非零交叉點立即重啟。
-    grooveStartTimer=setTimeout(()=>{
+    const startGrooveScheduler=()=>{
       grooveStartTimer=0;
       if(runId!==grooveRunId||S.metroMode!=='groove'||!document.getElementById('metronome')?.checked)return;
       restoreGrooveOutput();
       beatIndicatorActive=true;metroBeat=0;updateBeatIndicator(0,true,'Groove');updatePlaybackMonitorVisibility();
       startGrooveMeter();
-      // 以 beatTimeline 原點推算每次觸發的目標時刻，再用 setInterval 內自校正的
-      // setTimeout 觸發，取代裸 setInterval——消除累積漂移並與和弦進行共用同一原點。
+      // 排入 AudioContext 前方 120ms 的音訊佇列；JS timer 只負責補佇列，不能再決定發聲瞬間。
+      const patternForSchedule=GROOVE_PATTERNS[S.groove]||GROOVE_PATTERNS.disco;
+      const division=Math.max(1,patternForSchedule.division);
+      const stepSeconds=beatTimeline.beatMs/1000/division;
+      const elapsedSteps=(AC.currentTime-beatTimeline.originTime)/stepSeconds;
+      const measureSteps=BEATS_PER_MEASURE*division;
+      let nextStep=Math.ceil(Math.max(0,elapsedSteps)/(measureSteps)-1e-6)*measureSteps;
+      if(beatTimeline.originTime+nextStep*stepSeconds<AC.currentTime+0.005)nextStep+=measureSteps;
       const scheduleGroove=()=>{
-        const patternForSchedule=GROOVE_PATTERNS[S.groove]||GROOVE_PATTERNS.disco;
-        const stepMs=getBeatMs()/Math.max(1,patternForSchedule.division);
-        const firstGrooveStep=Math.ceil(Math.max(0,(AC.currentTime-beatTimeline.originTime)*1000/beatTimeline.beatMs)/(BEATS_PER_MEASURE*patternForSchedule.division))*(BEATS_PER_MEASURE*patternForSchedule.division);
-        let lastScheduledStep=firstGrooveStep-1;
-        const triggerNext=()=>{
-          if(timelineRun!==beatTimeline.runId)return;
-          const now=AC.currentTime;
-          const elapsedBeats=(now-beatTimeline.originTime)*1000/beatTimeline.beatMs;
-          const targetStep=Math.max(firstGrooveStep,lastScheduledStep+1,Math.floor(elapsedBeats*Math.max(1,patternForSchedule.division)+1e-6)+1);
-          lastScheduledStep=targetStep;
-          const targetTime=beatTimeline.originTime+targetStep*stepMs/1000;
-          const delay=Math.max(0,(targetTime-now)*1000);
-          metroInterval=setTimeout(()=>{
-            if(timelineRun!==beatTimeline.runId)return;
-            grooveStep=targetStep%patternForSchedule.steps;
-            const nextBeat=Math.floor(grooveStep/Math.max(1,patternForSchedule.division))%4;
-            if(nextBeat!==metroBeat){metroBeat=nextBeat;updateBeatIndicator(metroBeat,true,'Groove');}
-            playGrooveStep(grooveStep,targetTime);
-            triggerNext();
-          },delay);
-        };
-        triggerNext();
+        if(timelineRun!==beatTimeline.runId)return;
+        const now=AC.currentTime;
+        const horizon=now+0.12;
+        while(beatTimeline.originTime+nextStep*stepSeconds<=horizon){
+          const targetStep=nextStep++;
+          const targetTime=beatTimeline.originTime+targetStep*stepSeconds;
+          if(targetTime<now-0.025)continue;
+          const step=targetStep%patternForSchedule.steps;
+          const beat=Math.floor(step/division)%4;
+          playGrooveStep(step,targetTime);
+          const uiDelay=Math.max(0,(targetTime-now)*1000);
+          setTimeout(()=>{if(timelineRun===beatTimeline.runId){grooveStep=step;if(beat!==metroBeat){metroBeat=beat;updateBeatIndicator(beat,true,'Groove');}}},uiDelay);
+        }
       };
       scheduleGroove();
-    },145);
+      metroInterval=setInterval(scheduleGroove,25);
+    };
+    if(restartDelayMs)grooveStartTimer=setTimeout(startGrooveScheduler,restartDelayMs);
+    else startGrooveScheduler();
   }else{
     beatIndicatorActive=true;updateBeatIndicator(0,true,'木魚');updatePlaybackMonitorVisibility();
-    const timelineRun=acquireBeatTimelineForPlayback();
-    const triggerNext=()=>{
+    // 木魚與所有樂器共用絕對 beat index，提前 120ms 排入音訊時鐘。
+    const firstDownbeat=getNextDownbeatBoundary();
+    let nextBeatIndex=Math.max(0,Math.round((firstDownbeat-beatTimeline.originTime)*1000/beatTimeline.beatMs));
+    const scheduleWoodblock=()=>{
       if(timelineRun!==beatTimeline.runId)return;
-      const now=AC.currentTime;
-      const elapsedBeats=(now-beatTimeline.originTime)*1000/beatTimeline.beatMs;
-      const targetBeat=Math.floor(elapsedBeats+1e-6)+1;
-      const targetTime=beatTimeline.originTime+targetBeat*beatTimeline.beatMs/1000;
-      const delay=Math.max(0,(targetTime-now)*1000);
-      metroInterval=setTimeout(()=>{
-        if(timelineRun!==beatTimeline.runId)return;
-        metroBeat=targetBeat%4;
-        updateBeatIndicator(metroBeat,true,'木魚');
-        playMetronomeBeat(metroBeat===0,targetTime);
-        triggerNext();
-      },delay);
+      const now=AC.currentTime,horizon=now+0.12;
+      while(beatTimeline.originTime+nextBeatIndex*beatTimeline.beatMs/1000<=horizon){
+        const beatIndex=nextBeatIndex++;
+        const targetTime=beatTimeline.originTime+beatIndex*beatTimeline.beatMs/1000;
+        if(targetTime<now-0.025)continue;
+        const beat=beatIndex%BEATS_PER_MEASURE;
+        playMetronomeBeat(beat===0,targetTime);
+        const uiDelay=Math.max(0,(targetTime-now)*1000);
+        setTimeout(()=>{if(timelineRun===beatTimeline.runId){metroBeat=beat;updateBeatIndicator(beat,true,'木魚');}},uiDelay);
+      }
     };
-    // schedule first beat on next downbeat
-    const firstBeatAt=getNextDownbeatBoundary();
-    const firstDelay=Math.max(0,(firstBeatAt-AC.currentTime)*1000);
-    setTimeout(()=>{
-      if(timelineRun!==beatTimeline.runId)return;
-      playMetronomeBeat(true,firstBeatAt);
-      triggerNext();
-    },firstDelay);
+    scheduleWoodblock();
+    metroInterval=setInterval(scheduleWoodblock,25);
   }
 }
 document.getElementById('metronome').onchange=function(){

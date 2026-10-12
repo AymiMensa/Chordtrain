@@ -275,6 +275,19 @@ describe("隨堂考試模式契約", () => {
     expect(html).toContain("const fadeSeconds=.16");
   });
 
+  it("提供響應式音級換算題庫、交卷評分與連錯三次答案提示", () => {
+    expect(html).toContain('<option value="ScaleDegreeQuiz">音級換算題庫</option>');
+    expect(html).toContain("function createScaleDegreeQuizQuestion()");
+    expect(html).toContain("function checkScaleDegreeQuiz()");
+    expect(html).toContain("question.attempts>=3?'revealed':'wrong'");
+    expect(html).toContain("首次答對 ${correct}／${questions.length} 題");
+    expect(html).toContain("SCALE_DEGREE_NAMES[question.sourceDegree]");
+    expect(html).toContain("SCALE_DEGREE_NAMES[question.targetDegree]");
+    expect(html).toContain("Math.min(200,parsed)");
+    expect(html).toContain("@media(max-width:600px){.degree-quiz-page");
+    expect(html).toContain("body.scale-degree-quiz-mode .sidebar{display:none!important}");
+  });
+
   it("Exam 成績報告會顯示正確率與常錯音符", () => {
     expect(html).toContain("function examMistakeRows()");
     expect(html).toContain("function examReportMarkup()");
