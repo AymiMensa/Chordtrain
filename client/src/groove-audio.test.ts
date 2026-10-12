@@ -29,6 +29,10 @@ describe("Groove audio safety contracts", () => {
     expect(html).toContain("master.gain.setValueAtTime(0,now);");
     expect(html).toContain("master.gain.linearRampToValueAtTime(normalizedLevel,now+attack);");
     expect(html).toContain("master.gain.linearRampToValueAtTime(0,releaseEnd);");
+    expect(html).toContain("const attack=Math.min(.010,Math.max(.006,duration*.06));");
+    expect(html).toContain("const GROOVE_WAVEFORM_GAINS={triangle:1,sine:1.04,sawtooth:.9,square:.84};");
+    expect(html).toContain("peak*0.82*getGrooveWaveformGain()");
+    expect(html).toContain("peak*0.68*getGrooveWaveformGain()");
     expect(html).toContain("gain.gain.setValueAtTime(Math.max(.0001,level),now);");
     expect(html).toContain("S.mobilePureMode?0.14:0.22");
     expect(html).toContain("(S.grooveWaveform==='sawtooth'||S.grooveWaveform==='square')?1050:1800");
