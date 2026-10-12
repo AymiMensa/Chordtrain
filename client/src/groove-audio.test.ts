@@ -76,6 +76,9 @@ describe("Groove audio safety contracts", () => {
     expect(html).toContain("playMetronomeBeat(beat===0,targetTime)");
     expect(html).toContain("playGrooveStep(step,targetTime)");
     expect(html).toContain("const elapsedSteps=(AC.currentTime-beatTimeline.originTime)/stepSeconds;");
+    expect(html).toContain("let nextStep=Math.max(0,Math.ceil(elapsedSteps-1e-6));");
+    expect(html).toContain("let nextBeatIndex=Math.max(0,Math.ceil((AC.currentTime-beatTimeline.originTime)*1000/beatTimeline.beatMs-1e-6));");
+    expect(html).not.toContain("Math.ceil(Math.max(0,elapsedSteps)/(measureSteps)-1e-6)*measureSteps");
     expect(html).not.toContain("metroInterval=setTimeout(");
     expect(html).not.toContain("playGrooveStep(0);");
     expect((html.match(/const beatAlignMs=getMsUntilNextDownbeat\(\);/g)||[]).length).toBe(3);

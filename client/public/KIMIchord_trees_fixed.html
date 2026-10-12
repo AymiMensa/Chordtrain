@@ -4735,9 +4735,10 @@ function startMetronome(){
       const division=Math.max(1,patternForSchedule.division);
       const stepSeconds=beatTimeline.beatMs/1000/division;
       const elapsedSteps=(AC.currentTime-beatTimeline.originTime)/stepSeconds;
-      const measureSteps=BEATS_PER_MEASURE*division;
-      let nextStep=Math.ceil(Math.max(0,elapsedSteps)/(measureSteps)-1e-6)*measureSteps;
-      if(beatTimeline.originTime+nextStep*stepSeconds<AC.currentTime+0.005)nextStep+=measureSteps;
+      // 接入正在播放的樂器時，從共用時脈的下一個可排程細分拍加入；
+      // 不要等到下一小節，否則剛啟動的 Groove 會漏掉目前小節剩餘的拍點。
+      let nextStep=Math.max(0,Math.ceil(elapsedSteps-1e-6));
+      while(beatTimeline.originTime+nextStep*stepSeconds<AC.currentTime+0.005)nextStep++;
       const scheduleGroove=()=>{
         if(timelineRun!==beatTimeline.runId)return;
         const now=AC.currentTime;
@@ -4761,8 +4762,10 @@ function startMetronome(){
   }else{
     beatIndicatorActive=true;updateBeatIndicator(0,true,'木魚');updatePlaybackMonitorVisibility();
     // 木魚與所有樂器共用絕對 beat index，提前 120ms 排入音訊時鐘。
-    const firstDownbeat=getNextDownbeatBoundary();
-    let nextBeatIndex=Math.max(0,Math.round((firstDownbeat-beatTimeline.originTime)*1000/beatTimeline.beatMs));
+    // 木魚加入已播放的樂器時，接續同一時脈的下一拍，維持當下小節的拍號。
+    // 使用絕對拍 index，因此之後的第一至第四拍都與和弦／琶音共用同一原點。
+    let nextBeatIndex=Math.max(0,Math.ceil((AC.currentTime-beatTimeline.originTime)*1000/beatTimeline.beatMs-1e-6));
+    while(beatTimeline.originTime+nextBeatIndex*beatTimeline.beatMs/1000<AC.currentTime+0.005)nextBeatIndex++;
     const scheduleWoodblock=()=>{
       if(timelineRun!==beatTimeline.runId)return;
       const now=AC.currentTime,horizon=now+0.12;
