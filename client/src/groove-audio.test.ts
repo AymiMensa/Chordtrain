@@ -55,6 +55,14 @@ describe("Groove audio safety contracts", () => {
     expect(html).toContain("RMS ${Math.round(event.rms*100)}%");
   });
 
+  it("disconnects every Groove voice as soon as its scheduled sources end", () => {
+    expect(html).toContain("function disposeGrooveVoice(handle){");
+    expect(html).toContain("source.addEventListener('ended',()=>{");
+    expect(html).toContain("if(voiceHandle.sources.length===0)disposeGrooveVoice(voiceHandle);");
+    expect(html).toContain("try{handle.master.disconnect();}catch(error){}");
+    expect(html).not.toContain("setTimeout(()=>grooveVoiceStops.delete(voiceHandle),1500)");
+  });
+
   it("provides a one-click audio preference reset without weakening the safe output path", () => {
     expect(html).toContain('id="resetAudioPreferencesBtn"');
     expect(html).toContain("function resetAudioPreferences()");

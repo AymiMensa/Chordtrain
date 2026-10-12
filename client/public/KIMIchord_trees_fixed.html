@@ -1340,6 +1340,14 @@ function ensureGrooveMix(){
   return grooveMix;
 }
 function connectGrooveOutput(node){node.connect(ensureGrooveMix().input);}
+function disposeGrooveVoice(handle){
+  if(!handle||handle.disposed)return;
+  handle.disposed=true;
+  handle.sources.forEach(source=>{try{source.disconnect();}catch(error){}});
+  handle.sources.length=0;
+  try{handle.master.disconnect();}catch(error){}
+  grooveVoiceStops.delete(handle);
+}
 function ensureChordMix(){
   const ctx=ensureAudioReady();
   if(chordMix&&chordMix.context===ctx)return chordMix;
@@ -2107,9 +2115,17 @@ function playDrumVoice(kind,when,accent=false){
   const now=when||ctx.currentTime;
   const master=ctx.createGain();
   connectGrooveOutput(master);
-  const voiceHandle={master,sources:[],stopped:false};
+  const voiceHandle={master,sources:[],stopped:false,disposed:false};
   grooveVoiceStops.add(voiceHandle);
-  const trackSource=source=>{voiceHandle.sources.push(source);return source;};
+  const trackSource=source=>{
+    voiceHandle.sources.push(source);
+    source.addEventListener('ended',()=>{
+      try{source.disconnect();}catch(error){}
+      voiceHandle.sources=voiceHandle.sources.filter(activeSource=>activeSource!==source);
+      if(voiceHandle.sources.length===0)disposeGrooveVoice(voiceHandle);
+    },{once:true});
+    return source;
+  };
   const voiceGain={
     kick:0.96,edmKick:0.94,subKick:0.84,snare:0.9,clap:0.82,
     brush:1.32,brushAccent:1.46,closedHat:0.62,hat:0.64,openHat:0.72,
@@ -2224,7 +2240,6 @@ function playDrumVoice(kind,when,accent=false){
     default:
       envelope(0.12,peak*0.4);noiseBurst(0.1,'bandpass',1800,1,peak*0.25,1.5);
   }
-  setTimeout(()=>grooveVoiceStops.delete(voiceHandle),1500);
 }
 function playGrooveStep(step,when){
   const pattern=GROOVE_PATTERNS[S.groove]||GROOVE_PATTERNS.disco;
@@ -4709,7 +4724,7 @@ function fadeStopGrooveVoices(){
     }catch(error){}
     handle.sources.forEach(source=>{try{source.stop(now+fadeSeconds+.035);}catch(error){}});
   });
-  setTimeout(()=>handles.forEach(handle=>grooveVoiceStops.delete(handle)),Math.ceil((fadeSeconds+.16)*1000));
+  setTimeout(()=>handles.forEach(disposeGrooveVoice),Math.ceil((fadeSeconds+.16)*1000));
 }
 function startMetronome(){
   // 只有原本就有節拍器排程時才等待舊聲部淡出；樂器單獨播放後首次開節拍器不可延遲跳過起拍。
