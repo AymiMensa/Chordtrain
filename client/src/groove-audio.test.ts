@@ -78,7 +78,9 @@ describe("Groove audio safety contracts", () => {
     expect(html).toContain("function acquireBeatTimelineForPlayback(){return ensureBeatTimeline();}");
     expect(html).toContain("function getMsUntilNextDownbeat()");
     expect(html).toContain("const BEATS_PER_MEASURE=4;");
-    expect(html).toContain("const horizon=now+0.12;");
+    expect(html).toContain("const BEAT_SCHEDULE_AHEAD_SECONDS=.25;");
+    expect(html).toContain("const horizon=now+BEAT_SCHEDULE_AHEAD_SECONDS;");
+    expect(html).toContain("const now=AC.currentTime,horizon=now+BEAT_SCHEDULE_AHEAD_SECONDS;");
     expect(html).toContain("while(beatTimeline.originTime+nextStep*stepSeconds<=horizon)");
     expect(html).toContain("while(beatTimeline.originTime+nextBeatIndex*beatTimeline.beatMs/1000<=horizon)");
     expect(html).toContain("metroInterval=setInterval(scheduleGroove,25);");
@@ -95,7 +97,10 @@ describe("Groove audio safety contracts", () => {
     expect(html).not.toContain("playGrooveStep(0);");
     expect((html.match(/const beatAlignMs=getMsUntilNextDownbeat\(\);/g)||[]).length).toBe(3);
     expect(html).toContain("function scheduleChordAudio(midis,startAt,guard=()=>true)");
-    expect(html).toContain("const leadSeconds=.12;");
+    expect(html).toContain("const leadSeconds=BEAT_SCHEDULE_AHEAD_SECONDS;");
+    expect(html).toContain("function stopMetronome(keepBeatTimeline=false)");
+    expect(html).toContain("if(!keepBeatTimeline)stopBeatTimeline();");
+    expect(html).toContain("stopMetronome(true);");
     expect(html).toContain("document.getElementById('instSelect').onchange=function(){S.inst=normalizeInstrument(this.value);};");
   });
 

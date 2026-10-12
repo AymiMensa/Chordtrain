@@ -1028,6 +1028,7 @@ const BEGINNER_INPUT_WINDOW_MS=1200;
 const BEGINNER_RECOMMENDATION_HOLD_MS=6000;
 let AC=null,loopInterval=null,metroInterval=null,isRecording=false,arpTimers=[];
 const BEATS_PER_MEASURE=4;
+const BEAT_SCHEDULE_AHEAD_SECONDS=.25;
 let beatTimeline={originTime:0,isRunning:false,beatMs:0,runId:0};
 let beatTimelinePreserved=null;
 let scalePreviewTimers=[],scalePreviewRun=0,scalePreviewActive=false;
@@ -1900,7 +1901,7 @@ function getNextDownbeatBoundary(){
   const beats=getBeatsSinceTimelineOrigin();
   let nextDownbeat=Math.ceil(beats/BEATS_PER_MEASURE-1e-6)*BEATS_PER_MEASURE;
   let boundary=beatTimeline.originTime+nextDownbeat*beatTimeline.beatMs/1000;
-  while(boundary<AC.currentTime+0.12){nextDownbeat+=BEATS_PER_MEASURE;boundary=beatTimeline.originTime+nextDownbeat*beatTimeline.beatMs/1000;}
+  while(boundary<AC.currentTime+BEAT_SCHEDULE_AHEAD_SECONDS){nextDownbeat+=BEATS_PER_MEASURE;boundary=beatTimeline.originTime+nextDownbeat*beatTimeline.beatMs/1000;}
   return boundary;
 }
 // 確保共用時脈存在。和弦／智慧和聲／自訂進行可能在尚未開啟節拍器時就起拍；
@@ -2073,7 +2074,7 @@ function playChord(midis,dur,vol,capture,startAt){
 function playArpeggio(midis){playChord(midis);}
 function scheduleChordAudio(midis,startAt,guard=()=>true){
   const ctx=ensureAudioReady();
-  const leadSeconds=.12;
+  const leadSeconds=BEAT_SCHEDULE_AHEAD_SECONDS;
   const delay=Math.max(0,(startAt-ctx.currentTime-leadSeconds)*1000);
   return setTimeout(()=>{if(guard())playChord(midis,undefined,undefined,undefined,startAt);},delay);
 }
@@ -4693,14 +4694,14 @@ function setMetronomeMode(mode){
     startMetronome();
   }
 }
-function stopMetronome(){
+function stopMetronome(keepBeatTimeline=false){
   const hadScheduledMetronome=metroInterval!==null||Boolean(grooveStartTimer);
   if(tempoRestartTimer){clearTimeout(tempoRestartTimer);tempoRestartTimer=0;}
   if(grooveStartTimer){clearTimeout(grooveStartTimer);grooveStartTimer=0;}
   grooveRunId++;
   // metroInterval 現為自校正 setTimeout 的 handle，clearTimeout 才能正確取消。
   if(metroInterval){clearInterval(metroInterval);metroInterval=null;}
-  stopBeatTimeline();
+  if(!keepBeatTimeline)stopBeatTimeline();
   if(hadScheduledMetronome){fadeGrooveOutput();fadeStopGrooveVoices();}
   metroBeat=0;grooveStep=0;
   stopBeatIndicator();
@@ -4729,7 +4730,8 @@ function fadeStopGrooveVoices(){
 function startMetronome(){
   // 只有原本就有節拍器排程時才等待舊聲部淡出；樂器單獨播放後首次開節拍器不可延遲跳過起拍。
   const restartDelayMs=metroInterval!==null||grooveStartTimer?145:0;
-  stopMetronome();
+  // 重建節拍器排程時保留正在使用的 AudioContext 時脈，避免讓進行中的樂器失去原本的排程代次。
+  stopMetronome(true);
   ensureAudioReady();
   metroBeat=0;
   grooveStep=0;
@@ -4761,7 +4763,7 @@ function startMetronome(){
       const scheduleGroove=()=>{
         if(timelineRun!==beatTimeline.runId)return;
         const now=AC.currentTime;
-        const horizon=now+0.12;
+        const horizon=now+BEAT_SCHEDULE_AHEAD_SECONDS;
         while(beatTimeline.originTime+nextStep*stepSeconds<=horizon){
           const targetStep=nextStep++;
           const targetTime=beatTimeline.originTime+targetStep*stepSeconds;
@@ -4787,7 +4789,7 @@ function startMetronome(){
     while(beatTimeline.originTime+nextBeatIndex*beatTimeline.beatMs/1000<AC.currentTime+0.005)nextBeatIndex++;
     const scheduleWoodblock=()=>{
       if(timelineRun!==beatTimeline.runId)return;
-      const now=AC.currentTime,horizon=now+0.12;
+      const now=AC.currentTime,horizon=now+BEAT_SCHEDULE_AHEAD_SECONDS;
       while(beatTimeline.originTime+nextBeatIndex*beatTimeline.beatMs/1000<=horizon){
         const beatIndex=nextBeatIndex++;
         const targetTime=beatTimeline.originTime+beatIndex*beatTimeline.beatMs/1000;
