@@ -1907,6 +1907,15 @@ function getNextDownbeatBoundary(){
   while(boundary<AC.currentTime+0.005){nextDownbeat+=BEATS_PER_MEASURE;boundary=beatTimeline.originTime+nextDownbeat*beatTimeline.beatMs/1000;}
   return boundary;
 }
+// 未編入進行的單次和弦預聽，落在共用時鐘的下一拍；和弦進行仍使用小節第一拍對齊。
+function getNextBeatBoundary(){
+  if(!AC)return null;
+  if(!isBeatTimelineRunning())return AC.currentTime+0.15;
+  let nextBeat=Math.ceil(getBeatsSinceTimelineOrigin()-1e-6);
+  let boundary=beatTimeline.originTime+nextBeat*beatTimeline.beatMs/1000;
+  while(boundary<AC.currentTime+0.005){nextBeat++;boundary=beatTimeline.originTime+nextBeat*beatTimeline.beatMs/1000;}
+  return boundary;
+}
 // 確保共用時脈存在。和弦／智慧和聲／自訂進行可能在尚未開啟節拍器時就起拍；
 // 此時由進行先建立原點，之後開啟的節拍器沿用同一原點，
 // 兩者才不會各自為政而固定差半拍。
@@ -1939,7 +1948,9 @@ function getMsUntilNextDownbeat(){
 }
 function ensureMetronomeForMusicalPlayback(){
   const input=document.getElementById('metronome');
-  if(input?.checked&&metroInterval===null&&!grooveStartTimer)startMetronome();
+  if(!input)return;
+  if(!input.checked){input.checked=true;input.dispatchEvent(new Event('change'));return;}
+  if(metroInterval===null&&!grooveStartTimer)startMetronome();
 }
 function startBeatTimeline(){
   ensureAudioReady();
@@ -2040,6 +2051,10 @@ function setSoundLayerEnabled(layer,enabled){
 }
 function playChord(midis,dur,vol,capture,startAt){
   if(!Array.isArray(midis)||midis.length===0)return;
+  if(!Number.isFinite(startAt)){
+    ensureMetronomeForMusicalPlayback();
+    startAt=getNextBeatBoundary();
+  }
   const triggerAt=performance.now();
   // 行動瀏覽器可能在單次觸控附近送出重複事件；36ms 內的同一瞬態不再建立第二批振盪器。
   // 最快 300 BPM 的一拍仍有 200ms，因此不會改變每和弦四拍的正常排程。
@@ -4771,8 +4786,7 @@ function startMetronome(){
       let nextStep=Math.max(0,Math.ceil(elapsedSteps-1e-6));
       while(beatTimeline.originTime+nextStep*stepSeconds<AC.currentTime+0.005)nextStep++;
       const firstStep=nextStep%patternForSchedule.steps;
-      metroBeat=Math.floor(firstStep/division)%4;
-      updateBeatIndicator(metroBeat,true,'Groove');
+      metroBeat=(Math.floor(firstStep/division)+BEATS_PER_MEASURE-1)%BEATS_PER_MEASURE;
       const scheduleGroove=()=>{
         if(timelineRun!==beatTimeline.runId)return;
         const now=AC.currentTime;
@@ -4801,8 +4815,7 @@ function startMetronome(){
     let nextBeatIndex=Math.max(0,Math.ceil((AC.currentTime-beatTimeline.originTime)*1000/beatTimeline.beatMs-1e-6));
     while(beatTimeline.originTime+nextBeatIndex*beatTimeline.beatMs/1000<AC.currentTime+0.005)nextBeatIndex++;
     const runId=grooveRunId;
-    metroBeat=nextBeatIndex%BEATS_PER_MEASURE;
-    updateBeatIndicator(metroBeat,true,'木魚');
+    metroBeat=(nextBeatIndex+BEATS_PER_MEASURE-1)%BEATS_PER_MEASURE;
     const scheduleWoodblock=()=>{
       if(timelineRun!==beatTimeline.runId)return;
       const now=AC.currentTime,horizon=now+BEAT_SCHEDULE_AHEAD_SECONDS;

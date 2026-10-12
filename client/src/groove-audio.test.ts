@@ -77,11 +77,14 @@ describe("Groove audio safety contracts", () => {
     expect(html).toContain("let beatTimeline={originTime:0,isRunning:false,beatMs:0,runId:0};");
     expect(html).toContain("function acquireBeatTimelineForPlayback(){return ensureBeatTimeline();}");
     expect(html).toContain("function getMsUntilNextDownbeat()");
+    expect(html).toContain("function getNextBeatBoundary()");
     expect(html).toContain("const BEATS_PER_MEASURE=4;");
     expect(html).toContain('<input type="checkbox" id="metronome" checked>');
     expect(html).toContain("function ensureMetronomeForMusicalPlayback()");
+    expect(html).toContain("if(!input.checked){input.checked=true;input.dispatchEvent(new Event('change'));return;}");
     expect(html).toContain("while(boundary<AC.currentTime+0.005)");
     expect(html).toContain("function startBeatIndicator(label='和弦',startAt)");
+    expect(html).toContain("ensureMetronomeForMusicalPlayback();\n    startAt=getNextBeatBoundary();");
     expect(html).toContain("const BEAT_SCHEDULE_AHEAD_SECONDS=.25;");
     expect(html).toContain("const horizon=now+BEAT_SCHEDULE_AHEAD_SECONDS;");
     expect(html).toContain("const now=AC.currentTime,horizon=now+BEAT_SCHEDULE_AHEAD_SECONDS;");
