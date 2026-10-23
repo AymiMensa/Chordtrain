@@ -1,0 +1,36 @@
+{
+  "cfg": {
+    "wallMul": 3,
+    "wallAdd": 5,
+    "slowMul": 8,
+    "stunMul": 10,
+    "upgradeWeight": 0.1,
+    "minCov": 1,
+    "loopActions": [
+      "wall",
+      "upgrade",
+      "place",
+      "upgrade"
+    ],
+    "typeWeights": {
+      "arrow": 1,
+      "cannon": 1,
+      "ice": 1,
+      "fire": 1,
+      "poison": 1,
+      "shock": 1,
+      "stun": 1,
+      "laser": 1
+    },
+    "typeCaps": {
+      "arrow": 40,
+      "cannon": 15,
+      "ice": 8,
+      "shock": 8,
+      "stun": 6,
+      "poison": 6,
+      "laser": 4
+    }
+  },
+  "level": 41
+}
