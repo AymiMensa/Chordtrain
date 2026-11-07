@@ -336,13 +336,10 @@
     P.push("<text x=\"" + cx + "\" y=\"26\" text-anchor=\"middle\" font-size=\"16\" font-weight=\"700\" fill=\"" +
            ink + "\">" + esc(opts.title || "Natal Chart") + "</text>");
 
-    /* zodiac ring — bottom colours reversed (mirrored colour wheel) so the
-       outer ring's 12 sign backgrounds form a complete circle in the opposite
-       order. Sign positions and glyphs stay unchanged; only the background
-       colour of each slice is taken from the mirrored sign 11-s. */
+    /* zodiac ring */
     for (var s = 0; s < 12; s++) {
       var s0 = s * 30, s1 = (s + 1) * 30;
-      var color = SIGN_COLORS[ZODIAC[s].element];
+      var color = SIGN_COLORS[ZODIAC[11 - s].element];
       var p1 = polar(cx, cy, rZodiac, s0);
       var p2 = polar(cx, cy, rZodiac, s1);
       var p3 = polar(cx, cy, rZodiacInner, s1);
