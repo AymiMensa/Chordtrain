@@ -339,7 +339,7 @@
     /* zodiac ring */
     for (var s = 0; s < 12; s++) {
       var s0 = s * 30, s1 = (s + 1) * 30;
-      var color = SIGN_COLORS[ZODIAC[11 - s].element];
+      var color = SIGN_COLORS[ZODIAC[s].element];
       var p1 = polar(cx, cy, rZodiac, s0);
       var p2 = polar(cx, cy, rZodiac, s1);
       var p3 = polar(cx, cy, rZodiacInner, s1);
