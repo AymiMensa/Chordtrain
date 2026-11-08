@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+    
+    <defs>
+        <radialGradient id="enemyGrad" cx="30%" cy="30%" r="70%">
+            <stop offset="0%" stop-color="#ff4b2b" />
+            <stop offset="50%" stop-color="#ff416c" />
+            <stop offset="100%" stop-color="#330000" />
+        </radialGradient>
+        <filter id="enemyGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="4" result="blur" />
+            <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+            </feMerge>
+        </filter>
+        <filter id="mShadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="8" stdDeviation="5" flood-color="#000" flood-opacity="0.9" />
+        </filter>
+    </defs>
+    <!-- 機械腳 (8腳) -->
+    <path d="M 50 50 L 15 15 M 50 50 L 85 15 M 50 50 L 15 85 M 50 50 L 85 85 M 50 50 L 5 50 M 50 50 L 95 50 M 50 50 L 30 5 M 50 50 L 70 5 M 50 50 L 30 95 M 50 50 L 70 95" stroke="#222" stroke-width="8" stroke-linecap="round" filter="url(#mShadow)" />
+    <!-- 關節發光 -->
+    <path d="M 50 50 L 15 15 M 50 50 L 85 15 M 50 50 L 15 85 M 50 50 L 85 85 M 50 50 L 5 50 M 50 50 L 95 50" stroke="#ff4b2b" stroke-width="2" stroke-linecap="round" filter="url(#enemyGlow)" />
+    <!-- 核心球體 -->
+    <circle cx="50" cy="50" r="30" fill="url(#enemyGrad)" filter="url(#mShadow)" />
+    <!-- 金屬紋理 -->
+    <circle cx="50" cy="50" r="30" fill="url(#highlight)" />
+
+    <!-- 單眼核心 (右側) -->
+    <circle cx="70" cy="50" r="12" fill="#111" />
+    <circle cx="72" cy="50" r="8" fill="#ffff00" filter="url(#enemyGlow)" />
+    <!-- 瞳孔 -->
+    <rect x="70" y="45" width="4" height="10" fill="#000" />
+</svg>

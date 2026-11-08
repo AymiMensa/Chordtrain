@@ -1,0 +1,8 @@
+{
+  "name": "Neon Bomberman (雙人精緻版)",
+  "description": "A highly polished, responsive Bomberman clone featuring Co-op, Versus, Single Player, and CPU modes with a beautiful neon aesthetic.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

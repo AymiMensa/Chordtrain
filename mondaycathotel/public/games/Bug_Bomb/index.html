@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Bomber Arena Ultimate</title>
+    <link rel="manifest" href="/manifest.json">
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap');
+
+      :root {
+        --bg-color: #050510;
+        --accent-glow: rgba(0, 238, 255, 0.4);
+        --text-color: #e0f2fe;
+      }
+
+      body, html {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        height: 100dvh;
+        overflow: hidden;
+        background-color: var(--bg-color);
+        font-family: 'Outfit', sans-serif;
+        color: var(--text-color);
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+      }
+
+      /* HUD Area - Top */
+      #hud-top {
+        flex: 0 0 auto;
+        padding: clamp(4px, 1vh, 8px) clamp(6px, 2vw, 12px);
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        z-index: 10;
+        box-sizing: border-box;
+        min-height: clamp(28px, 5vh, 40px);
+      }
+
+      .logo-text {
+        font-size: clamp(0.8rem, 2.5vw, 1.5rem);
+        font-weight: 900;
+        letter-spacing: 2px;
+        background: linear-gradient(90deg, #00f2fe 0%, #4facfe 100%);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 0 20px var(--accent-glow);
+      }
+
+      .controls-info {
+        display: flex;
+        gap: clamp(8px, 2vw, 20px);
+        font-size: clamp(0.6rem, 1.5vw, 0.9rem);
+        font-weight: 700;
+        letter-spacing: 1px;
+      }
+
+      .key-cap {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 6px;
+        padding: 4px 10px;
+        color: #fff;
+        box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      }
+
+      /* Game Container */
+      #game-wrapper {
+        flex: 1 1 auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: clamp(3px, 1.5vh, 10px);
+        background: radial-gradient(circle at center, #0f1225 0%, #050510 100%);
+        position: relative;
+        box-sizing: border-box;
+        min-height: 0;
+        overflow: hidden;
+      }
+
+      canvas {
+        background-color: transparent;
+        border-radius: 12px;
+        box-shadow: 0 0 50px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.05);
+        image-rendering: pixelated; 
+      }
+
+      /* Debug Overlay */
+      #debug-overlay {
+        position: absolute;
+        top: 80px;
+        left: 20px;
+        color: lime;
+        font-family: monospace;
+        z-index: 100;
+        pointer-events: none;
+        background: rgba(0,0,0,0.5);
+        padding: 10px;
+        display: none; /* 隱藏 Debug */
+      }
+      #error-overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: red;
+        font-family: monospace;
+        font-size: 20px;
+        z-index: 1000;
+        pointer-events: none;
+        background: rgba(0,0,0,0.8);
+        padding: 20px;
+        display: none;
+      }
+
+      /* Game UI Overlays */
+      .fullscreen-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(5, 5, 16, 0.9);
+        backdrop-filter: blur(20px);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 50;
+        transition: opacity 0.5s ease;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: clamp(10px, 2vh, 30px) clamp(10px, 3vw, 30px);
+        box-sizing: border-box;
+      }
+
+      .title-huge {
+        font-size: clamp(2rem, 8vw, 5rem);
+        font-weight: 900;
+        letter-spacing: clamp(2px, 0.5vw, 5px);
+        margin-bottom: clamp(15px, 4vh, 50px);
+        background: linear-gradient(180deg, #00f2fe 0%, #4facfe 100%);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 0 40px rgba(0, 238, 255, 0.6);
+        animation: pulse 2s infinite alternate;
+        text-align: center;
+        line-height: 1.2;
+        padding: 0 10px;
+        word-break: break-word;
+      }
+
+      @keyframes pulse {
+        0% { transform: scale(1); text-shadow: 0 0 20px rgba(0, 238, 255, 0.4); }
+        100% { transform: scale(1.05); text-shadow: 0 0 50px rgba(0, 238, 255, 0.8); }
+      }
+
+      .menu-btn {
+        background: rgba(0, 238, 255, 0.1);
+        border: 2px solid #00f2fe;
+        color: #fff;
+        padding: clamp(10px, 2vh, 15px) clamp(20px, 5vw, 40px);
+        font-size: clamp(0.9rem, 2.5vw, 1.5rem);
+        font-family: 'Outfit', sans-serif;
+        font-weight: 700;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 15px rgba(0, 238, 255, 0.3);
+        margin: clamp(5px, 1vh, 10px);
+        width: 90%;
+        max-width: 320px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .menu-btn:hover {
+        background: rgba(0, 238, 255, 0.3);
+        transform: scale(1.05);
+        box-shadow: 0 0 25px rgba(0, 238, 255, 0.6);
+      }
+      
+      .key-col {
+        background: rgba(0, 0, 0, 0.5);
+        border: 1px solid #00f2fe;
+        border-radius: 15px;
+        padding: clamp(10px, 2vh, 20px);
+        color: white;
+        text-align: left;
+        width: 90%;
+        max-width: min(300px, 45vw);
+        min-width: 0;
+      }
+      .key-col h3 {
+        text-align: center;
+        color: #00f2fe;
+        margin-top: 0;
+        font-size: clamp(0.9rem, 2vw, 1.2rem);
+      }
+      .key-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: clamp(5px, 1vh, 10px) 0;
+        font-size: clamp(0.8rem, 2vw, 1.2rem);
+        gap: 8px;
+      }
+      .key-bind {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid #fff;
+        color: #fff;
+        padding: 5px clamp(8px, 2vw, 15px);
+        border-radius: 5px;
+        cursor: pointer;
+        min-width: clamp(70px, 15vw, 100px);
+        text-align: center;
+        font-family: monospace;
+        font-size: clamp(0.7rem, 1.5vw, 1rem);
+      }
+      .key-bind.listening {
+        background: rgba(255, 0, 85, 0.5);
+        border-color: #ff0055;
+        box-shadow: 0 0 10px #ff0055;
+      }
+
+      .hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      /* Mobile Touch Controls */
+      #touch-controls {
+        width: 100%;
+        pointer-events: none;
+        z-index: 80;
+        display: flex;
+        justify-content: space-between;
+        padding: 0 clamp(10px, 3vw, 30px);
+        box-sizing: border-box;
+        align-items: center;
+      }
+
+      @media (max-width: 1024px) and (orientation: portrait) {
+        #touch-controls {
+          position: relative;
+          flex: 0 0 clamp(100px, 18vh, 150px);
+        }
+        #hud-top {
+          padding: 6px 10px;
+          min-height: 35px;
+        }
+        .logo-text {
+          font-size: clamp(0.9rem, 3vw, 1.2rem);
+        }
+        .controls-info {
+          font-size: clamp(0.6rem, 1.5vw, 0.75rem);
+        }
+        .fullscreen-overlay {
+          padding: 10px;
+        }
+        .key-col {
+          max-width: min(300px, 42vw);
+        }
+      }
+
+      @media (max-width: 1024px) and (orientation: landscape) {
+        #game-wrapper {
+          padding: clamp(3px, 1vh, 5px) clamp(120px, 25vw, 180px);
+        }
+        #touch-controls {
+          position: absolute;
+          bottom: clamp(5px, 1.5vh, 10px);
+          left: 0;
+          height: clamp(90px, 18vh, 130px);
+        }
+        #hud-top {
+          padding: 4px 8px;
+          min-height: clamp(28px, 6vh, 35px);
+        }
+        .logo-text {
+          font-size: clamp(0.8rem, 2.5vw, 1.2rem);
+        }
+        .controls-info {
+          font-size: clamp(0.6rem, 1.2vw, 0.75rem);
+        }
+      }
+
+      @media (max-width: 768px) {
+        #hud-top {
+          padding: 5px 8px;
+          min-height: 32px;
+        }
+        .logo-text {
+          font-size: clamp(0.8rem, 2.5vw, 1rem);
+        }
+        .controls-info {
+          font-size: clamp(0.6rem, 1.5vw, 0.7rem);
+          gap: 10px;
+        }
+        #game-wrapper {
+          padding: 5px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        #hud-top {
+          padding: 4px 6px;
+          min-height: 30px;
+        }
+        .logo-text {
+          font-size: clamp(0.7rem, 3.5vw, 0.9rem);
+        }
+        .controls-info {
+          display: none;
+        }
+        #game-wrapper {
+          padding: 3px;
+        }
+      }
+
+      @media (max-height: 600px) and (orientation: landscape) {
+        #hud-top {
+          padding: 3px 6px;
+          min-height: 24px;
+        }
+        .logo-text {
+          font-size: clamp(0.7rem, 2vw, 1rem);
+        }
+        .controls-info {
+          font-size: clamp(0.55rem, 1vw, 0.7rem);
+        }
+        #game-wrapper {
+          padding: 2px clamp(90px, 14vw, 140px);
+        }
+        #touch-controls {
+          height: clamp(80px, 15vh, 110px);
+        }
+      }
+
+      /* Desktop 預設隱藏觸控，手機透過媒體查詢顯示 */
+      @media (min-width: 1025px) {
+        #touch-controls {
+            display: none;
+        }
+      }
+
+      @media (max-width: 1024px) {
+        .mobile-hide {
+            display: none !important;
+        }
+      }
+
+      .dpad {
+        position: relative;
+        width: clamp(120px, 25vw, 180px);
+        height: clamp(120px, 25vw, 180px);
+        pointer-events: auto;
+      }
+
+      .dpad-btn {
+        position: absolute;
+        width: 33.33%;
+        height: 33.33%;
+        background: rgba(0, 242, 254, 0.1);
+        border: 2px solid rgba(0, 242, 254, 0.5);
+        border-radius: clamp(8px, 1.5vw, 15px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: rgba(255, 255, 255, 0.8);
+        font-weight: 900;
+        font-size: clamp(0.7rem, 2vw, 1.2rem);
+        user-select: none;
+        backdrop-filter: blur(5px);
+        box-shadow: 0 0 10px rgba(0, 242, 254, 0.2), inset 0 0 10px rgba(0, 242, 254, 0.1);
+        transition: all 0.1s ease;
+      }
+      .dpad-btn:active { 
+        background: rgba(0, 242, 254, 0.6); 
+        color: #fff;
+        box-shadow: 0 0 20px rgba(0, 242, 254, 0.8), inset 0 0 15px rgba(255, 255, 255, 0.5);
+        transform: scale(0.95);
+      }
+
+      #btn-up { top: 0; left: 33.33%; }
+      #btn-down { bottom: 0; left: 33.33%; }
+      #btn-left { top: 33.33%; left: 0; }
+      #btn-right { top: 33.33%; right: 0; }
+
+      .action-btns {
+        position: relative;
+        width: clamp(130px, 28vw, 200px);
+        height: clamp(120px, 25vw, 180px);
+        pointer-events: auto;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: clamp(8px, 2vw, 15px);
+      }
+
+      #btn-bomb, #btn-action {
+        width: clamp(55px, 12vw, 80px);
+        height: clamp(55px, 12vw, 80px);
+        border-radius: 50%;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 900;
+        font-size: clamp(0.65rem, 1.5vw, 1rem);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        user-select: none;
+        backdrop-filter: blur(5px);
+        transition: all 0.1s ease;
+      }
+      
+      #btn-bomb {
+        background: rgba(255, 85, 0, 0.2);
+        border: 2px solid rgba(255, 85, 0, 0.6);
+        box-shadow: 0 0 15px rgba(255, 85, 0, 0.3), inset 0 0 15px rgba(255, 85, 0, 0.2);
+      }
+      #btn-bomb:active { 
+        background: rgba(255, 85, 0, 0.8); 
+        box-shadow: 0 0 30px rgba(255, 85, 0, 1), inset 0 0 20px rgba(255, 255, 255, 0.5);
+        transform: scale(0.92); 
+        color: #fff;
+      }
+
+      #btn-action {
+        background: rgba(0, 255, 85, 0.2);
+        border: 2px solid rgba(0, 255, 85, 0.6);
+        box-shadow: 0 0 15px rgba(0, 255, 85, 0.3), inset 0 0 15px rgba(0, 255, 85, 0.2);
+      }
+      #btn-action:active { 
+        background: rgba(0, 255, 85, 0.8); 
+        box-shadow: 0 0 30px rgba(0, 255, 85, 1), inset 0 0 20px rgba(255, 255, 255, 0.5);
+        transform: scale(0.92); 
+        color: #fff;
+      }
+
+      /* Map Editor responsive grid */
+      #editor-grid {
+        display: grid;
+        gap: 2px;
+        background: rgba(0,0,0,0.8);
+        padding: 10px;
+        border: 2px solid #0088ff;
+        border-radius: 10px;
+        max-width: 95vw;
+        max-height: 50vh;
+        overflow: auto;
+      }
+
+      /* HUD status text responsive */
+      #p1-status, #p2-status {
+        font-size: clamp(0.6rem, 1.5vw, 0.9rem);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      #item-log {
+        font-size: clamp(0.7rem, 2vw, 1.2rem);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      /* Modal description text responsive */
+      .modal-desc {
+        font-size: clamp(0.8rem, 2vw, 1.2rem);
+        color: #aaa;
+        margin-bottom: clamp(10px, 2vh, 20px);
+        text-align: center;
+        padding: 0 10px;
+      }
+
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  </head>
+  <body>
+    <!-- Background 3D Canvas -->
+    <canvas id="bg-canvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;"></canvas>
+
+    <!-- Main Menu -->
+    <div id="main-menu" class="fullscreen-overlay">
+      <div class="title-huge">炸彈超人 終極版</div>
+      <div style="display: flex; flex-wrap: wrap; justify-content: center; max-width: 800px; gap: clamp(8px, 2vh, 15px);">
+        <button class="menu-btn mode-btn mobile-hide" data-mode="P1_P2_COOP">雙人合作闖關</button>
+        <button class="menu-btn mode-btn mobile-hide" data-mode="P1_P2_VS">雙人對戰模式</button>
+        <button class="menu-btn mode-btn" data-mode="P1_SINGLE">單人闖關模式</button>
+        <button class="menu-btn mode-btn" data-mode="BOT_BOT_VS">電腦雙人對打</button>
+        <button class="menu-btn mode-btn" data-mode="BOT_BOT_COOP">電腦雙人合作</button>
+        <button class="menu-btn mode-btn" data-mode="BOT_SINGLE">電腦單人闖關</button>
+      </div>
+      <div style="display: flex; gap: clamp(8px, 2vw, 15px); margin-top: clamp(20px, 4vh, 40px); flex-wrap: wrap; justify-content: center;">
+        <button id="settings-btn" class="menu-btn" style="background: rgba(255, 170, 0, 0.2); border-color: #ffaa00; width: clamp(120px, 25vw, 150px);">自訂按鍵</button>
+        <button id="gallery-btn" class="menu-btn" style="background: rgba(0, 255, 128, 0.2); border-color: #00ff80; width: clamp(120px, 25vw, 150px);">圖鑑</button>
+        <button id="achievements-btn" class="menu-btn" style="background: rgba(255, 0, 255, 0.2); border-color: #ff00ff; width: clamp(120px, 25vw, 150px);">成就</button>
+        <button id="map-editor-btn" class="menu-btn" style="background: rgba(0, 128, 255, 0.2); border-color: #0088ff; width: clamp(120px, 25vw, 150px);">地圖編輯器</button>
+      </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="fullscreen-overlay hidden">
+      <div class="title-huge" style="font-size: clamp(1.5rem, 5vw, 3rem);">按鍵設定</div>
+      <div class="modal-desc">點擊下方按鈕後，按下您想綁定的鍵盤按鍵。</div>
+      <div style="display: flex; gap: clamp(15px, 3vw, 40px); flex-wrap: wrap; justify-content: center; width: 90%; max-width: 800px;">
+        <div class="key-col" style="flex: 1 1 clamp(240px, 40vw, 300px); min-width: 0;">
+           <h3>玩家一 (P1)</h3>
+           <div class="key-row"><span>上:</span> <button class="key-bind" data-player="0" data-action="up">KeyW</button></div>
+           <div class="key-row"><span>下:</span> <button class="key-bind" data-player="0" data-action="down">KeyS</button></div>
+           <div class="key-row"><span>左:</span> <button class="key-bind" data-player="0" data-action="left">KeyA</button></div>
+           <div class="key-row"><span>右:</span> <button class="key-bind" data-player="0" data-action="right">KeyD</button></div>
+           <div class="key-row"><span>炸彈:</span> <button class="key-bind" data-player="0" data-action="bomb">KeyJ</button></div>
+           <div class="key-row"><span>特殊/引爆:</span> <button class="key-bind" data-player="0" data-action="action">KeyK</button></div>
+        </div>
+        <div class="key-col" style="flex: 1 1 clamp(240px, 40vw, 300px); min-width: 0;">
+           <h3>玩家二 (P2)</h3>
+           <div class="key-row"><span>上:</span> <button class="key-bind" data-player="1" data-action="up">ArrowUp</button></div>
+           <div class="key-row"><span>下:</span> <button class="key-bind" data-player="1" data-action="down">ArrowDown</button></div>
+           <div class="key-row"><span>左:</span> <button class="key-bind" data-player="1" data-action="left">ArrowLeft</button></div>
+           <div class="key-row"><span>右:</span> <button class="key-bind" data-player="1" data-action="right">ArrowRight</button></div>
+           <div class="key-row"><span>炸彈:</span> <button class="key-bind" data-player="1" data-action="bomb">Numpad1</button></div>
+           <div class="key-row"><span>特殊/引爆:</span> <button class="key-bind" data-player="1" data-action="action">Numpad2</button></div>
+        </div>
+      </div>
+      <div style="display: flex; gap: clamp(10px, 2vw, 20px); margin-top: clamp(15px, 3vh, 30px);">
+        <button id="cancel-settings-btn" class="menu-btn" style="background: rgba(255, 85, 0, 0.2); border-color: #ff5500;">取消</button>
+        <button id="save-settings-btn" class="menu-btn" style="background: rgba(0, 255, 128, 0.2); border-color: #00ff80;">確認儲存</button>
+      </div>
+    </div>
+
+    <!-- Gallery Modal -->
+    <div id="gallery-modal" class="fullscreen-overlay hidden">
+      <div class="title-huge" style="font-size: clamp(1.5rem, 5vw, 3rem);">怪物圖鑑</div>
+      <div class="modal-desc">探索並遭遇各種未知的怪物與首領。</div>
+      <div id="gallery-list" style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; max-width: 800px; max-height: 50vh; overflow-y: auto; background: rgba(0,0,0,0.5); padding: 20px; border-radius: 15px; border: 1px solid #00ff80;">
+        <!-- JS 動態生成 -->
+      </div>
+      <button id="close-gallery-btn" class="menu-btn" style="margin-top: clamp(15px, 3vh, 30px); background: rgba(0, 255, 128, 0.2); border-color: #00ff80;">返回</button>
+    </div>
+
+    <!-- Achievements Modal -->
+    <div id="achievements-modal" class="fullscreen-overlay hidden">
+      <div class="title-huge" style="font-size: clamp(1.5rem, 5vw, 3rem);">遊戲成就</div>
+      <div class="modal-desc">突破自我極限，解鎖各項榮譽！</div>
+      <div id="achievements-list" style="display: flex; flex-direction: column; gap: 15px; width: 90%; max-width: 600px; max-height: 50vh; overflow-y: auto; background: rgba(0,0,0,0.5); padding: 20px; border-radius: 15px; border: 1px solid #ff00ff;">
+        <!-- JS 動態生成 -->
+      </div>
+      <button id="close-achievements-btn" class="menu-btn" style="margin-top: clamp(15px, 3vh, 30px); background: rgba(255, 0, 255, 0.2); border-color: #ff00ff;">返回</button>
+    </div>
+
+    <!-- Game Over / Victory -->
+    <div id="game-over" class="fullscreen-overlay hidden">
+      <div id="game-over-title" class="title-huge" style="font-size: clamp(2rem, 8vw, 5rem);">遊戲結束</div>
+      <button id="restart-btn" class="menu-btn">回主畫面</button>
+    </div>
+
+    <!-- Map Editor Modal -->
+    <div id="map-editor-modal" class="fullscreen-overlay hidden">
+      <div class="title-huge" style="font-size: clamp(1.5rem, 5vw, 3rem);">地圖編輯器</div>
+      <div class="modal-desc" style="margin-bottom: 10px;">點擊網格以切換板塊：<span style="color:#33cc33">空地</span> ➔ <span style="color:#888">硬牆</span> ➔ <span style="color:#ff0055">軟牆</span></div>
+      <div id="editor-grid">
+        <!-- JS 動態生成 -->
+      </div>
+      <div style="display: flex; gap: clamp(10px, 2vw, 20px); margin-top: clamp(10px, 2vh, 20px);">
+        <button id="save-map-btn" class="menu-btn" style="background: rgba(0, 255, 128, 0.2); border-color: #00ff80;">儲存地圖</button>
+        <button id="close-editor-btn" class="menu-btn" style="background: rgba(255, 0, 85, 0.2); border-color: #ff0055;">返回主畫面</button>
+      </div>
+    </div>
+
+    <div id="debug-overlay">除錯資訊: 等待中...</div>
+    <div id="error-overlay"></div>
+    <div id="hud-top" style="display: flex; justify-content: space-between; align-items: center;">
+      <div id="p1-status" style="font-weight: bold; color: #00f2fe; width: 30%;"></div>
+      <div id="item-log" style="color: #ffaa00; font-weight: bold; flex: 1; text-align: center;"></div>
+      <div id="p2-status" style="font-weight: bold; color: #ff0055; width: 30%; text-align: right;"></div>
+    </div>
+
+    <div id="game-wrapper">
+      <canvas id="game-canvas"></canvas>
+    </div>
+
+    <!-- Mobile Touch Controls -->
+    <div id="touch-controls">
+      <div class="dpad">
+        <div id="btn-up" class="dpad-btn">W</div>
+        <div id="btn-down" class="dpad-btn">S</div>
+        <div id="btn-left" class="dpad-btn">A</div>
+        <div id="btn-right" class="dpad-btn">D</div>
+      </div>
+      <div class="action-btns">
+        <div id="btn-action">ACTION</div>
+        <div id="btn-bomb">BOMB</div>
+      </div>
+    </div>
+
+    <script>
+      window.onerror = function(msg, source, lineno, colno, error) {
+        const errDiv = document.getElementById('error-overlay');
+        errDiv.style.display = 'block';
+        errDiv.innerText += "ERROR: " + msg + "\nLine: " + lineno + "\n\n";
+      };
+      
+      window.addEventListener('keydown', (e) => {
+        document.getElementById('debug-overlay').innerText = 'Last KeyDown: ' + e.key + ' / ' + e.code;
+      });
+    </script>
+    <script type="module" src="./src/main.js"></script>
+    <script>
+      // D3.js UI Animations
+      d3.select('.title-huge').transition().duration(2000).style('text-shadow', '0 0 50px rgba(0, 238, 255, 0.8)').on('end', function loop() {
+         d3.select(this).transition().duration(2000).style('text-shadow', '0 0 20px rgba(0, 238, 255, 0.4)').transition().duration(2000).style('text-shadow', '0 0 50px rgba(0, 238, 255, 0.8)').on('end', loop);
+      });
+      
+      // Auto-hide VS/Coop modes on mobile/tablet (touch devices)
+      if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+         document.querySelectorAll('.mobile-hide').forEach(el => el.style.display = 'none');
+      }
+
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js');
+        });
+      }
+    </script>
+  </body>
+</html>

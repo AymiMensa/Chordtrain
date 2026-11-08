@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+    
+    <defs>
+        <!-- 主體裝甲漸層 -->
+        <radialGradient id="armorGrad" cx="30%" cy="30%" r="70%">
+            <stop offset="0%" stop-color="#00f2fe" />
+            <stop offset="50%" stop-color="#4facfe" />
+            <stop offset="100%" stop-color="#003366" />
+        </radialGradient>
+        <!-- 高光反射 -->
+        <linearGradient id="highlight" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="rgba(255,255,255,0.9)" />
+            <stop offset="30%" stop-color="rgba(255,255,255,0.1)" />
+            <stop offset="100%" stop-color="rgba(255,255,255,0)" />
+        </linearGradient>
+        <!-- 陰影濾鏡 -->
+        <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="5" stdDeviation="4" flood-color="#000" flood-opacity="0.8" />
+        </filter>
+        <!-- 霓虹光暈濾鏡 -->
+        <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="3" result="blur" />
+            <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+            </feMerge>
+        </filter>
+    </defs>
+    <!-- 外側防護能量環 -->
+    <circle cx="50" cy="50" r="48" fill="none" stroke="rgba(0, 242, 254, 0.2)" stroke-width="2" filter="url(#neonGlow)" />
+    <!-- 圓形機甲頭部/身體 -->
+    <circle cx="50" cy="50" r="40" fill="url(#armorGrad)" filter="url(#dropShadow)" />
+    <!-- 裝甲板縫隙細節 -->
+    <path d="M 10 50 Q 50 80 90 50" fill="none" stroke="#002244" stroke-width="2" opacity="0.5" />
+    <path d="M 50 10 L 50 30" fill="none" stroke="#002244" stroke-width="2" opacity="0.5" />
+    <!-- 金屬高光 -->
+    <circle cx="50" cy="50" r="40" fill="url(#highlight)" />
+
+    <!-- 高科技面罩 (左側) -->
+    <rect x="5" y="35" width="45" height="28" rx="14" fill="#050a15" filter="url(#dropShadow)" />
+    <!-- 面罩玻璃反光 -->
+    <rect x="7" y="37" width="41" height="12" rx="6" fill="url(#highlight)" opacity="0.6" />
+    <!-- 螢幕眼睛 (像素感/LED) -->
+    <rect x="15" y="45" width="14" height="8" rx="2" fill="#00ffcc" filter="url(#neonGlow)" />
+    <!-- 耳機/通訊器 -->
+    <circle cx="65" cy="50" r="12" fill="#1a2035" stroke="#00f2fe" stroke-width="2" filter="url(#dropShadow)" />
+    <circle cx="65" cy="50" r="4" fill="#00ffcc" filter="url(#neonGlow)" />
+</svg>

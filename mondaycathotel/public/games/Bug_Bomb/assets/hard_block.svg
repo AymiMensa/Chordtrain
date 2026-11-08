@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+    <defs>
+        <linearGradient id="hardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#1e293b" />
+            <stop offset="50%" stop-color="#0f172a" />
+            <stop offset="100%" stop-color="#020617" />
+        </linearGradient>
+        <filter id="neonEdge" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="2" result="blur" />
+            <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+            </feMerge>
+        </filter>
+    </defs>
+    <!-- 基底 -->
+    <rect x="2" y="2" width="96" height="96" rx="10" fill="url(#hardGrad)" stroke="#334155" stroke-width="4" />
+    <!-- 裝甲拼縫 -->
+    <path d="M 2 50 L 98 50 M 50 2 L 50 98" stroke="#000" stroke-width="4" opacity="0.8" />
+    <!-- 霓虹科技線條 -->
+    <path d="M 20 20 L 40 20 L 40 40" fill="none" stroke="#00f2fe" stroke-width="2" filter="url(#neonEdge)" />
+    <path d="M 80 80 L 60 80 L 60 60" fill="none" stroke="#00f2fe" stroke-width="2" filter="url(#neonEdge)" />
+    <!-- 四角鉚釘 -->
+    <circle cx="12" cy="12" r="4" fill="#64748b" />
+    <circle cx="88" cy="12" r="4" fill="#64748b" />
+    <circle cx="12" cy="88" r="4" fill="#64748b" />
+    <circle cx="88" cy="88" r="4" fill="#64748b" />
+</svg>

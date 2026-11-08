@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+    <defs>
+        <radialGradient id="expGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#ffffff" />
+            <stop offset="20%" stop-color="#fcd34d" />
+            <stop offset="60%" stop-color="#ef4444" />
+            <stop offset="100%" stop-color="rgba(239, 68, 68, 0)" />
+        </radialGradient>
+        <filter id="expGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="4" result="blur" />
+            <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+            </feMerge>
+        </filter>
+    </defs>
+    <!-- 十字衝擊波 -->
+    <path d="M 50 10 L 60 40 L 90 50 L 60 60 L 50 90 L 40 60 L 10 50 L 40 40 Z" fill="url(#expGrad)" filter="url(#expGlow)" />
+    <circle cx="50" cy="50" r="35" fill="url(#expGrad)" filter="url(#expGlow)" />
+    <!-- 內核爆破閃光 -->
+    <circle cx="50" cy="50" r="15" fill="#fff" filter="url(#expGlow)" />
+    <!-- 飛濺火星 -->
+    <circle cx="20" cy="20" r="4" fill="#fcd34d" filter="url(#expGlow)" />
+    <circle cx="80" cy="20" r="5" fill="#fcd34d" filter="url(#expGlow)" />
+    <circle cx="20" cy="80" r="3" fill="#fcd34d" filter="url(#expGlow)" />
+    <circle cx="80" cy="80" r="6" fill="#fcd34d" filter="url(#expGlow)" />
+</svg>

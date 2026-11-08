@@ -1,0 +1,17 @@
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+
+# ---- AI 實驗用的暫存檔與備份（不是程式，不進版控）----
+# simulate*.js / simulate_log.txt 是一次性的批量模擬腳本與其輸出。
+/simulate*.js
+/simulate*.txt
+# *.bak* / *.checkpoint 是開發中手動留下的 Bot.js / HunterPolicy.js 備份，
+# 版控已經能還原任何歷史版本，這些只會讓 diff 與搜尋變髒。
+/src/game/ai/*.bak*
+/src/game/ai/*.checkpoint
