@@ -544,6 +544,7 @@ const Admin = () => {
               ) : (
                 <>
                   <AdminStoreClosure />
+                  <h3 className="mt-8 text-xl font-bold text-primary">遊戲區</h3>
                   <div className={`mx-auto mt-5 w-fit max-w-full rounded-full px-4 py-2 text-center text-sm sm:text-base font-bold text-[#635F6D] bg-[#D7D2DC] ${games.length >= 100 ? "animate-pulse bg-gradient-to-r from-[#D8C8A8] via-[#D8B8C8] to-[#AFC5B8] shadow-[0_0_18px_rgba(180,160,190,0.9)]" : ""}`}>{games.length >= 100 ? "Aymi設計100款小遊戲合集(完成!)" : `Aymi設計100款(目前${games.length}款)小遊戲合集(目前尚未達標!)`}</div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-6">
                     {games.map((game, i) => {
