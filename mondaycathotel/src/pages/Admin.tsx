@@ -25,7 +25,6 @@ import { WorkLogBoard } from "@/components/admin/WorkLogBoard";
 import CatEasterEgg from "@/components/CatEasterEgg";
 
 const games = [
-                      { name: "台灣瘋狂大賽車", path: "TaiwanRun-main/index.html", color: "#B0A0D0" },
                        { name: "經典 2048", path: "2048-master/index.html", color: "#B6A6A0" },
                       { name: "超酷立體 Hextris", path: "hextris-gh-pages/index.html", color: "#A0B0A6" },
                       { name: "單人立體迷宮 RPG", path: "cat.html", color: "#9C9EAE" },
@@ -80,6 +79,7 @@ const games = [
                     { name: "開源占星工具包", path: "Astrology-Pro-main/index.html", color: "#9B8B7A" },
                       { name: "kerykeion星盤", path: "kerykeion-main/scripts/glyph_playground.html", color: "#8FA0B0" },
                       { name: "星盤模擬器", path: "stellarium-web-master/index.html", color: "#8FA8B8" },
+                      { name: "台灣瘋狂大賽車", path: "TaiwanRun-main/index.html", color: "#A88FBB" },
                     ];
 
 const Admin = () => {
@@ -442,7 +442,7 @@ const Admin = () => {
                   style={{ overscrollBehavior: "none", touchAction: "none" }}
                 >
                   {/* Top navigation bar for game mode */}
-                  <div className={`game-top-nav ${selectedGame.path === "cat-breaker.html" || selectedGame.path === "crimson-sky-fleet/dist/index.html" || selectedGame.path === "meowdokuplus/index.html" || selectedGame.path === "Sorting Visualizer/index.html" || selectedGame.path === "9_Rings/dist/index.html" || selectedGame.path === "domino3d.html" || selectedGame.path === "last-arcade/index.html" || selectedGame.path === "Fidget_Spinner.html" || selectedGame.path === "San_Yuan.html" || selectedGame.path === "translator_morandi_elvish.html" || selectedGame.path === "JP.html" || selectedGame.path === "Music_Museum/dist/index.html" || selectedGame.path === "Astrology-Pro-main/index.html" ? "game-compact-nav h-9 px-2" : "h-12 px-4"} bg-zinc-900 border-b border-zinc-800 flex items-center justify-between shrink-0 z-10 transition-all`}>
+                  <div className={`game-top-nav ${selectedGame.path === "cat-breaker.html" || selectedGame.path === "crimson-sky-fleet/dist/index.html" || selectedGame.path === "meowdokuplus/index.html" || selectedGame.path === "Sorting Visualizer/index.html" || selectedGame.path === "9_Rings/dist/index.html" || selectedGame.path === "domino3d.html" || selectedGame.path === "last-arcade/index.html" || selectedGame.path === "Fidget_Spinner.html" || selectedGame.path === "San_Yuan.html" || selectedGame.path === "translator_morandi_elvish.html" || selectedGame.path === "JP.html" || selectedGame.path === "Music_Museum/dist/index.html" || selectedGame.path === "Astrology-Pro-main/index.html" || selectedGame.path === "TaiwanRun-main/index.html" ? "game-compact-nav h-9 px-2" : "h-12 px-4"} bg-zinc-900 border-b border-zinc-800 flex items-center justify-between shrink-0 z-10 transition-all`}>
                     <div className="game-title-container flex items-center gap-2 text-white/80 font-bold text-sm truncate">
                       <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse shrink-0"></span>
                       <span className="truncate">{selectedGame.name}</span>
@@ -451,7 +451,7 @@ const Admin = () => {
                       <Button
                         variant="secondary"
                         size="sm"
-                        className={`game-btn-admin ${selectedGame.path === "cat-breaker.html" || selectedGame.path === "crimson-sky-fleet/dist/index.html" || selectedGame.path === "meowdokuplus/index.html" || selectedGame.path === "Sorting Visualizer/index.html" || selectedGame.path === "9_Rings/dist/index.html" || selectedGame.path === "domino3d.html" || selectedGame.path === "last-arcade/index.html" || selectedGame.path === "Fidget_Spinner.html" || selectedGame.path === "San_Yuan.html" || selectedGame.path === "translator_morandi_elvish.html" || selectedGame.path === "JP.html" || selectedGame.path === "Music_Museum/dist/index.html" || selectedGame.path === "Astrology-Pro-main/index.html" ? "h-7 px-2" : "h-8"} text-xs font-bold bg-white/10 hover:bg-white/20 text-white border-0`}
+                        className={`game-btn-admin ${selectedGame.path === "cat-breaker.html" || selectedGame.path === "crimson-sky-fleet/dist/index.html" || selectedGame.path === "meowdokuplus/index.html" || selectedGame.path === "Sorting Visualizer/index.html" || selectedGame.path === "9_Rings/dist/index.html" || selectedGame.path === "domino3d.html" || selectedGame.path === "last-arcade/index.html" || selectedGame.path === "Fidget_Spinner.html" || selectedGame.path === "San_Yuan.html" || selectedGame.path === "translator_morandi_elvish.html" || selectedGame.path === "JP.html" || selectedGame.path === "Music_Museum/dist/index.html" || selectedGame.path === "Astrology-Pro-main/index.html" || selectedGame.path === "TaiwanRun-main/index.html" ? "h-7 px-2" : "h-8"} text-xs font-bold bg-white/10 hover:bg-white/20 text-white border-0`}
                         onClick={() => {
                           setSelectedGame(null);
                           setActiveTab("bookings");
@@ -462,7 +462,7 @@ const Admin = () => {
                       <Button
                         variant="default"
                         size="sm"
-                        className={`game-btn-list ${selectedGame.path === "cat-breaker.html" || selectedGame.path === "crimson-sky-fleet/dist/index.html" || selectedGame.path === "meowdokuplus/index.html" || selectedGame.path === "Sorting Visualizer/index.html" || selectedGame.path === "9_Rings/dist/index.html" || selectedGame.path === "domino3d.html" || selectedGame.path === "last-arcade/index.html" || selectedGame.path === "Fidget_Spinner.html" || selectedGame.path === "San_Yuan.html" || selectedGame.path === "translator_morandi_elvish.html" || selectedGame.path === "JP.html" || selectedGame.path === "Music_Museum/dist/index.html" || selectedGame.path === "Astrology-Pro-main/index.html" ? "h-7 px-2" : "h-8"} text-xs font-bold`}
+                        className={`game-btn-list ${selectedGame.path === "cat-breaker.html" || selectedGame.path === "crimson-sky-fleet/dist/index.html" || selectedGame.path === "meowdokuplus/index.html" || selectedGame.path === "Sorting Visualizer/index.html" || selectedGame.path === "9_Rings/dist/index.html" || selectedGame.path === "domino3d.html" || selectedGame.path === "last-arcade/index.html" || selectedGame.path === "Fidget_Spinner.html" || selectedGame.path === "San_Yuan.html" || selectedGame.path === "translator_morandi_elvish.html" || selectedGame.path === "JP.html" || selectedGame.path === "Music_Museum/dist/index.html" || selectedGame.path === "Astrology-Pro-main/index.html" || selectedGame.path === "TaiwanRun-main/index.html" ? "h-7 px-2" : "h-8"} text-xs font-bold`}
                         onClick={() => setSelectedGame(null)}
                       >
                         遊戲列表
@@ -517,7 +517,7 @@ const Admin = () => {
 
                   {(() => {
                     // 內容高於視窗或需上下捲動的頁面，必須允許內部捲動與顯示 scrollbar
-                    const gameScrollable = selectedGame.path === "preview.html" || selectedGame.path.startsWith("lattice-mind") || selectedGame.path.startsWith("princess-maker") || selectedGame.path.startsWith("Starweave Duet") || selectedGame.path === "catwork.html" || selectedGame.path === "meowdokuplus/index.html" || selectedGame.path === "Sorting Visualizer/index.html" || selectedGame.path === "camel_race.html" || selectedGame.path === "Dungeons_of_Dreadrock.html" || selectedGame.path.includes("shaoyun_music_theory") || selectedGame.path === "vajra_dsl.html" || selectedGame.path === "translator_morandi_elvish.html" || selectedGame.path === "JP.html" || selectedGame.path === "kerykeion-main/scripts/glyph_playground.html" || selectedGame.path === "Astrology-Pro-main/index.html";
+                    const gameScrollable = selectedGame.path === "preview.html" || selectedGame.path.startsWith("lattice-mind") || selectedGame.path.startsWith("princess-maker") || selectedGame.path.startsWith("Starweave Duet") || selectedGame.path === "catwork.html" || selectedGame.path === "meowdokuplus/index.html" || selectedGame.path === "Sorting Visualizer/index.html" || selectedGame.path === "camel_race.html" || selectedGame.path === "Dungeons_of_Dreadrock.html" || selectedGame.path.includes("shaoyun_music_theory") || selectedGame.path === "vajra_dsl.html" || selectedGame.path === "translator_morandi_elvish.html" || selectedGame.path === "JP.html" || selectedGame.path === "kerykeion-main/scripts/glyph_playground.html" || selectedGame.path === "Astrology-Pro-main/index.html" || selectedGame.path === "TaiwanRun-main/index.html";
                     return (
                       <div
                         className={`flex-1 w-full relative flex items-center justify-center ${gameScrollable ? "overflow-y-auto overflow-x-hidden" : "overflow-hidden overscroll-none touch-none"}`}
