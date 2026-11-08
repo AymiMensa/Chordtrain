@@ -340,11 +340,12 @@
     for (var s = 0; s < 12; s++) {
       var s0 = s * 30, s1 = (s + 1) * 30;
       var color = SIGN_COLORS[ZODIAC[s].element];
+      var backgroundColor = SIGN_COLORS[ZODIAC[11 - s].element];
       var p1 = polar(cx, cy, rZodiac, s0);
       var p2 = polar(cx, cy, rZodiac, s1);
       var p3 = polar(cx, cy, rZodiacInner, s1);
       var p4 = polar(cx, cy, rZodiacInner, s0);
-      var fill = isDark ? shade(color, -0.30) : shade(color, 0.55);
+      var fill = isDark ? shade(backgroundColor, -0.30) : shade(backgroundColor, 0.55);
       P.push("<path d=\"M" + p1[0].toFixed(2) + "," + p1[1].toFixed(2) +
              "A" + rZodiac.toFixed(2) + "," + rZodiac.toFixed(2) + " 0 0 0 " + p2[0].toFixed(2) + "," + p2[1].toFixed(2) +
              "L" + p3[0].toFixed(2) + "," + p3[1].toFixed(2) +
