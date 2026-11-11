@@ -78,6 +78,7 @@ const games = [
                     { name: "奇幻珍稀樂器3D音樂博物館", path: "Music_Museum/dist/index.html", color: "#A6A08D" },
                     { name: "開源占星工具包", path: "Astrology-Pro-main/index.html", color: "#9B8B7A" },
                       { name: "kerykeion星盤", path: "kerykeion-main/scripts/glyph_playground.html", color: "#8FA0B0" },
+                       { name: "3D 奇珍 樂器館", path: "3D_INSTRUMENTS.html", color: "#B8A0A8" },
                       { name: "星盤模擬器", path: "stellarium-web-master/index.html", color: "#8FA8B8" },
                       { name: "台灣瘋狂大賽車", path: "TaiwanRun-main/index.html", color: "#A88FBB" },
                     ];
