@@ -2764,7 +2764,10 @@ export class Bot extends Player {
 
         for (const pd of predicted) {
             const e = pd.e;
-            for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+            const bombDirs = shape === 'X'
+                ? [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]]
+                : [[1, 0], [-1, 0], [0, 1], [0, -1]];
+            for (const [dx, dy] of bombDirs) {
                 for (let d = 1; d <= R; d++) {
                     const gx = pd.gx + dx * d, gy = pd.gy + dy * d;
                     const k = `${gx},${gy}`;
@@ -5483,7 +5486,10 @@ export class Bot extends Player {
         // 枚舉：對每隻怪、每個方向、距離 1..R
         // 遇到牆就 break（牆後面更遠的位置也蓋不到）
         for (const m of live) {
-            for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+            const bombDirs = shape === 'X'
+                ? [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]]
+                : [[1, 0], [-1, 0], [0, 1], [0, -1]];
+            for (const [dx, dy] of bombDirs) {
                 for (let d = 1; d <= R; d++) {
                     const gx = m.gridX + dx * d, gy = m.gridY + dy * d;
                     if (gx < 1 || gy < 1 || gx >= gs.cols - 1 || gy >= gs.rows - 1) break;
@@ -5686,7 +5692,10 @@ export class Bot extends Player {
 
         // 枚舉所有「炸得到怪」的站位（十字形爆炸的唯一可能命中集合）
         for (const m of live) {
-            for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+            const bombDirs = shape === 'X'
+                ? [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]]
+                : [[1, 0], [-1, 0], [0, 1], [0, -1]];
+            for (const [dx, dy] of bombDirs) {
                 for (let d = 1; d <= R; d++) {
                     const gx = m.gridX + dx * d, gy = m.gridY + dy * d;
                     if (gx < 1 || gy < 1 || gx >= gs.cols - 1 || gy >= gs.rows - 1) break;
