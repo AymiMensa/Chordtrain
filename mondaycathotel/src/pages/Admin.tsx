@@ -21,7 +21,87 @@ import AdminShiftTracker from "@/components/admin/AdminShiftTracker";
 import AdminBackup from "@/components/admin/AdminBackup";
 import AdminLongTermAgreement from "@/components/admin/AdminLongTermAgreement";
 import AdminStoreClosure from "@/components/admin/AdminStoreClosure";
+import { useLawweaverAI } from "@/components/admin/LawweaverAIController";
 import { WorkLogBoard } from "@/components/admin/WorkLogBoard";
+
+const useLawweaverGameAI = (iframeRef) => {
+  const [isAIPlaying, setIsAIPlaying] = useState(false);
+  const [aiTurns, setAITurns] = useState(0);
+  
+  useEffect(() => {
+    if (!iframeRef.current) return;
+    
+    const iframe = iframeRef.current;
+    let intervalId = null;
+    
+    const startAI = () => {
+      setIsAIPlaying(true);
+      intervalId = setInterval(() => {
+        try {
+          const doc = iframe.contentDocument || iframe.contentWindow.document;
+          if (!doc) return;
+          
+          // 檢查遊戲是否就緒
+          const ruleBlocks = doc.querySelectorAll('.tile[data-role="rule"]');
+          const challengeElem = doc.querySelector('.challenge-info');
+          
+          if (ruleBlocks.length < 3 || !challengeElem) return;
+          
+          // 獲取目標 phrases
+          const targetPhrase = challengeElem.getAttribute('data-target') || '';
+          const currentPhrases = Array.from(ruleBlocks).map(rb => rb.textContent.trim()).filter(s => s);
+          
+          // 檢查是否已組成目標
+          if (currentPhrases.join("|") === targetPhrase) {
+            // 檢查是否可以執行規則
+            const executeBtn = doc.querySelector('.rule-execute.is-ready');
+            if (executeBtn && !executeBtn.disabled) {
+              executeBtn.click();
+              setAITurns(prev => prev + 1);
+              
+              // 等待規則生效後移動
+              setTimeout(() => {
+                const moveBtn = doc.querySelector('.move-button[direction="up"]');
+                if (moveBtn && !moveBtn.disabled) {
+                  moveBtn.click();
+                  setIsAIPlaying(false);
+                  clearInterval(intervalId);
+                }
+              }, 1500);
+            }
+          } else {
+            // 未組成，進行排列
+            const direction = currentPhrases[0] && currentPhrases[0].indexOf("焰流") >= 0 
+              ? "left" : "right";
+              const moveBtn = doc.querySelector(`.break-slot[data-direction="${direction}"]`);
+              if (moveBtn && !moveBtn.disabled) {
+                moveBtn.click();
+              }
+          }
+        } catch (e) {
+          console.error("AI 遊戲錯誤:", e);
+        }
+      }, 800);
+    };
+    
+    const checkGameLoad = setInterval(() => {
+      try {
+        const doc = iframe.contentDocument || iframe.contentWindow.document;
+        if (doc && doc.querySelector('.lawweaver-board')) {
+          clearInterval(checkGameLoad);
+          startAI();
+        }
+      } catch (e) {}
+    }, 300);
+    
+    return () => {
+      clearInterval(intervalId);
+      clearInterval(checkGameLoad);
+    };
+  }, [iframeRef]);
+  
+  return isAIPlaying;
+};
 import CatEasterEgg from "@/components/CatEasterEgg";
 
 const games = [
@@ -51,7 +131,7 @@ const games = [
                       { name: "貓咪排序遊戲", path: "Sort.html", color: "#B8A89A" },
                       { name: "格智", path: "lattice-mind/dist/public/index.html", color: "#9AAFA8" },
                       { name: "Echoes of the Grid 迴音網格", path: "echoes-of-the-grid/dist/public/index.html", color: "#A3B0A4" },
-                      { name: "Lawweaver 界律編織者", path: "lawweaver/dist/public/index.html", color: "#A8A5A2" },
+                      { name: "Lawweaver 界律編織者", path: "lawweaver/dist/public/index.html", color: "#A8A5A2", onLoad: (e) => useLawweaverGameAI(lawweaverRef) },
                       { name: "Starweave Duet 星紗雙譜", path: "Starweave Duet/index.html", color: "#8E9DA6" },
                       { name: "Starweave Duet 星紗雙譜 · 雙界協奏", path: "starweave-duet/index.html", color: "#9AA8B8" },
                       { name: "Meowdoku 貓咪數獨", path: "meowdoku/dist/index.html", color: "#B7AAA2" },
@@ -93,7 +173,11 @@ const Admin = () => {
   const [showOverdueLongTermDialog, setShowOverdueLongTermDialog] = useState(false);
   const [activeTab, setActiveTab] = useState("bookings");
   const [selectedGame, setSelectedGame] = useState<{ name: string, path: string } | null>(null);
+  const lawweaverAI = useLawweaverAI({ subject: "壁垣", verb: "賦有", predicate: "可通過", requiredOperation: "assemble" });
   const { toast } = useToast();
+  
+  // AI iframe ref for Lawweaver game
+  const lawweaverRef = { current: null as HTMLIFrameElement | null };
 
   // Load background color from Supabase on mount
   useEffect(() => {
@@ -545,6 +629,35 @@ const Admin = () => {
               ) : (
                 <>
                   <AdminStoreClosure />
+                  {/* Lawweaver AI 控制面板 */}
+                  <div className="mt-6 p-4 bg-indigo-50 rounded border border-indigo-200">
+                    <h4 className="font-medium mb-3 flex items-center gap-2">
+                      <Zap className="w-4 h-4 text-purple-400" /> Lawweaver AI 自動玩家
+                    </h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={() => setLawweaverAIState(prev => ({ ...prev, isPlaying: true }))}
+                          disabled={lawweaverAI.state.isPlaying}
+                          className="flex-1 py-2">
+                          <Play className="w-4 h-4 mr-2" /> 啟動 AI
+                        </Button>
+                        <Button
+                          onClick={() => setLawweaverAIState(prev => ({ ...prev, isPlaying: false }))}
+                          disabled={!lawweaverAI.state.isPlaying}
+                          variant="outline"
+                          className="flex-1 py-2">
+                          <Pause className="w-4 h-4 mr-2" /> 停止
+                        </Button>
+                      </div>
+                      <div className="p-2 bg-white rounded border border-gray-200">
+                        <p className="font-medium">關卡: {lawweaverAI.state.currentLevel + 1}</p>
+                        <p className="font-medium">過關: {lawweaverAI.state.levelsCleared} 個</p>
+                        <p className="font-medium">回合: {lawweaverAI.state.totalTurns}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
                   <h3 className="mt-8 text-xl font-bold text-primary">遊戲區</h3>
                   <div className={`mx-auto mt-5 w-fit max-w-full rounded-full px-4 py-2 text-center text-sm sm:text-base font-bold text-[#635F6D] bg-[#D7D2DC] ${games.length >= 100 ? "animate-pulse bg-gradient-to-r from-[#D8C8A8] via-[#D8B8C8] to-[#AFC5B8] shadow-[0_0_18px_rgba(180,160,190,0.9)]" : ""}`}>{games.length >= 100 ? "Aymi設計100款小遊戲合集(完成!)" : `Aymi設計100款(目前${games.length}款)小遊戲合集(目前尚未達標!)`}</div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-6">
