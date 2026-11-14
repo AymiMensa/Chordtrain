@@ -1,0 +1,785 @@
+﻿/* 霧面工藝棋盤：本檔將紙質層次、工藝陰影、青綠因果與可讀性作為首要原則。 */
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&family=Noto+Serif+TC:wght@600;700&display=swap");
+@import "tailwindcss";
+
+:root {
+  color: #293239;
+  background: #dbe1df;
+  font-family: "Noto Sans TC", system-ui, sans-serif;
+  font-synthesis: none;
+}
+
+* { box-sizing: border-box; -webkit-user-select: none; user-select: none; }
+
+html, body, #root { width: 100%; height: 100%; min-height: 100%; margin: 0; overflow: hidden; }
+
+button, input { font: inherit; }
+button { -webkit-tap-highlight-color: transparent; }
+
+.game-frame { position: relative; width: 100vw; height: 100dvh; min-height: 100svh; overflow: hidden; background: #dce3e1; }
+.game-canvas { position: absolute; inset: 0; width: 100%; height: 100%; outline: 0; }
+
+.game-overlay {
+  position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  isolation: isolate;
+}
+.game-overlay::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; opacity: .23;
+  background-image: var(--lawweaver-paper-background, url("/manus-storage/lawweaver-paper-background_28f3d5a2.png"));
+  background-size: cover; background-position: center; mix-blend-mode: soft-light;
+}
+.game-overlay button, .game-overlay input { pointer-events: auto; }
+/* overlay 本身 pointer-events:none 讓事件穿透到棋盤畫布；但可捲動/可選字的資訊面板必須接回事件，否則 scrollbar 拖不動、滾輪也無法捲動。放在 .focus-mode 覆寫之前，專注模式仍可整體隱藏。 */
+.game-overlay .rule-desk, .game-overlay .inspector, .game-overlay .camera-dock,
+.game-overlay .control-dock, .game-overlay .chapter-rail, .game-overlay .causal-thread,
+.game-overlay .game-header, .game-overlay .mobile-console, .game-overlay .tutorial-card,
+.game-overlay .board-maximize-fab, .game-overlay .daily-countdown, .game-overlay .fps-widget,
+.game-overlay .orientation-advice { pointer-events: auto; }
+
+
+.game-header {
+  position: absolute; left: 28px; right: 28px; top: 22px; z-index: 5;
+  display: flex; align-items: center; justify-content: space-between; gap: 18px;
+}
+.brand-lockup { display: flex; align-items: center; gap: 11px; }
+.brand-logo { width: 48px; height: 48px; object-fit: contain; filter: drop-shadow(0 6px 9px rgba(26, 61, 60, .16)); }
+.eyebrow { margin: 0 0 3px; color: #61716f; font-size: 10px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
+.brand-lockup h1 { margin: 0; font-family: "Noto Serif TC", serif; font-size: 19px; letter-spacing: .12em; line-height: 1; }
+.law-mark { position: relative; display: inline-block; margin: 0 1px; color: #167a78; font-weight: 700; text-shadow: 1px 0 0 rgba(244,242,234,.9); }.law-mark::before { content: ""; position: absolute; left: 2px; right: 1px; top: 42%; height: 1px; border-top: 2px solid #167a78; transform: rotate(18deg); }.law-mark::after { content: ""; position: absolute; left: 1px; right: 1px; top: 64%; height: 2px; background: #167a78; box-shadow: 5px -4px 0 -1px #f5f1e8, -5px 4px 0 -1px #f5f1e8; transform: rotate(-16deg); }
+.header-meta { display: flex; align-items: center; gap: 8px; }
+.chapter-badge, .turn-badge { border: 1px solid rgba(73, 94, 92, .18); background: rgba(252, 250, 244, .78); box-shadow: 0 8px 24px rgba(48, 63, 61, .08); padding: 8px 11px; color: #43504f; font-size: 11px; }
+.chapter-badge { border-radius: 5px; }
+.turn-badge { border-radius: 50px; color: #167a78; font-weight: 700; }
+.tutorial-reopen { display: inline-flex; align-items: center; gap: 5px; border: 1px solid rgba(22,122,120,.28); border-radius: 5px; background: rgba(239,248,246,.86); color: #126c6b; padding: 8px 10px; font-size: 11px; font-weight: 700; transition: transform 150ms ease, background 150ms ease; }.tutorial-reopen:hover { background: #d9edeb; }.tutorial-reopen:active { transform: scale(.96); }
+.orientation-advice { position: absolute; z-index: 9; top: 76px; left: 50%; display: flex; width: min(410px, calc(100vw - 32px)); align-items: flex-start; gap: 9px; padding: 10px 11px; transform: translateX(-50%); color: #50635f; font-size: 11px; line-height: 1.45; pointer-events: auto; }.orientation-advice span { min-width: 0; }.orientation-advice b { display: block; margin-bottom: 2px; color: #167a78; font-size: 10px; letter-spacing: .08em; }.orientation-advice button, .reading-settings-heading > button { display: grid; flex: 0 0 auto; width: 24px; height: 24px; place-items: center; border: 1px solid #cfd7d1; background: #fbfaf5; color: #59706b; font-size: 17px; line-height: 1; }
+.orientation-advice-active .board-caption { opacity: 0; pointer-events: none; }.orientation-advice-active .board-maximize-fab { display: none; }
+.board-maximize-fab { position: absolute; z-index: 7; top: 105px; right: 18px; display: inline-flex; align-items: center; gap: 6px; min-height: 34px; border: 1px solid rgba(22,122,120,.34); border-radius: 999px; background: rgba(248, 252, 247, .93); box-shadow: 0 7px 18px rgba(31,63,61,.13); color: #126c6b; padding: 0 11px; font-size: 10px; font-weight: 800; pointer-events: auto; }.board-maximize-fab:hover { background: #dff1ed; }.focus-mode .board-maximize-fab { right: 22px; top: 84px; }
+.game-overlay.desktop-panel-inspector .board-maximize-fab { right: 230px; top: 91px; }
+.game-overlay.desktop-panel-rules .board-maximize-fab { right: 18px; top: 105px; }
+.reading-settings { position: absolute; z-index: 10; top: calc(100% + 8px); right: 0; width: min(300px, calc(100vw - 24px)); padding: 12px; color: #5a6c67; font-size: 10px; pointer-events: auto; }.reading-settings-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }.reading-settings-heading .eyebrow { margin: 0 0 3px; }.reading-settings-heading b { color: #294943; font-family: "Noto Serif TC", serif; font-size: 15px; }.reading-settings > p { margin: 8px 0 10px; line-height: 1.5; }.reading-setting-row { display: grid; grid-template-columns: 74px 1fr; align-items: center; gap: 7px; padding: 8px 0; border-top: 1px dashed #d8d0c1; }.reading-setting-row > span { color: #61736d; font-weight: 800; }.reading-setting-row > div { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }.reading-setting-row button { min-height: 29px; border: 1px solid #cbd7d0; background: #fbfaf5; color: #5e6e69; font-size: 9px; font-weight: 700; }.reading-setting-row button.is-selected { border-color: #167a78; background: #dff1ed; color: #126c6b; box-shadow: inset 0 -2px #167a78; }
+.diagnostics-open { display: flex; width: 100%; align-items: center; justify-content: center; gap: 6px; min-height: 33px; margin-top: 9px; border: 1px solid #a9cbc5; background: #e3f1ee; color: #126c6b; font-size: 10px; font-weight: 800; }.device-diagnostics { position: absolute; z-index: 11; top: 84px; right: max(18px, env(safe-area-inset-right)); width: min(360px, calc(100vw - 36px)); padding: 15px; color: #596b66; pointer-events: auto; }.device-diagnostics dl { margin: 12px 0 8px; }.device-diagnostics dl > div { display: grid; grid-template-columns: 72px 1fr; gap: 10px; padding: 7px 0; border-top: 1px dashed #d8d0c1; font-size: 11px; }.device-diagnostics dt { color: #8b7967; font-weight: 800; }.device-diagnostics dd { margin: 0; color: #365852; font-weight: 700; }.device-diagnostics > p { margin: 9px 0 0; color: #6a7a76; font-size: 10px; line-height: 1.5; }
+.quality-recommendation { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 8px 0 3px; padding: 8px; border: 1px solid #bfd9d3; background: #edf6f2; color: #42635c; }.quality-recommendation span { min-width: 0; }.quality-recommendation b, .quality-recommendation small { display: block; }.quality-recommendation b { color: #167a78; font-size: 10px; }.quality-recommendation small { margin-top: 2px; color: #668079; font-size: 8px; line-height: 1.35; }.quality-recommendation button { flex: 0 0 auto; min-height: 29px; border: 1px solid #78ada4; background: #fffdf7; color: #126c6b; padding: 0 7px; font-size: 9px; font-weight: 800; }
+.slow-device-warning { position: absolute; z-index: 24; top: 50%; right: 18px; display: grid; width: min(248px, calc(100vw - 36px)); gap: 7px; padding: 10px; color: #52635e; pointer-events: auto; transform: translateY(-50%); }.slow-device-warning span { min-width: 0; }.slow-device-warning b, .slow-device-warning small { display: block; }.slow-device-warning b { color: #a55c31; font-size: 11px; }.slow-device-warning small { margin-top: 3px; color: #6e7b77; font-size: 9px; line-height: 1.45; }.slow-device-warning button { min-height: 31px; border: 1px solid #cab8a1; background: #fffaf1; color: #75553d; font-size: 10px; font-weight: 800; }.slow-device-warning .slow-device-apply { border-color: #c67c45; background: #c8783d; color: white; }.slow-device-warning .slow-device-dismiss { background: #f0eee7; color: #687570; }
+
+.glass-panel {
+  background-color: rgba(249, 247, 240, .95); background-image: linear-gradient(90deg, rgba(70,82,77,.035) 1px, transparent 1px), linear-gradient(rgba(255,255,255,.76), rgba(232,227,215,.26)); background-size: 8px 8px, 100% 100%; border: 1px solid rgba(71, 85, 82, .24); border-radius: 2px 9px 2px 9px;
+  box-shadow: 0 4px 0 rgba(164,157,143,.46), 0 18px 50px rgba(44, 55, 52, .12), inset 0 1px rgba(255,255,255,.9), inset 0 -2px rgba(145,135,119,.14); backdrop-filter: none;
+}
+/* 四角分散預設佈局（桌機）：規則=左上、inspector=右上、中央只留棋盤。 */
+.rule-desk, .inspector { position: absolute; z-index: 3; top: 64px; width: clamp(216px, 17vw, 260px); max-height: min(calc(100dvh - 250px), 620px); padding: 18px; border-radius: 8px; overflow-y: auto; overflow-x: hidden; }
+.rule-desk { left: 18px; }
+.inspector { right: 18px; }
+.panel-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.panel-heading h2 { margin: 0; color: #2b3637; font-family: "Noto Serif TC", serif; font-size: 16px; letter-spacing: .03em; }
+.status-dot { display: inline-flex; align-items: center; border-radius: 999px; padding: 4px 7px; font-size: 10px; font-weight: 700; line-height: 1; white-space: nowrap; }
+.status-active { background: #d8edeb; color: #126c6b; }
+.status-fragment { background: #f6e7cf; color: #9b6529; }
+.status-locked { background: #e0e3e2; color: #596566; }
+.desk-copy { margin: 16px 0 12px; color: #61706f; font-size: 12px; line-height: 1.7; }
+.sentence-row { display: flex; align-items: center; gap: 6px; min-height: 48px; }
+.rule-tile {
+  appearance: none; position: relative; isolation: isolate; overflow: hidden; border: 1px solid #c9c0af; border-radius: 2px 9px 2px 9px; min-width: 50px; padding: 10px 11px 10px; background: #f7f3e8; color: #31393a; box-shadow: 0 3px 0 #d4ccbc, 0 8px 18px rgba(71, 63, 51, .12), inset 0 1px rgba(255,255,255,.88), inset 0 -2px rgba(139,128,110,.11); font-size: 13px; font-weight: 700; letter-spacing: .04em; transition: transform 160ms cubic-bezier(.23,1,.32,1), box-shadow 160ms ease, background 160ms ease;
+}
+.rule-tile::before { content: ""; position: absolute; inset: 0; z-index: -1; opacity: .13; background-image: var(--lawweaver-rule-tile, url("/manus-storage/lawweaver-rule-tile-material_1ef3f924.png")); background-size: cover; mix-blend-mode: multiply; }
+.rule-tile::after { content: ""; position: absolute; left: 8px; right: 8px; bottom: 4px; height: 1px; border-top: 1px dashed rgba(93,85,70,.23); box-shadow: 0 -4px 0 -3px rgba(22,122,120,.35); }
+.rule-tile:hover { transform: translateY(-2px); box-shadow: 0 5px 0 #dcd5c6, 0 12px 20px rgba(71, 63, 51, .14); }
+.rule-tile:active { transform: translateY(2px) scale(.97); box-shadow: 0 1px 0 #dcd5c6; }
+.rule-tile-accent { border-color: #4a9a96; background: #d9edeb; color: #116f6c; cursor: grab; }
+.empty-interface { width: 52px; height: 38px; border: 1px dashed #b58a4f; border-radius: 5px; color: #9a6d30; background: rgba(255,248,233,.75); font-size: 11px; }
+.break-slot { display: flex; align-items: center; justify-content: center; gap: 7px; width: 100%; min-height: 42px; margin-top: 13px; border: 1px dashed #a9aaa0; background: rgba(225, 227, 219, .4); color: #75807e; font-size: 11px; transition: border-color 160ms ease, background 160ms ease, color 160ms ease; }
+.break-slot:hover, .break-slot.is-filled { border-color: #167a78; background: #dcecea; color: #126c6b; }
+.slot-rationale { margin: 7px 1px 0; color: #84908c; font-size: 10px; line-height: 1.5; }
+.rule-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 10px; }
+.small-action { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 34px; border: 1px solid #dbd6cb; background: rgba(255,255,255,.45); color: #566361; font-size: 11px; transition: background 160ms ease, transform 160ms ease; }
+.small-action:hover { background: #f1eee6; }.small-action:active { transform: scale(.97); }
+.rule-list { margin-top: 18px; border-top: 1px solid #e3ded4; }
+.rule-list-row { display: grid; grid-template-columns: 33px 1fr auto; align-items: center; gap: 9px; padding: 11px 0; border-bottom: 1px solid #eae5db; }
+.rule-list-row p { margin: 0; color: #3f4b4b; font-size: 10px; line-height: 1.4; }.rule-list-row span { color: #87908c; font-size: 10px; }.rule-index { color: #9a8571; font-family: "Noto Serif TC", serif; font-size: 11px; }
+
+.board-caption { position: absolute; z-index: 6; left: 50%; top: 150px; width: min(370px, 34vw); transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+.board-label { padding: 5px 9px; border: 1px solid rgba(74, 99, 96, .16); border-radius: 999px; background: rgba(249,247,240,.74); color: #6e7b78; font-size: 9px; font-weight: 700; letter-spacing: .12em; }
+.objective-card { display: flex; align-items: baseline; justify-content: center; gap: 8px; padding: 9px 13px; border: 1px solid rgba(71, 92, 88, .17); border-radius: 6px; background: rgba(250,249,243,.86); box-shadow: 0 9px 20px rgba(54, 69, 67, .08); }
+.objective-card span { color: #167a78; font-size: 10px; font-weight: 700; letter-spacing: .12em; }.objective-card strong { color: #3b4746; font-size: 12px; font-weight: 600; }
+.causal-toast { display: inline-flex; align-items: center; gap: 8px; max-width: 370px; border-radius: 999px; padding: 8px 12px; background: rgba(46,58,58,.84); box-shadow: 0 10px 24px rgba(40, 50, 49, .18); color: #edf2ed; font-size: 11px; line-height: 1.35; }
+.causal-pin { flex: 0 0 7px; height: 7px; border-radius: 50%; background: #6ed0c6; box-shadow: 0 0 0 3px rgba(110,208,198,.16); }
+.causal-thread { position: absolute; z-index: 7; right: 18px; left: auto; top: auto; bottom: 80px; width: clamp(180px, 15vw, 220px); max-height: 50px; overflow: hidden; border-top: 2px solid rgba(22,122,120,.82); border-right: 2px solid rgba(22,122,120,.82); border-radius: 0 26px 0 0; pointer-events: none; filter: drop-shadow(0 3px 4px rgba(22,122,120,.18)); }.causal-thread::before { content: ""; position: absolute; right: -7px; bottom: -6px; width: 11px; height: 11px; border: 2px solid #167a78; border-radius: 50%; background: #eaf6f2; }.thread-origin, .thread-destination { position: absolute; padding: 3px 6px; border: 1px solid rgba(22,122,120,.36); background: rgba(241,250,247,.9); color: #167a78; font-size: 9px; font-weight: 700; letter-spacing: .05em; }.thread-origin { left: 7px; top: -19px; }.thread-destination { right: -30px; bottom: -27px; }.thread-knot { position: absolute; top: -5px; left: 48%; width: 9px; height: 9px; border: 2px solid #167a78; background: #eaf6f2; transform: rotate(45deg); }
+.camera-dock { position: absolute; z-index: 5; right: auto; top: auto; bottom: max(18px, env(safe-area-inset-bottom)); left: 18px; display: grid; gap: 7px; width: 190px; padding: 10px; }.camera-dock label { display: grid; grid-template-columns: 15px 31px 1fr; align-items: center; gap: 5px; color: #5e6c68; font-size: 10px; }.camera-dock input { width: 100%; accent-color: #167a78; }.camera-focus { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 29px; border: 1px solid #c9c1b1; background: #fbfaf5; color: #43615d; font-size: 10px; font-weight: 700; }.camera-focus:hover { border-color: #167a78; color: #126c6b; background: #e7f2ef; }
+.focus-mode .rule-desk, .focus-mode .inspector, .focus-mode .board-caption, .focus-mode .causal-thread, .focus-mode .chapter-rail { opacity: 0; pointer-events: none; transform: translateY(-12px); }.focus-mode .camera-dock { right: 24px; top: 86px; }.focus-mode .control-dock { box-shadow: 0 4px 0 rgba(164,157,143,.32), 0 15px 38px rgba(44,55,52,.16); }.rule-desk, .inspector, .board-caption, .causal-thread, .chapter-rail { transition: opacity 180ms cubic-bezier(.23,1,.32,1), transform 180ms cubic-bezier(.23,1,.32,1); }
+
+.causal-entry { position: relative; display: flex; gap: 10px; padding: 12px 0; border-bottom: 1px solid #e7e2d7; }.entry-line { display: block; flex: 0 0 3px; min-height: 34px; border-radius: 99px; }.teal-line { background: #167a78; }.graphite-line { background: #778283; }.amber-line { background: #d88b3c; }.causal-entry b { color: #394443; font-size: 11px; }.causal-entry p { margin: 3px 0 0; color: #71807d; font-size: 11px; line-height: 1.55; }.conflict-entry b { color: #9e5f35; }
+.map-object-strip { margin: 9px 0 1px; padding: 7px 8px; border-left: 2px solid #bfc9c5; background: rgba(242,244,239,.72); color: #72807c; font-size: 9px; line-height: 1.55; }.map-object-strip b { color: #4c5c58; font-weight: 700; }
+.object-statuses { display: flex; flex-wrap: wrap; gap: 5px; margin: 8px 0; }.object-statuses span { padding: 4px 6px; border: 1px solid #d6d0c2; background: #f8f6ee; color: #697773; font-size: 9px; font-weight: 700; }.object-statuses .status-blocked { border-color: rgba(216,139,60,.46); background: #fbefe1; color: #9b6031; }.object-statuses .status-ready { border-color: rgba(22,122,120,.35); background: #e4f1ee; color: #126c6b; animation: stateReveal 460ms cubic-bezier(.23,1,.32,1); }
+.causal-map { display: grid; grid-template-columns: 1fr 12px 1fr 12px 1fr; align-items: stretch; gap: 3px; margin: 9px 0 7px; padding: 8px 6px; border-top: 1px dashed #d7d1c3; border-bottom: 1px dashed #d7d1c3; }.causal-map div { display: flex; flex-direction: column; justify-content: center; min-width: 0; padding: 5px; border: 1px solid #dad5c9; background: #f6f3ea; }.causal-map b { color: #7b827d; font-size: 8px; }.causal-map span { margin-top: 3px; color: #3e504c; font-size: 9px; line-height: 1.35; word-break: break-word; }.causal-map i { align-self: center; color: #a27a55; font-style: normal; font-size: 12px; }.causal-map.is-resolved div { border-color: rgba(22,122,120,.35); background: #ecf5f2; }.causal-map.is-resolved i { color: #167a78; }.causal-map.is-resolved div:last-child span { color: #167a78; font-weight: 700; }
+.causal-report { display: grid; gap: 3px; margin: 7px 0 9px; padding: 8px; border-left: 2px solid #167a78; background: rgba(234,244,240,.64); color: #5c6d68; font-size: 9px; line-height: 1.45; }.causal-report b { color: #126c6b; font-size: 10px; }.editor-warning { margin: 8px 0; padding: 8px; border-left: 3px solid #d88b3c; background: #fbefe1; color: #925f31; font-size: 11px; line-height: 1.55; }
+@keyframes stateReveal { from { opacity: .25; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+.guide-toggle { display: flex; width: 100%; align-items: center; justify-content: space-between; margin-top: 13px; border: 0; background: transparent; color: #167a78; font-size: 11px; font-weight: 700; }.guide-copy { margin: 8px 0 0; padding: 9px; background: #eef3f0; color: #5b6a67; font-size: 11px; line-height: 1.6; }
+.chapter-card { position: relative; overflow: hidden; margin-top: 15px; min-height: 92px; padding: 14px; background-position: right center; background-size: cover; color: #f7f5ef; }.chapter-card::before { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(29,52,52,.94) 0%, rgba(29,52,52,.58) 66%, rgba(29,52,52,.1) 100%); }.chapter-card span, .chapter-card b { position: relative; display: block; }.chapter-card span { margin-bottom: 4px; font-size: 10px; letter-spacing: .1em; }.chapter-card b { font-family: "Noto Serif TC", serif; font-size: 14px; line-height: 1.45; }
+
+.control-dock { position: absolute; z-index: 4; bottom: 24px; left: 50%; display: grid; grid-template-columns: auto auto minmax(150px, 220px); align-items: center; gap: 16px; min-width: 485px; padding: 10px 14px; border-radius: 2px 11px 2px 11px; transform: translateX(-50%); }
+.dpad { display: grid; grid-template-columns: 28px 28px 28px; grid-template-rows: 28px 28px 28px; gap: 2px; }.dpad-button, .dpad-core { display: grid; place-items: center; border: 1px solid #d8d4cb; background: #fbfaf5; color: #536260; font-size: 16px; transition: transform 120ms ease, background 120ms ease; }.dpad-button:hover { background: #e4f0ed; color: #167a78; }.dpad-button:active { transform: scale(.93); }.dpad-up { grid-column: 2; grid-row: 1; }.dpad-left { grid-column: 1; grid-row: 2; }.dpad-core { grid-column: 2; grid-row: 2; border-color: #4c9d98; background: #d8eeeb; color: #126c6b; font-size: 10px; font-weight: 700; }.dpad-right { grid-column: 3; grid-row: 2; }.dpad-down { grid-column: 2; grid-row: 3; }
+.transport-controls { display: flex; gap: 5px; }.transport-controls > button { display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; border: 1px solid #d8d4cb; background: #fbfaf5; color: #52615f; transition: transform 120ms ease, background 120ms ease; }.transport-controls > button:hover { background: #eeeae0; }.transport-controls > button:active { transform: scale(.94); }.transport-controls .demo-button { width: auto; padding: 0 10px; gap: 5px; border-color: #167a78; background: #167a78; color: white; font-size: 11px; font-weight: 700; }.ai-auto-button { width: auto; padding: 0 10px; gap: 5px; border-color: #8a6d3d; background: #d4af37; color: #4a2c0a; font-size: 11px; font-weight: 700; }
+.replay-control { min-width: 0; }.replay-meta { display: flex; justify-content: space-between; margin-bottom: 5px; color: #6e7d7a; font-size: 10px; }.replay-control input { width: 100%; accent-color: #167a78; }
+
+.chapter-rail { position: absolute; z-index: 3; right: 27px; bottom: 26px; display: flex; align-items: flex-end; gap: 3px; }.chapter-node { display: flex; flex-direction: column; align-items: flex-start; min-width: 44px; border: 0; border-left: 1px solid rgba(60,77,74,.22); background: transparent; color: #77827f; padding: 5px 7px; text-align: left; }.chapter-node span { color: #a0aaa6; font-family: "Noto Serif TC", serif; font-size: 14px; }.chapter-node i { max-width: 54px; overflow: hidden; font-size: 9px; font-style: normal; white-space: nowrap; text-overflow: ellipsis; }.chapter-node.is-unlocked span, .chapter-node.is-unlocked i { color: #167a78; }
+
+.tutorial-active::after { content: ""; position: absolute; inset: 0; z-index: 6; background: rgba(35, 52, 51, .12); pointer-events: none; }
+.tutorial-target { z-index: 8 !important; outline: 2px solid rgba(22,122,120,.7); outline-offset: 5px; box-shadow: 0 0 0 9px rgba(226,245,241,.6), 0 18px 48px rgba(31,67,64,.18) !important; animation: targetBreath 1.7s ease-in-out infinite; }
+.tutorial-card { position: absolute; z-index: 9; left: 50%; top: 118px; width: min(360px, calc(100vw - 32px)); padding: 17px 20px 16px; transform: translateX(-50%) rotate(-.35deg); border: 1px solid rgba(210,202,184,.95); border-radius: 1px 8px 1px 8px; background-color: rgba(250,248,241,.92); background-image: linear-gradient(90deg, rgba(74,91,85,.045) 1px, transparent 1px), linear-gradient(rgba(255,255,255,.9), rgba(238,233,220,.45)); background-size: 8px 8px, 100% 100%; box-shadow: 0 5px 0 rgba(169,158,139,.38), 0 13px 28px rgba(19,36,34,.13), inset 0 1px rgba(255,255,255,.9); color: #344140; pointer-events: auto; transition: opacity 180ms cubic-bezier(.23,1,.32,1), transform 180ms cubic-bezier(.23,1,.32,1), filter 180ms cubic-bezier(.23,1,.32,1), box-shadow 180ms cubic-bezier(.23,1,.32,1); }
+.tutorial-card::after { content: ""; position: absolute; top: -4px; left: 26px; width: 44px; height: 8px; border-left: 1px solid rgba(130,120,98,.2); border-right: 1px solid rgba(130,120,98,.2); background: rgba(225,214,181,.5); transform: rotate(-3deg); }
+.tutorial-card::before { content: "說明紙 / 01"; display: block; margin: -7px 0 9px; color: #9a8571; font-size: 8px; font-weight: 700; letter-spacing: .13em; }
+.tutorial-card.is-receded { opacity: .14; transform: translateX(-50%) translateY(-9px) scale(.985) rotate(-.35deg); filter: saturate(.45); box-shadow: 0 3px 0 rgba(169,158,139,.16), 0 12px 34px rgba(19,36,34,.1); pointer-events: none; }
+.tutorial-card-topline { display: flex; align-items: center; gap: 7px; color: #167a78; font-size: 11px; font-weight: 700; letter-spacing: .08em; }.tutorial-card-topline b { margin-left: auto; color: #7c8a87; font-size: 10px; font-weight: 600; }.tutorial-orb, .tutorial-icon { display: inline-grid; place-items: center; width: 25px; height: 25px; background: #dcefed; color: #167a78; }.tutorial-icon { margin-top: 15px; width: 31px; height: 31px; }
+.tutorial-card h2 { margin: 13px 0 7px; color: #28423f; font-family: "Noto Serif TC", serif; font-size: 21px; line-height: 1.3; }.tutorial-card p { margin: 0; color: #5e6e6a; font-size: 13px; line-height: 1.75; }.tutorial-card p b { color: #167a78; }.tutorial-note { margin-top: 9px !important; border-left: 2px solid #b8d9d5; padding-left: 9px; color: #76847f !important; font-size: 11px !important; }
+.tutorial-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 17px; }.tutorial-primary, .tutorial-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 36px; padding: 0 12px; border: 1px solid #167a78; font-size: 11px; font-weight: 700; transition: transform 150ms ease, box-shadow 150ms ease, background 150ms ease; }.tutorial-primary { background: #167a78; color: white; box-shadow: 0 6px 13px rgba(22,122,120,.18); }.tutorial-secondary { background: #fbfaf5; color: #52615f; border-color: #d7d4ca; }.tutorial-primary:hover { background: #116c6a; }.tutorial-secondary:hover { background: #eeeae0; }.tutorial-primary:active, .tutorial-secondary:active { transform: scale(.96); }.tutorial-skip { margin-top: 14px; border: 0; background: transparent; color: #75827f; font-size: 10px; text-decoration: underline; text-underline-offset: 3px; }
+@keyframes targetBreath { 50% { outline-color: rgba(22,122,120,.3); box-shadow: 0 0 0 13px rgba(226,245,241,.27), 0 18px 48px rgba(31,67,64,.13) !important; } }
+
+.completion-layer { position: absolute; inset: 0; z-index: 10; display: grid; place-items: center; background: rgba(30,44,43,.42); backdrop-filter: blur(5px); pointer-events: auto; }.completion-card { width: min(390px, calc(100vw - 42px)); padding: 28px; border: 1px solid rgba(255,255,255,.72); background: #f7f4ec; box-shadow: 0 28px 80px rgba(17,30,29,.28); text-align: center; }.completion-card h2 { margin: 8px 0; color: #1f4340; font-family: "Noto Serif TC", serif; font-size: 25px; }.completion-card p:not(.eyebrow) { margin: 0; color: #64706e; font-size: 13px; line-height: 1.7; }.completion-card button { margin-top: 18px; border: 0; padding: 10px 17px; background: #167a78; color: #fff; font-size: 12px; font-weight: 700; }
+.completion-time { display: flex; justify-content: center; align-items: baseline; gap: 9px; margin-top: 15px; padding: 10px; border-top: 1px dashed #cfc8b9; border-bottom: 1px dashed #cfc8b9; color: #6c7b78; font-size: 11px; }.completion-time b { color: #167a78; font-family: "Noto Serif TC", serif; font-size: 21px; }
+.editor-layer { position: absolute; z-index: 14; inset: 0; display: grid; place-items: center; padding: 24px; background: rgba(34,47,46,.48); backdrop-filter: blur(5px); pointer-events: auto; }.editor-sheet { width: min(830px, 94vw); max-height: min(850px, 92dvh); overflow-y: auto; padding: 22px; border: 1px solid #d1c8b5; border-radius: 2px 12px 2px 12px; background: #f8f5ec; background-image: linear-gradient(90deg, rgba(73,91,85,.035) 1px, transparent 1px); background-size: 9px 9px; box-shadow: 0 7px 0 rgba(151,140,121,.4), 0 35px 80px rgba(14,29,27,.32); }.editor-heading { display: flex; align-items: flex-start; justify-content: space-between; }.editor-heading h2 { margin: 2px 0 0; font-family: "Noto Serif TC", serif; color: #28423f; font-size: 24px; }.editor-heading > button { display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid #d3cabb; background: #fdfbf4; color: #64716e; }.editor-copy { margin: 12px 0; color: #61706f; font-size: 12px; line-height: 1.65; }.editor-field { display: grid; gap: 5px; max-width: 360px; color: #52615f; font-size: 11px; font-weight: 700; }.editor-field input, .editor-sheet textarea { border: 1px solid #cfc7b6; background: rgba(255,255,255,.72); color: #344140; padding: 9px; outline-color: #167a78; }.editor-tools, .editor-actions { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 13px; }.editor-tools button, .editor-actions button { display: inline-flex; align-items: center; gap: 6px; border: 1px solid #cfc7b6; background: #fdfbf4; color: #4e5c59; padding: 8px 10px; font-size: 11px; font-weight: 700; }.editor-tools button.is-selected, .editor-actions button:hover { border-color: #167a78; background: #dcefed; color: #126c6b; }.editor-grid { display: grid; grid-template-columns: repeat(7, minmax(28px, 1fr)); gap: 4px; width: min(420px, 100%); margin: 16px auto; padding: 9px; background: #dfe4df; box-shadow: inset 0 1px #fff, 0 3px 0 #c7cfc9; }.editor-cell { aspect-ratio: 1; border: 1px solid #c6cfca; background: #f8f8f2; color: #4d5a58; font-size: 17px; }.editor-cell:hover { border-color: #167a78; background: #edf6f3; }.cell-wall { background: #4c555c; color: #f7f5ef; box-shadow: 0 2px 0 #354047; }.cell-player { background: #d7efec; color: #167a78; }.cell-door { background: #e6f4f1; color: #167a78; }.cell-ember { background: #f7e4c6; color: #b26a27; }.cell-tide { background: #dcecf0; color: #357a91; }.editor-notice { min-height: 20px; margin: 6px 0; color: #6f7c78; font-size: 10px; }.editor-sheet textarea { width: 100%; min-height: 78px; margin-top: 13px; resize: vertical; font-size: 10px; line-height: 1.45; }
+
+@media (max-width: 1120px) { .rule-desk, .inspector { width: 236px; padding: 14px; }.rule-list-row { grid-template-columns: 27px 1fr; }.rule-list-row .status-dot { display: none; }.control-dock { min-width: 430px; }.chapter-rail { display: none; } }
+@media (max-width: 850px) {
+  .game-header { left: 14px; right: 14px; top: 13px; }.brand-logo { width: 39px; height: 39px; }.brand-lockup h1 { font-size: 16px; }.header-meta .chapter-badge { display: none; }
+  .rule-desk, .inspector { top: auto; bottom: 100px; width: calc(50% - 22px); max-height: 222px; overflow: auto; }.rule-desk { left: 14px; }.inspector { right: 14px; }.rule-list { display: none; }.desk-copy { margin: 9px 0; }.chapter-card { display: none; }.board-caption { top: 52px; width: min(330px, 78vw); }.control-dock { bottom: 12px; min-width: 0; width: calc(100% - 28px); grid-template-columns: auto auto 1fr; gap: 9px; padding: 8px; }.objective-card strong { font-size: 11px; }.causal-toast { max-width: 320px; }
+  .tutorial-card { top: 124px; }.causal-thread { left: 246px; top: 305px; width: 31vw; }
+  .camera-dock { top: 66px; right: 14px; width: 178px; }
+}
+@media (max-width: 580px) {
+  .header-meta { gap: 4px; }.turn-badge { padding: 6px 8px; font-size: 10px; }.tutorial-reopen { padding: 6px 7px; font-size: 9px; }.tutorial-reopen svg { width: 12px; }.rule-desk, .inspector { bottom: 86px; width: calc(50% - 10px); max-height: 188px; padding: 11px; border-radius: 6px; }.rule-desk { left: 8px; }.inspector { right: 8px; }.panel-heading h2 { font-size: 13px; }.panel-heading .eyebrow { font-size: 8px; }.status-dot { padding: 3px 5px; font-size: 8px; }.desk-copy, .causal-entry p, .guide-copy { font-size: 9px; }.slot-rationale { font-size: 8px; }.causal-entry { gap: 7px; padding: 7px 0; }.causal-entry b { font-size: 10px; }.sentence-row { gap: 2px; }.rule-tile { min-width: auto; padding: 6px 3px; font-size: 10px; }.empty-interface { width: 39px; height: 31px; }.break-slot { min-height: 32px; margin-top: 8px; font-size: 9px; }.rule-actions { margin-top: 6px; gap: 4px; }.small-action { min-height: 28px; font-size: 9px; }.small-action svg { width: 12px; }.inspector .guide-toggle { margin-top: 7px; font-size: 10px; }.control-dock { grid-template-columns: auto auto; justify-content: space-between; }.replay-control { grid-column: 1 / -1; }.dpad { transform: scale(.86); transform-origin: left center; margin-right: -12px; }.transport-controls > button { min-width: 29px; height: 29px; }.transport-controls .demo-button { padding: 0 7px; }.board-caption { top: 43px; }.board-label { font-size: 8px; }.objective-card { padding: 6px 9px; }.objective-card span { font-size: 8px; }.objective-card strong { font-size: 10px; }.causal-toast { padding: 6px 9px; font-size: 9px; }.completion-card { padding: 23px; }.tutorial-card { top: 102px; padding: 15px; }.tutorial-card h2 { margin: 9px 0 5px; font-size: 18px; }.tutorial-card p { font-size: 11px; line-height: 1.65; }.tutorial-note { font-size: 9px !important; }.tutorial-actions { margin-top: 12px; }.tutorial-primary, .tutorial-secondary { min-height: 32px; padding: 0 9px; font-size: 10px; }.causal-thread { left: 21px; top: 285px; width: calc(100% - 61px); height: 57px; opacity: .78; }.thread-origin { left: 5px; }.thread-destination { right: -21px; }
+  .camera-dock { top: 58px; right: 8px; width: 148px; padding: 7px; }.camera-dock label { grid-template-columns: 13px 26px 1fr; gap: 3px; font-size: 9px; }.camera-dock svg { width: 12px; }.camera-focus { min-height: 26px; font-size: 9px; }
+}
+
+/* 平板直向：將兩側資訊改為底部雙欄，保留中央棋盤的大面積可視範圍。 */
+@media (min-width: 581px) and (max-width: 850px) and (orientation: portrait) {
+  .rule-desk, .inspector { bottom: 112px; width: calc(50% - 22px); max-height: 216px; }
+  .control-dock { bottom: 18px; width: calc(100% - 32px); }
+  .tutorial-card { top: 118px; }
+  .board-caption { top: 52px; }
+}
+
+/* 手機橫向：面板回到短側，底部控制列完整保留，棋盤維持最大的中央視野。 */
+@media (max-width: 850px) and (orientation: landscape) {
+  .game-header { left: 12px; right: 12px; top: 8px; }.brand-logo { width: 33px; height: 33px; }.brand-lockup h1 { font-size: 14px; }.eyebrow { font-size: 8px; }
+  .chapter-badge { display: none; }.turn-badge, .tutorial-reopen { padding: 5px 7px; font-size: 9px; }
+  .rule-desk, .inspector { top: 58px; bottom: 80px; width: min(190px, 25vw); max-height: none; padding: 10px; overflow: auto; }
+  .rule-desk { left: 10px; }.inspector { right: 10px; }.rule-list, .chapter-card { display: none; }
+  .desk-copy { margin: 7px 0; font-size: 9px; line-height: 1.45; }.slot-rationale { font-size: 8px; }.rule-actions { margin-top: 6px; }.small-action { min-height: 28px; font-size: 9px; }
+  .sentence-row { gap: 2px; }.rule-tile { min-width: auto; padding: 6px 4px; font-size: 10px; white-space: nowrap; }.empty-interface { width: 42px; }
+  .causal-entry { padding: 6px 0; gap: 6px; }.causal-entry p { font-size: 9px; line-height: 1.4; }.causal-entry b { font-size: 9px; }.entry-line { min-height: 28px; }
+  .board-caption { top: 30px; width: min(340px, 42vw); }.causal-toast { display: none; }.objective-card { padding: 5px 8px; }.objective-card strong { font-size: 10px; }
+  .causal-thread { left: 25vw; top: 190px; width: 25vw; height: 50px; opacity: .58; }
+  .control-dock { bottom: 8px; min-width: 0; width: min(470px, 58vw); padding: 6px 9px; grid-template-columns: auto auto minmax(110px,1fr); gap: 8px; }.dpad { transform: scale(.78); transform-origin: left center; margin-right: -16px; }.transport-controls > button { min-width: 29px; height: 29px; }.replay-meta { margin-bottom: 2px; }
+  .tutorial-card { top: 60px; width: min(340px, 46vw); padding: 14px; }.tutorial-card h2 { margin: 8px 0 4px; font-size: 17px; }.tutorial-card p { font-size: 10px; line-height: 1.5; }.tutorial-note { font-size: 9px !important; }.tutorial-actions { margin-top: 10px; }.tutorial-primary, .tutorial-secondary { min-height: 30px; font-size: 9px; }.tutorial-skip { margin-top: 8px; }
+  .camera-dock { top: 57px; right: 10px; width: 150px; }.focus-mode .camera-dock { top: 57px; right: 10px; }
+}
+
+/* 小尺寸手機直向：把規則與因果區變成可觸及的底部雙卡，控制列獨立在最下方。 */
+@media (max-width: 580px) and (orientation: portrait) {
+  .game-header { top: max(9px, env(safe-area-inset-top)); }.board-caption { top: 41px; }.rule-desk, .inspector { bottom: 104px; max-height: 178px; }
+  .control-dock { bottom: max(8px, env(safe-area-inset-bottom)); }.tutorial-card { top: 102px; max-height: min(310px, 42vh); overflow-y: auto; }
+}
+@media (max-width: 850px) { .editor-layer { padding: 10px; }.editor-sheet { width: 100%; max-height: 96dvh; padding: 16px; }.editor-grid { width: min(360px, 100%); }.editor-heading h2 { font-size: 20px; } }
+@media (max-width: 850px) and (orientation: landscape) { .editor-sheet { display: grid; grid-template-columns: minmax(220px, .8fr) minmax(260px, 1fr); gap: 12px; }.editor-heading, .editor-copy, .editor-field, .editor-tools, .editor-notice, .editor-actions { grid-column: 1; }.editor-grid, .editor-sheet textarea { grid-column: 2; }.editor-grid { grid-row: 1 / span 5; margin: 0 auto; }.editor-sheet textarea { align-self: end; min-height: 64px; }.editor-sheet .editor-actions:last-child { grid-column: 2; grid-row: 6; }.editor-sheet { max-height: 94dvh; padding: 13px; }.editor-copy { margin: 4px 0; font-size: 10px; }.editor-tools, .editor-actions { margin-top: 7px; }.editor-tools button, .editor-actions button { padding: 6px 8px; font-size: 9px; } }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; } }
+
+.completion-time { display: flex; justify-content: center; align-items: baseline; gap: 9px; margin-top: 15px; padding: 10px; border-top: 1px dashed #cfc8b9; border-bottom: 1px dashed #cfc8b9; color: #6c7b78; font-size: 11px; }.completion-time b { color: #167a78; font-family: "Noto Serif TC", serif; font-size: 21px; }
+.personal-record { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; padding: 10px; border: 1px solid #ddd4c4; background: rgba(255,255,255,.5); color: #61706d; text-align: left; }.personal-record > span { grid-column: 1 / -1; color: #9a8571; font-size: 9px; font-weight: 700; letter-spacing: .12em; }.personal-record div { display: flex; align-items: baseline; gap: 5px; }.personal-record b { color: #167a78; font-size: 16px; }.personal-record small, .personal-record em { color: #7c8985; font-size: 9px; font-style: normal; }.personal-record em { grid-column: 1 / -1; }
+.editor-field select { border: 1px solid #cfc7b6; background: rgba(255,255,255,.72); color: #344140; padding: 8px; outline-color: #167a78; }.share-preview { display: grid; grid-template-columns: 1fr 130px; gap: 12px; align-items: center; margin: 13px 0 4px; padding: 11px; border: 1px solid #d5ccbc; background: #eef2ed; box-shadow: inset 0 1px rgba(255,255,255,.8); }.share-preview span, .share-preview b, .share-preview i { display: block; }.share-preview span { color: #71807b; font-size: 8px; letter-spacing: .12em; }.share-preview b { margin: 4px 0; color: #314542; font-family: "Noto Serif TC", serif; font-size: 17px; }.share-preview i { color: #66736f; font-size: 10px; font-style: normal; }.preview-teal { background: #e4f0ed; }.preview-amber { background: #f4ead9; }.preview-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; padding: 5px; background: rgba(255,255,255,.55); }.preview-cell { aspect-ratio: 1; background: #f9f8f2; border: 1px solid rgba(90,105,100,.14); }.preview-wall { background: #4d575c; }.preview-player { background: #167a78; clip-path: polygon(50% 10%, 90% 90%, 10% 90%); }.preview-door { border: 2px solid #167a78; transform: rotate(45deg) scale(.62); }
+@media (max-width: 580px) { .share-preview { grid-template-columns: 1fr 100px; }.share-preview b { font-size: 14px; }.personal-record { grid-template-columns: 1fr; }.personal-record > span, .personal-record em { grid-column: 1; } }
+.rule-execute.is-ready { color: #f8fffc; background: #167A78; border-color: #167A78; box-shadow: 0 0 0 3px rgba(22, 122, 120, .16), 0 8px 18px rgba(22, 122, 120, .24); animation: rule-ready-pulse 1.35s ease-in-out infinite; }
+@keyframes rule-ready-pulse { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-1px); } }
+@media (prefers-reduced-motion: reduce) { .rule-execute.is-ready { animation: none; } }
+.board-key { display: flex; flex-wrap: wrap; gap: 5px 10px; margin-top: 7px; font-size: 10px; font-weight: 700; line-height: 1.25; }
+.board-key span { display: inline-flex; align-items: center; gap: 4px; }
+.key-ember { color: #9B4C2A; }.key-tide { color: #2D6F89; }
+@media (max-width: 680px) { .board-key { font-size: 9px; gap: 4px 8px; } }
+
+
+/* 手機專用設計：棋盤優先、資訊分頁、底部控制固定在安全區內；不把桌面雙欄縮小硬塞進窄螢幕。 */
+.mobile-console, .mobile-controls { display: none; }
+
+@media (max-width: 680px), (max-width: 850px) and (orientation: landscape) {
+  html, body, #root { overflow: hidden; }
+  .game-frame { min-height: 100svh; }
+  .game-header { left: max(12px, env(safe-area-inset-left)); right: max(12px, env(safe-area-inset-right)); top: max(10px, env(safe-area-inset-top)); gap: 8px; align-items: flex-start; }
+  .brand-lockup { gap: 7px; min-width: 0; }
+  .brand-logo { width: 34px; height: 34px; }
+  .brand-lockup h1 { font-size: 15px; letter-spacing: .08em; white-space: nowrap; }
+  .eyebrow { max-width: 145px; overflow: hidden; font-size: 8px; letter-spacing: .08em; white-space: nowrap; text-overflow: ellipsis; }
+  .header-meta { flex: 0 0 auto; gap: 4px; }
+  .header-meta .chapter-badge { display: none; }
+  .turn-badge { padding: 6px 7px; font-size: 10px; }
+  .tutorial-reopen { min-width: 35px; min-height: 35px; padding: 5px; font-size: 0; }
+  .tutorial-reopen svg { width: 15px; height: 15px; }
+
+  .rule-desk, .inspector, .camera-dock, .control-dock, .chapter-rail, .causal-thread { display: none !important; }
+  .board-caption { top: 76px; left: 10px; width: calc(100% - 20px); transform: none; gap: 6px; }
+  .board-label { max-width: 100%; padding: 4px 7px; font-size: 8px; letter-spacing: .07em; }
+  .objective-card { width: 100%; align-items: flex-start; justify-content: flex-start; gap: 7px; padding: 9px 10px; text-align: left; }
+  .objective-card span { flex: 0 0 auto; padding-top: 2px; font-size: 9px; }
+  .objective-card strong { display: -webkit-box; overflow: hidden; font-size: 11px; line-height: 1.45; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+  .board-key { display: none; }
+  .causal-toast { width: 100%; max-width: none; justify-content: flex-start; padding: 7px 9px; border-radius: 10px; font-size: 10px; text-align: left; }
+
+  .mobile-console { position: absolute; z-index: 5; right: 9px; bottom: calc(174px + env(safe-area-inset-bottom)); left: 9px; display: block; overflow: hidden; padding: 0; border-radius: 9px 2px 9px 2px; }
+  .mobile-console-handle { display: none; }
+  .mobile-console-tabs { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid #d9d2c4; background: rgba(240, 238, 229, .9); }
+  .mobile-console-tabs button { min-height: 42px; border: 0; border-right: 1px solid #ded8cc; background: transparent; color: #697672; font-size: 11px; font-weight: 700; }
+  .mobile-console-tabs button:last-child { border-right: 0; }
+  .mobile-console-tabs button.is-active { background: #e3f1ee; color: #126c6b; box-shadow: inset 0 -3px #167a78; }
+  .mobile-console-tabs span { display: block; margin-top: 2px; color: #9a8571; font-size: 8px; font-weight: 500; }
+  .mobile-console-body { min-height: 116px; padding: 10px 11px 11px; background: rgba(250, 248, 241, .97); }
+  .mobile-panel-kicker { margin: 0 0 7px; color: #8e806d; font-size: 9px; font-weight: 700; letter-spacing: .12em; }
+  .mobile-rule-tiles { display: flex; gap: 5px; min-height: 39px; overflow-x: auto; padding: 1px 1px 5px; }
+  .mobile-rule-tiles .rule-tile { flex: 0 0 auto; min-width: 55px; min-height: 35px; padding: 8px 9px; font-size: 12px; }
+  .mobile-rule-actions { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; margin-top: 3px; }
+  .mobile-rule-actions button { min-height: 38px; border: 1px solid #d5cfc1; background: #fbfaf5; color: #52615f; font-size: 10px; font-weight: 700; }
+  .mobile-rule-actions button:active, .mobile-console-tabs button:active, .mobile-camera-heading button:active { transform: scale(.97); }
+  .mobile-rule-actions button:last-child { grid-column: 1 / -1; border-color: #a9aaa0; background: #eef0e9; color: #66736f; }
+  .mobile-rule-actions button:last-child.is-ready { border-color: #167a78; background: #167a78; color: #fff; box-shadow: 0 0 0 3px rgba(22, 122, 120, .14); animation: rule-ready-pulse 1.35s ease-in-out infinite; }
+  .mobile-rule-status { margin: 7px 1px 0; color: #6e7b77; font-size: 10px; line-height: 1.45; }
+  .mobile-object-copy { display: -webkit-box; overflow: hidden; margin: 0 0 8px; color: #53635f; font-size: 10px; line-height: 1.5; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+  .mobile-object-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
+  .mobile-object-grid span { min-width: 0; padding: 6px; border: 1px solid #dfd9ca; background: #f5f3eb; color: #4d5c58; font-size: 9px; line-height: 1.35; }
+  .mobile-object-grid b { display: block; margin-bottom: 3px; color: #9a8571; font-size: 8px; }
+  .mobile-camera-heading { display: flex; align-items: center; justify-content: space-between; }
+  .mobile-camera-heading button { min-height: 32px; border: 1px solid #b9d7d2; background: #e3f1ee; color: #126c6b; padding: 0 9px; font-size: 10px; font-weight: 700; }
+  .mobile-camera-panel label { display: grid; grid-template-columns: 36px 1fr; align-items: center; gap: 8px; margin-top: 8px; color: #63716d; font-size: 10px; }
+  .mobile-camera-panel input { width: 100%; accent-color: #167a78; }
+
+  .mobile-controls { position: absolute; z-index: 6; right: 8px; bottom: max(8px, env(safe-area-inset-bottom)); left: 8px; display: block; padding: 8px 9px max(9px, env(safe-area-inset-bottom)); border-radius: 2px 11px 2px 11px; }
+  .mobile-control-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .mobile-dpad { display: grid; flex: 0 0 auto; grid-template-columns: repeat(3, 38px); grid-template-rows: repeat(3, 32px); gap: 2px; }
+  .mobile-dpad .dpad-button, .mobile-dpad .dpad-core { min-width: 38px; min-height: 32px; }
+  .mobile-transport-controls { display: grid; grid-template-columns: repeat(3, 38px); gap: 5px; align-items: center; }
+  .mobile-transport-controls button { display: inline-flex; align-items: center; justify-content: center; min-width: 38px; min-height: 38px; border: 1px solid #d8d4cb; background: #fbfaf5; color: #52615f; }
+  .mobile-transport-controls .demo-button { grid-column: 1 / -1; width: 100%; gap: 4px; border-color: #167a78; background: #167a78; color: #fff; font-size: 10px; font-weight: 700; }
+  .mobile-replay-control { margin-top: 7px; }
+  .mobile-replay-control input { display: block; width: 100%; accent-color: #167a78; }
+  .mobile-replay-control .replay-meta { margin-bottom: 2px; font-size: 9px; }
+
+  .tutorial-card { top: 96px; width: calc(100% - 28px); max-height: min(370px, 55dvh); overflow-y: auto; }
+  .completion-layer { padding: max(16px, env(safe-area-inset-top)) 14px max(16px, env(safe-area-inset-bottom)); }
+  .completion-card { width: 100%; max-width: 390px; padding: 23px 18px; }
+  .editor-layer { padding: max(10px, env(safe-area-inset-top)) 10px max(10px, env(safe-area-inset-bottom)); }
+  .editor-sheet { max-height: 98dvh; overflow-y: auto; }
+  .game-overlay { padding-bottom: env(safe-area-inset-bottom); }
+  .game-overlay button, .game-overlay input { touch-action: manipulation; }
+  .orientation-advice { top: 76px; width: min(330px, calc(100vw - 24px)); padding: 8px 9px; font-size: 10px; }.orientation-advice b { font-size: 9px; }
+  .board-maximize-header { display: none; }.board-maximize-fab { top: 73px; right: 9px; min-height: 31px; padding: 0 9px; font-size: 9px; }.focus-mode .board-maximize-fab { top: 73px; right: 9px; }
+  .reading-settings { top: calc(100% + 5px); right: 0; width: min(294px, calc(100vw - 20px)); padding: 10px; }.settings-trigger { font-size: 0; min-width: 35px; min-height: 35px; padding: 5px; }.settings-trigger svg { width: 15px; height: 15px; }
+  .quality-recommendation { padding: 7px; }.quality-recommendation small { font-size: 7px; }
+  .device-diagnostics { top: 76px; right: 10px; width: min(340px, calc(100vw - 20px)); padding: 12px; }.device-diagnostics dl > div { font-size: 10px; }
+  .slow-device-warning { top: auto; right: 10px; bottom: calc(190px + env(safe-area-inset-bottom)); width: min(280px, calc(100vw - 20px)); transform: none; }
+}
+
+@media (max-width: 680px) and (max-height: 720px), (max-width: 850px) and (orientation: landscape) {
+  .board-caption { top: 61px; }
+  .mobile-console { bottom: calc(158px + env(safe-area-inset-bottom)); }
+  .mobile-console-body { min-height: 98px; padding: 8px 10px; }
+  .mobile-controls { padding-top: 5px; }
+  .mobile-dpad { grid-template-columns: repeat(3, 34px); grid-template-rows: repeat(3, 27px); }
+  .mobile-dpad .dpad-button, .mobile-dpad .dpad-core { min-width: 34px; min-height: 27px; }
+  .mobile-transport-controls { grid-template-columns: repeat(3, 34px); }
+  .mobile-transport-controls button { min-width: 34px; min-height: 34px; }
+}
+
+@media (max-width: 850px) and (orientation: landscape) {
+  .mobile-console { right: 8px; bottom: 70px; left: auto; width: min(320px, 42vw); }
+  .mobile-controls { right: 8px; bottom: 7px; left: 8px; width: min(470px, 55vw); }
+  .board-caption { top: 30px; left: 50%; width: min(340px, 42vw); transform: translateX(-50%); }
+  .causal-toast { display: none; }
+  .mobile-console-body { min-height: 96px; padding: 8px; }
+  .mobile-rule-tiles .rule-tile { min-width: 46px; padding: 6px; font-size: 10px; }
+  .mobile-rule-actions button { min-height: 31px; font-size: 9px; }
+  .mobile-controls { padding: 5px 7px; }
+  .mobile-dpad { grid-template-columns: repeat(3, 29px); grid-template-rows: repeat(3, 25px); }
+  .mobile-dpad .dpad-button, .mobile-dpad .dpad-core { min-width: 29px; min-height: 25px; }
+  .mobile-transport-controls { grid-template-columns: repeat(3, 30px); gap: 3px; }
+  .mobile-transport-controls button { min-width: 30px; min-height: 30px; }
+  .orientation-advice { top: 48px; left: 50%; width: min(400px, 50vw); transform: translateX(-50%); }.board-maximize-fab { top: 48px; right: 9px; }.focus-mode .board-maximize-fab { top: 48px; right: 9px; }
+}
+
+
+/* 手機教學：非起始／結尾步驟只佔一條引導紙，棋盤與控制台保持可見可按。 */
+@media (max-width: 680px), (max-width: 850px) and (orientation: landscape) {
+  .tutorial-card:not(.tutorial-step-offer):not(.tutorial-step-replay) { top: 205px; left: 10px; width: calc(100% - 20px); max-height: 76px; overflow: hidden; padding: 8px 10px; transform: none; pointer-events: none; }
+  .tutorial-card:not(.tutorial-step-offer):not(.tutorial-step-replay)::before { display: none; }
+  .tutorial-card:not(.tutorial-step-offer):not(.tutorial-step-replay)::after { top: -3px; left: 18px; width: 34px; height: 6px; }
+  .tutorial-card:not(.tutorial-step-offer):not(.tutorial-step-replay) .tutorial-card-topline { gap: 5px; font-size: 9px; }
+  .tutorial-card:not(.tutorial-step-offer):not(.tutorial-step-replay) .tutorial-orb { width: 21px; height: 21px; }
+  .tutorial-card:not(.tutorial-step-offer):not(.tutorial-step-replay) .tutorial-card-topline b { font-size: 9px; }
+  .tutorial-card:not(.tutorial-step-offer):not(.tutorial-step-replay) .tutorial-icon { display: none; }
+  .tutorial-card:not(.tutorial-step-offer):not(.tutorial-step-replay) h2 { display: inline; margin: 0 5px 0 0; color: #28423f; font-size: 13px; line-height: 1.3; }
+  .tutorial-card:not(.tutorial-step-offer):not(.tutorial-step-replay) p:not(.tutorial-note) { display: inline; margin: 0; color: #5e6e6a; font-size: 9px; line-height: 1.4; }
+  .tutorial-card:not(.tutorial-step-offer):not(.tutorial-step-replay) .tutorial-note { display: none; }
+  .tutorial-card:not(.tutorial-step-offer):not(.tutorial-step-replay) .tutorial-skip { display: block; width: max-content; margin: 3px 0 0 auto; pointer-events: auto; font-size: 8px; }
+  .tutorial-card:not(.tutorial-step-offer):not(.tutorial-step-replay) .tutorial-actions { display: none; }
+}
+@media (max-width: 680px) and (orientation: portrait) and (max-height: 720px) {
+  .tutorial-card:not(.tutorial-step-offer):not(.tutorial-step-replay) { top: 174px; max-height: 68px; }
+}
+@media (max-width: 850px) and (orientation: landscape) {
+  .tutorial-card:not(.tutorial-step-offer):not(.tutorial-step-replay) { top: 108px; left: 50%; width: min(390px, 50vw); max-height: 64px; transform: translateX(-50%); }
+}
+
+/* 手機教學第1/5：觀察階段改用底部抽屜，下一步永遠位於觸控安全區。 */
+@media (max-width: 680px) and (orientation: portrait) {
+  .game-overlay.tutorial-step-observe .mobile-console { display: none; }
+  .game-overlay.tutorial-step-observe .tutorial-card.tutorial-step-observe:not(.tutorial-step-offer):not(.tutorial-step-replay) {
+    position: absolute;
+    z-index: 10;
+    top: auto;
+    right: 9px;
+    bottom: calc(174px + env(safe-area-inset-bottom));
+    left: 9px;
+    display: grid;
+    width: auto;
+    height: min(154px, 22dvh);
+    max-height: none;
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    overflow: hidden;
+    padding: 10px 12px 9px;
+    transform: none;
+    pointer-events: auto;
+  }
+  .game-overlay.tutorial-step-observe .tutorial-card::before,
+  .game-overlay.tutorial-step-observe .tutorial-card::after { display: none; }
+  .game-overlay.tutorial-step-observe .tutorial-card-topline { grid-row: 1; align-self: start; }
+  .game-overlay.tutorial-step-observe .tutorial-card h2 { display: block; grid-row: 2; margin: 4px 0 2px; font-size: 15px; }
+  .game-overlay.tutorial-step-observe .tutorial-card p { display: block; grid-row: 3; overflow-y: auto; margin: 0; padding-right: 2px; font-size: 10px; line-height: 1.48; }
+  .game-overlay.tutorial-step-observe .tutorial-card .tutorial-actions { grid-row: 4; display: flex; margin: 7px 0 0; padding-top: 7px; border-top: 1px solid rgba(207, 199, 182, .72); }
+  .game-overlay.tutorial-step-observe .tutorial-card .tutorial-primary { min-height: 36px; min-width: 92px; }
+}
+
+/* 手機教學第2/5：把規則重排所需的操作直接收進底部抽屜，任何按鈕都不再落到可視區外。 */
+@media (max-width: 680px) and (orientation: portrait) {
+  .game-overlay.tutorial-step-detach .mobile-console { display: none; }
+  .game-overlay.tutorial-step-detach .tutorial-card.tutorial-step-detach:not(.tutorial-step-offer):not(.tutorial-step-replay) {
+    position: absolute;
+    z-index: 10;
+    top: auto;
+    right: 9px;
+    bottom: calc(174px + env(safe-area-inset-bottom));
+    left: 9px;
+    display: grid;
+    width: auto;
+    height: min(184px, 27dvh);
+    max-height: none;
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    overflow: hidden;
+    padding: 10px 12px 9px;
+    transform: none;
+    pointer-events: auto;
+  }
+  .game-overlay.tutorial-step-detach .tutorial-card::before,
+  .game-overlay.tutorial-step-detach .tutorial-card::after { display: none; }
+  .game-overlay.tutorial-step-detach .tutorial-card-topline { grid-row: 1; align-self: start; }
+  .game-overlay.tutorial-step-detach .tutorial-card h2 { display: block; grid-row: 2; margin: 4px 0 2px; font-size: 15px; }
+  .game-overlay.tutorial-step-detach .tutorial-card p:not(.tutorial-rule-preview) { display: block; grid-row: 3; overflow-y: auto; margin: 0; padding-right: 2px; font-size: 10px; line-height: 1.48; }
+  .game-overlay.tutorial-step-detach .tutorial-card .tutorial-note { display: none; }
+  .game-overlay.tutorial-step-detach .tutorial-rule-preview { display: block; grid-row: 3; align-self: end; margin: 5px 0 0; color: #126c6b; font-size: 10px; font-weight: 700; }
+  .game-overlay.tutorial-step-detach .tutorial-step-actions { display: grid; grid-row: 4; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 7px; padding-top: 7px; border-top: 1px solid rgba(207, 199, 182, .72); }
+  .game-overlay.tutorial-step-detach .tutorial-step-actions .tutorial-primary,
+  .game-overlay.tutorial-step-detach .tutorial-step-actions .tutorial-secondary { min-height: 36px; padding: 0 8px; font-size: 10px; }
+  .game-overlay.tutorial-step-detach .tutorial-step-actions .tutorial-primary.is-ready { background: #167a78; box-shadow: 0 0 0 3px rgba(22, 122, 120, .14); }
+  .game-overlay.tutorial-step-detach .tutorial-step-actions .tutorial-skip { grid-column: 1 / -1; margin: 0; padding: 2px 0 0; border: 0; background: transparent; color: #75827f; font-size: 9px; text-decoration: underline; text-underline-offset: 3px; }
+  .game-overlay.tutorial-step-detach .tutorial-card > .tutorial-skip { display: none; }
+}
+
+/* 手機教學第3/5：移動提示固定在方向控制台上方，保留完整指令與略過入口。 */
+@media (max-width: 680px) and (orientation: portrait) {
+  .game-overlay.tutorial-step-cross .mobile-console { display: none; }
+  .game-overlay.tutorial-step-cross .tutorial-card.tutorial-step-cross:not(.tutorial-step-offer):not(.tutorial-step-replay) {
+    position: absolute;
+    z-index: 10;
+    top: auto;
+    right: 9px;
+    bottom: calc(174px + env(safe-area-inset-bottom));
+    left: 9px;
+    display: grid;
+    width: auto;
+    height: min(144px, 21dvh);
+    max-height: none;
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    overflow: hidden;
+    padding: 10px 12px 9px;
+    transform: none;
+    pointer-events: auto;
+  }
+  .game-overlay.tutorial-step-cross .tutorial-card::before,
+  .game-overlay.tutorial-step-cross .tutorial-card::after { display: none; }
+  .game-overlay.tutorial-step-cross .tutorial-card-topline { grid-row: 1; align-self: start; }
+  .game-overlay.tutorial-step-cross .tutorial-card h2 { display: block; grid-row: 2; margin: 4px 0 2px; font-size: 15px; }
+  .game-overlay.tutorial-step-cross .tutorial-card p:not(.tutorial-note) { display: block; grid-row: 3; overflow-y: auto; margin: 0; padding-right: 2px; font-size: 10px; line-height: 1.48; }
+  .game-overlay.tutorial-step-cross .tutorial-card .tutorial-note { display: none; }
+  .game-overlay.tutorial-step-cross .tutorial-card > .tutorial-skip { display: block; grid-row: 4; width: max-content; margin: 7px 0 0 auto; padding-top: 6px; border-top: 1px solid rgba(207, 199, 182, .72); pointer-events: auto; font-size: 9px; }
+}
+
+/* 手機純移動模式：規則結算後不再讓中間資訊面板遮住棋盤。 */
+@media (max-width: 680px) and (orientation: portrait) {
+  .game-overlay.mobile-walk-mode .mobile-console { display: none; }
+  .game-overlay.mobile-walk-mode .mobile-controls { z-index: 7; }
+  .game-overlay.mobile-walk-mode .board-caption { max-width: calc(100% - 18px); }
+}
+
+/* 手機規則面板的暫存區：任何需要分離再重組的關卡都能完成完整操作。 */
+@media (max-width: 680px) {
+  .mobile-stash { margin: 8px 0; padding: 7px 8px; border: 1px dashed #bdb3a1; background: rgba(239, 235, 224, .78); }
+  .mobile-stash.is-filled { border-color: #167a78; background: rgba(221, 240, 235, .72); }
+  .mobile-stash-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: #66746e; font-size: 9px; }
+  .mobile-stash-heading span { font-weight: 800; letter-spacing: .08em; }
+  .mobile-stash-heading b { color: #126c6b; font-size: 11px; }
+  .mobile-stash-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 6px; }
+  .mobile-stash-actions button { min-height: 31px; border: 1px solid #d0c8ba; background: rgba(255, 255, 255, .7); color: #4f5c58; font-size: 10px; font-weight: 700; }
+  .mobile-stash-actions button:disabled { opacity: .42; }
+  .mobile-stash-actions button:not(:disabled):active { transform: scale(.97); }
+}
+
+/* 手機移動期間：教學文字與規則面板不占用棋盤視野，停止輸入後再恢復提示。 */
+@media (max-width: 680px) and (orientation: portrait) {
+  .game-overlay.tutorial-step-door .mobile-console { display: none; }
+  .game-overlay.tutorial-step-cross .tutorial-card.is-receded,
+  .game-overlay.tutorial-step-door .tutorial-card.is-receded {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+/* 戰役跳關：完成節點可直接前往；每一筆已保存的個人成績以緊湊標籤呈現步數與最短時間。 */
+.chapter-node { position: relative; cursor: pointer; }
+.chapter-node.is-completed { background: rgba(221, 240, 235, .48); }
+.chapter-node.is-completed:hover { background: rgba(205, 234, 228, .9); transform: translateY(-2px); }
+.chapter-node.is-current { box-shadow: inset 0 -2px #167a78; }
+.chapter-node.is-locked, .chapter-node:disabled { cursor: not-allowed; opacity: .43; }
+.chapter-node b { position: absolute; top: 2px; right: 4px; color: #167a78; font-size: 10px; }
+.chapter-node-record { display: block; max-width: 58px; margin-top: 2px; color: #4b847e; font-size: 8px; font-weight: 700; line-height: 1.25; white-space: nowrap; }
+@media (max-width: 680px) { .chapter-rail { display: none; } }
+
+/* 已過關跳關選單：關卡徽章在桌機與手機皆可開啟完成清單與個人成績。 */
+.header-meta { position: relative; }
+.level-jump-trigger { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; }
+.level-jump-trigger:disabled { cursor: default; opacity: .62; }
+.completed-level-menu { position: absolute; z-index: 30; top: calc(100% + 8px); right: 92px; display: grid; width: min(218px, calc(100vw - 24px)); max-height: min(330px, 54dvh); overflow-y: auto; padding: 8px; border: 1px solid #d0c8ba; border-radius: 3px 10px 3px 10px; background: rgba(250, 248, 241, .98); box-shadow: 0 12px 32px rgba(41, 59, 55, .18); }
+.completed-level-menu > b { padding: 3px 5px 7px; color: #126c6b; font-size: 10px; letter-spacing: .04em; }
+.completed-level-menu button { display: flex; align-items: center; gap: 9px; min-height: 45px; border: 0; border-top: 1px solid #e1dbcf; background: transparent; color: #50605b; text-align: left; font-size: 11px; }
+.completed-level-menu button:hover { background: #e3f1ee; color: #126c6b; }
+.completed-level-order { flex: 0 0 22px; color: #167a78; font-family: "Noto Serif TC", serif; }
+.completed-level-details { display: grid; min-width: 0; gap: 2px; }
+.completed-level-details strong { overflow: hidden; color: #45534f; font-size: 11px; font-weight: 600; white-space: nowrap; text-overflow: ellipsis; }
+.completed-level-details small { color: #7a8883; font-size: 9px; line-height: 1.35; white-space: nowrap; }
+.completed-level-details small b { color: #167a78; font-size: inherit; font-weight: 800; }
+.completed-level-details small i { margin: 0 4px; color: #b19f86; font-style: normal; }
+@media (max-width: 680px) { .completed-level-menu { top: calc(100% + 5px); right: 4px; max-height: 44dvh; } }
+
+/* 章節成績總覽：以工藝檔案卡彙整完成率與最佳步數；只在玩家主動開啟時覆蓋棋盤。 */
+.chapter-summary-layer { position: absolute; z-index: 20; inset: 0; display: grid; place-items: center; padding: 24px; background: rgba(30, 44, 43, .42); backdrop-filter: blur(5px); pointer-events: auto; }
+.chapter-summary-sheet { width: min(760px, 100%); max-height: min(760px, calc(100dvh - 48px)); overflow: auto; padding: 21px; }
+.chapter-summary-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; padding-bottom: 13px; border-bottom: 1px dashed #cec4b4; }
+.chapter-summary-heading h2 { margin: 0; color: #28423f; font-family: "Noto Serif TC", serif; font-size: 25px; letter-spacing: .04em; }
+.chapter-summary-heading p:not(.eyebrow) { max-width: 500px; margin: 6px 0 0; color: #66736f; font-size: 11px; line-height: 1.55; }
+.chapter-summary-heading > button { display: grid; flex: 0 0 auto; place-items: center; width: 34px; height: 34px; border: 1px solid #d2c8b8; background: #fdfbf4; color: #61706c; transition: transform 150ms ease, background 150ms ease; }
+.chapter-summary-heading > button:hover { background: #e4f0ed; color: #126c6b; }.chapter-summary-heading > button:active { transform: scale(.96); }
+.campaign-summary-total { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin: 14px 0; border: 1px solid #d2c8b8; background: #d2c8b8; }
+.campaign-summary-total div { padding: 10px 12px; background: rgba(247, 244, 236, .9); }.campaign-summary-total span, .chapter-score-metrics span { display: block; color: #8a806f; font-size: 9px; font-weight: 700; letter-spacing: .1em; }.campaign-summary-total b { display: block; margin-top: 3px; color: #167a78; font-family: "Noto Serif TC", serif; font-size: 22px; }.campaign-summary-total small { color: #70807a; font-family: "Noto Sans TC", sans-serif; font-size: 10px; }
+.chapter-summary-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+.chapter-score-card { padding: 11px; border: 1px solid #d8d0c0; background: rgba(252, 250, 244, .78); box-shadow: inset 0 1px rgba(255,255,255,.75); }.chapter-score-card.is-complete { border-color: rgba(22, 122, 120, .5); background: rgba(228, 242, 238, .77); }
+.chapter-score-topline { display: grid; grid-template-columns: auto 1fr auto; align-items: baseline; gap: 7px; }.chapter-score-topline span { color: #9a8571; font-size: 9px; font-weight: 700; letter-spacing: .08em; }.chapter-score-topline b { overflow: hidden; color: #354744; font-size: 12px; white-space: nowrap; text-overflow: ellipsis; }.chapter-score-topline em { color: #167a78; font-size: 10px; font-style: normal; font-weight: 700; }
+.chapter-score-progress { height: 5px; margin: 9px 0; overflow: hidden; background: #e2ddd1; }.chapter-score-progress i { display: block; height: 100%; background: linear-gradient(90deg, #5eb7ae, #167a78); transition: width 220ms cubic-bezier(.23,1,.32,1); }
+.chapter-score-callout { display: flex; width: 100%; align-items: baseline; gap: 7px; margin: 0 0 8px; padding: 5px 7px; border: 0; border-left: 2px solid #c89c53; background: rgba(250, 245, 231, .78); text-align: left; }.chapter-score-callout span { flex: 0 0 auto; color: #a57736; font-size: 9px; font-weight: 800; letter-spacing: .1em; }.chapter-score-callout b { min-width: 0; color: #735d3a; font-size: 11px; line-height: 1.35; }.chapter-score-callout > svg { flex: 0 0 auto; margin-left: auto; color: #a57736; transition: transform 160ms cubic-bezier(.23,1,.32,1); }.chapter-score-callout:not(.is-complete) { cursor: pointer; transition: background 160ms ease, border-color 160ms ease; }.chapter-score-callout:not(.is-complete):hover, .chapter-score-callout:not(.is-complete):focus-visible { border-left-color: #167a78; background: rgba(218, 239, 234, .92); outline: none; }.chapter-score-callout:not(.is-complete):hover > svg, .chapter-score-callout:not(.is-complete):focus-visible > svg { color: #167a78; transform: translateX(2px); }.chapter-score-callout:not(.is-complete):active { transform: scale(.985); }.chapter-score-callout.is-complete { border-left-color: #167a78; background: rgba(220, 241, 235, .74); }.chapter-score-callout.is-complete span, .chapter-score-callout.is-complete b { color: #167a78; }
+.chapter-score-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }.chapter-score-metrics b { display: block; margin-top: 2px; color: #365d57; font-size: 14px; }.chapter-score-card > small { display: block; min-height: 14px; margin-top: 7px; color: #76837f; font-size: 9px; line-height: 1.4; }
+@media (max-width: 680px) { .chapter-summary-trigger { min-width: 35px; }.chapter-summary-layer { padding: max(12px, env(safe-area-inset-top)) 10px max(12px, env(safe-area-inset-bottom)); }.chapter-summary-sheet { max-height: calc(100dvh - 24px); padding: 15px 13px; }.chapter-summary-heading { gap: 10px; }.chapter-summary-heading h2 { font-size: 20px; }.chapter-summary-heading p:not(.eyebrow) { font-size: 10px; }.campaign-summary-total { margin: 11px 0; }.campaign-summary-total div { padding: 8px; }.campaign-summary-total b { font-size: 18px; }.chapter-summary-grid { grid-template-columns: 1fr; gap: 7px; }.chapter-score-card { padding: 9px; } }
+
+/* 全破終章：五十道界律匯聚成門，結算後引導玩家創造自己的織界。 */
+.finale-layer { overflow: hidden; background: radial-gradient(circle at 50% 42%, rgba(50, 124, 121, .24), rgba(20, 34, 34, .76) 58%, rgba(14, 21, 25, .88)); }
+.finale-card { position: relative; z-index: 2; width: min(500px, calc(100% - 28px)); border-color: rgba(108, 192, 185, .45); box-shadow: 0 26px 80px rgba(4, 18, 25, .5), inset 0 1px rgba(255,255,255,.56); animation: finale-card-rise 620ms cubic-bezier(.23,1,.32,1) both; }
+.finale-card h2 { margin: 10px 0 9px; color: #224b4d; font-family: "Noto Serif TC", serif; font-size: clamp(22px, 4vw, 31px); letter-spacing: .08em; }
+.finale-card > p:not(.eyebrow) { color: #5e706d; line-height: 1.8; }
+.finale-card > button:not(.finale-replay) { background: linear-gradient(135deg, #168481, #0e6568); box-shadow: 0 9px 20px rgba(17, 105, 103, .22); }
+.finale-replay { display: block; width: 100%; margin-top: 8px; border: 0; background: transparent; color: #70817d; font-size: 11px; text-decoration: underline; text-underline-offset: 4px; }
+.finale-replay:hover { color: #167a78; }
+.finale-seal { display: grid; width: 116px; height: 116px; place-content: center; margin: 2px auto 17px; border: 1px solid rgba(44, 141, 139, .55); border-radius: 50%; background: radial-gradient(circle, rgba(149, 224, 211, .44), rgba(238, 245, 235, .82) 62%, rgba(198, 226, 211, .42)); color: #166f70; box-shadow: 0 0 0 8px rgba(111, 202, 187, .1), 0 0 36px rgba(79, 202, 190, .38); animation: finale-seal-breathe 2.4s ease-in-out infinite; }
+.finale-seal span { font-family: "Noto Serif TC", serif; font-size: 29px; font-weight: 800; line-height: 1; letter-spacing: .08em; }
+.finale-seal small { margin-top: 4px; font-size: 10px; letter-spacing: .18em; text-align: center; }
+.finale-seal-revealed { background: radial-gradient(circle, #d9f2e8, #f5f0df 66%, #c6e4d7); animation: finale-seal-reveal 520ms cubic-bezier(.23,1,.32,1) both; }
+.finale-constellation { position: absolute; z-index: 1; inset: 0; pointer-events: none; }
+.finale-constellation i { position: absolute; top: 50%; left: 50%; display: grid; width: 54px; height: 54px; place-items: center; border: 1px solid rgba(126, 223, 210, .52); background: rgba(116, 198, 190, .08); color: rgba(168, 238, 222, .86); font-family: "Noto Serif TC", serif; font-size: 21px; font-style: normal; opacity: 0; animation: finale-rune-orbit 3.9s cubic-bezier(.23,1,.32,1) forwards; animation-delay: calc(var(--finale-index) * 100ms); }
+.finale-constellation i:nth-child(1) { --finale-x: -210px; --finale-y: -150px; --finale-r: -18deg; }
+.finale-constellation i:nth-child(2) { --finale-x: 190px; --finale-y: -130px; --finale-r: 16deg; }
+.finale-constellation i:nth-child(3) { --finale-x: -250px; --finale-y: 140px; --finale-r: 12deg; }
+.finale-constellation i:nth-child(4) { --finale-x: 235px; --finale-y: 145px; --finale-r: -12deg; }
+.finale-constellation i:nth-child(5) { --finale-x: 0px; --finale-y: -220px; --finale-r: 0deg; }
+@keyframes finale-card-rise { from { opacity: 0; transform: translateY(18px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes finale-seal-breathe { 50% { transform: scale(1.045); box-shadow: 0 0 0 12px rgba(111, 202, 187, .08), 0 0 48px rgba(79, 202, 190, .46); } }
+@keyframes finale-seal-reveal { from { opacity: 0; transform: rotate(-12deg) scale(.72); } to { opacity: 1; transform: rotate(0) scale(1); } }
+@keyframes finale-rune-orbit { 0% { opacity: 0; transform: translate(-50%, -50%) scale(.4) rotate(0); } 28% { opacity: 1; } 100% { opacity: .72; transform: translate(calc(-50% + var(--finale-x)), calc(-50% + var(--finale-y))) rotate(var(--finale-r)); } }
+@media (max-width: 680px) { .finale-card { width: min(420px, calc(100% - 20px)); padding: 18px 15px; }.finale-card h2 { font-size: 22px; }.finale-card > p:not(.eyebrow) { font-size: 11px; line-height: 1.65; }.finale-seal { width: 92px; height: 92px; margin-bottom: 12px; }.finale-seal span { font-size: 23px; }.finale-constellation i { width: 38px; height: 38px; font-size: 15px; }.finale-constellation i:nth-child(1) { --finale-x: -135px; --finale-y: -155px; }.finale-constellation i:nth-child(2) { --finale-x: 125px; --finale-y: -135px; }.finale-constellation i:nth-child(3) { --finale-x: -145px; --finale-y: 155px; }.finale-constellation i:nth-child(4) { --finale-x: 135px; --finale-y: 150px; }.finale-constellation i:nth-child(5) { --finale-y: -220px; } }
+@media (prefers-reduced-motion: reduce) { .finale-card, .finale-seal, .finale-constellation i { animation-duration: 1ms; animation-iteration-count: 1; } }
+
+/* 關卡編輯器：在放置前預覽核心紙藝模型，同步顯示由場景包圍盒驅動的貼地基準。 */
+.editor-model-inspector { display: grid; grid-template-columns: 116px minmax(0, 1fr); gap: 11px; margin: 11px 0; padding: 10px; border: 1px solid rgba(39, 113, 108, .28); background: linear-gradient(135deg, rgba(225, 242, 237, .9), rgba(250, 247, 238, .94)); box-shadow: inset 0 1px rgba(255,255,255,.85); }
+.editor-model-stage { position: relative; display: grid; min-height: 106px; place-items: center; overflow: hidden; border: 1px solid rgba(36, 103, 101, .22); background: radial-gradient(circle at 50% 34%, rgba(130, 215, 204, .48), rgba(39, 91, 92, .22) 46%, rgba(34, 55, 57, .74) 100%); }
+.editor-model-stage b { position: relative; z-index: 2; display: grid; width: 56px; height: 68px; place-items: center; border: 4px solid rgba(238, 244, 229, .92); border-radius: 43% 43% 16% 16%; background: linear-gradient(145deg, #88d5ca, #1a7071 62%, #10484d); color: #f9f4e6; font-family: "Noto Serif TC", serif; font-size: 29px; text-shadow: 0 1px 3px rgba(0,0,0,.35); box-shadow: 0 8px 12px rgba(5, 32, 35, .35); }
+.inspector-wall .editor-model-stage b { width: 76px; height: 47px; border-radius: 9px 9px 3px 3px; background: repeating-linear-gradient(0deg, #4d625e 0 10px, #899a83 10px 12px, #435653 12px 22px); }.inspector-door .editor-model-stage b { border-color: #d4d3a4; border-radius: 49% 49% 12% 12%; background: radial-gradient(circle, #112f36 25%, #278f8c 28%, #1b5d66 58%, #5b877b); }.inspector-ember .editor-model-stage b { border-radius: 54% 46% 48% 52%; background: radial-gradient(circle at 52% 74%, #fff0a2 0 16%, #f49a3a 18% 35%, #bd4330 37% 70%, #642c38); }.inspector-tide .editor-model-stage b { width: 78px; height: 49px; border-radius: 68% 28% 64% 28%; background: linear-gradient(150deg, #d7faf2 6%, #55c8ca 28%, #16879c 65%, #255d82); }
+.editor-ground-plane { position: absolute; z-index: 1; right: 9px; bottom: 13px; left: 9px; height: 13px; border-top: 2px solid #7ee5d0; background: repeating-linear-gradient(90deg, rgba(117, 225, 206, .16) 0 12px, rgba(32, 85, 86, .14) 12px 24px); transform: skewX(-26deg); box-shadow: 0 5px 10px rgba(0,0,0,.28); }.preview-spark { position: absolute; z-index: 3; width: 5px; height: 5px; border-radius: 50%; background: #d8fff0; box-shadow: 0 0 10px #82e7d4; }.preview-spark-a { top: 22px; left: 19px; }.preview-spark-b { top: 40px; right: 17px; }
+.editor-model-copy { min-width: 0; }.editor-model-copy .eyebrow { margin: 1px 0 3px; color: #16807e; font-size: 8px; font-weight: 800; letter-spacing: .12em; }.editor-model-copy h3 { margin: 0; color: #284a47; font-family: "Noto Serif TC", serif; font-size: 17px; }.editor-model-copy h3 small { display: block; margin-top: 2px; color: #6f8079; font-family: "Noto Sans TC", sans-serif; font-size: 9px; font-weight: 700; }.editor-model-copy > p { margin: 5px 0 0; color: #61736d; font-size: 10px; line-height: 1.5; }.editor-model-parts { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 7px; }.editor-model-parts span { padding: 2px 5px; border: 1px solid rgba(29, 118, 112, .22); border-radius: 99px; background: rgba(255,255,255,.55); color: #39736d; font-size: 8px; font-weight: 700; }
+.editor-ground-readout { grid-column: 1 / -1; display: flex; align-items: center; gap: 7px; padding-top: 8px; border-top: 1px dashed rgba(82, 136, 126, .38); color: #4f6760; }.editor-ground-readout b { display: block; color: #197a70; font-size: 10px; }.editor-ground-readout small { display: block; margin-top: 1px; font-size: 8px; line-height: 1.35; }.editor-ground-readout em { margin-left: auto; padding: 3px 6px; border-radius: 99px; background: #d5f1e9; color: #137265; font-size: 8px; font-style: normal; font-weight: 800; }.ground-indicator { display: block; flex: 0 0 19px; height: 9px; border-bottom: 3px solid #32a890; border-radius: 0 0 9px 9px; box-shadow: 0 4px 0 rgba(50,168,144,.13); }
+.editor-cell.is-grounded { box-shadow: inset 0 -2px rgba(47, 164, 145, .26); }.editor-cell.is-grounded:not(.cell-empty)::after { content: "⌁"; position: absolute; right: 1px; bottom: -2px; color: #168178; font-size: 8px; line-height: 1; }
+@media (max-width: 680px) { .editor-model-inspector { grid-template-columns: 87px minmax(0, 1fr); gap: 8px; padding: 8px; }.editor-model-stage { min-height: 94px; }.editor-model-stage b { transform: scale(.82); }.editor-model-copy h3 { font-size: 15px; }.editor-model-copy > p { font-size: 9px; line-height: 1.4; }.editor-model-parts { margin-top: 5px; }.editor-ground-readout { gap: 5px; padding-top: 6px; }.editor-ground-readout small { font-size: 7px; } }
+
+/* 進階編輯器：先驗證可解性與環境可讀性，再將已去背的自訂詞彙放入棋盤。 */
+.editor-environment, .editor-asset-uploader, .editor-solvability { display: grid; gap: 8px; margin: 11px 0; padding: 10px; border: 1px solid rgba(76, 121, 113, .28); background: rgba(244, 248, 241, .88); }.editor-environment { grid-template-columns: minmax(0, 1.2fr) minmax(136px, .8fr); }.editor-environment h3, .editor-asset-uploader h3, .editor-solvability h3 { margin: 1px 0 3px; color: #2e504c; font-family: "Noto Serif TC", serif; font-size: 15px; }.editor-environment small, .editor-asset-uploader p, .editor-solvability p { margin: 0; color: #687972; font-size: 9px; line-height: 1.45; }.editor-environment label { display: grid; align-content: start; gap: 4px; color: #58716b; font-size: 9px; font-weight: 700; }.editor-environment select { min-height: 31px; border: 1px solid #c3d4cb; background: #fffdf7; color: #315752; font-size: 10px; }.editor-lighting { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }.editor-lighting button { display: grid; gap: 1px; min-height: 43px; border: 1px solid #c9d7cf; background: linear-gradient(145deg, #fdfcf4, #e6f0eb); color: #54716a; text-align: left; }.editor-lighting button.is-selected { border-color: #168178; background: linear-gradient(145deg, #dff4ec, #c3e7df); color: #126e67; box-shadow: inset 0 -2px #168178; }.editor-lighting b { font-size: 10px; }.editor-lighting small { color: inherit; font-size: 8px; }
+.editor-asset-uploader { grid-template-columns: minmax(0, 1fr) minmax(120px, .52fr) minmax(138px, .58fr); align-items: end; }.editor-asset-uploader > label { display: grid; gap: 4px; color: #58716b; font-size: 9px; font-weight: 700; }.editor-asset-uploader input { min-height: 31px; border: 1px solid #c3d4cb; background: #fffdf7; color: #315752; }.asset-file-picker { position: relative; min-height: 33px; overflow: hidden; border: 1px solid #168178; background: linear-gradient(135deg, #208d88, #136d6a); color: #fff; cursor: pointer; }.asset-file-picker input { position: absolute; inset: 0; width: 100%; opacity: 0; cursor: pointer; }.asset-file-picker span { display: grid; min-height: 33px; place-items: center; padding: 0 6px; font-size: 9px; text-align: center; }.asset-file-picker.is-busy { opacity: .6; cursor: wait; }.custom-asset-list { grid-column: 1 / -1; display: grid; gap: 5px; }.custom-asset-list > div { display: flex; align-items: center; gap: 7px; padding: 5px; border: 1px solid rgba(42, 130, 119, .22); background: rgba(218, 243, 235, .48); }.custom-asset-list img { width: 35px; height: 35px; object-fit: contain; background: radial-gradient(circle, rgba(89, 190, 178, .18), transparent 68%); }.custom-asset-list b, .custom-asset-list small { display: block; }.custom-asset-list b { color: #1d6d66; font-size: 10px; }.custom-asset-list small { color: #68807a; font-size: 8px; }
+.editor-solvability { grid-template-columns: minmax(0, 1fr) auto; align-items: center; border-left: 3px solid #b8924c; }.editor-solvability > button { min-height: 37px; border: 1px solid #187f76; background: #197e77; color: #fff; font-size: 10px; }.editor-solvability.is-solved { border-left-color: #168178; background: rgba(216, 242, 233, .82); }.editor-solvability.has-issues { border-left-color: #b65447; background: rgba(249, 231, 223, .78); }.editor-solvability ul { grid-column: 1 / -1; margin: 0; padding: 7px 0 0 17px; border-top: 1px dashed rgba(156, 83, 68, .35); color: #9b5144; font-size: 9px; line-height: 1.5; }
+@media (max-width: 680px) { .editor-environment, .editor-asset-uploader { grid-template-columns: 1fr; }.editor-lighting { grid-column: auto; }.editor-asset-uploader > label, .custom-asset-list { grid-column: auto; }.editor-solvability { grid-template-columns: 1fr; }.editor-solvability > button { width: 100%; } }
+.custom-asset-row { display: grid; grid-template-columns: auto 42px minmax(0, 1fr) auto; align-items: center; gap: 0.55rem; padding: 0.48rem; border: 1px solid rgba(42, 130, 119, .22); border-radius: 0.7rem; background: rgba(218, 243, 235, .48); transition: border-color 160ms cubic-bezier(.23,1,.32,1), transform 160ms cubic-bezier(.23,1,.32,1), opacity 160ms cubic-bezier(.23,1,.32,1); }.custom-asset-row.is-dragging { opacity: .48; transform: scale(.985); border-color: #168178; }.custom-asset-list > .custom-asset-row { display: grid; }.asset-drag-handle, .asset-row-actions button { display: grid; min-width: 28px; min-height: 28px; place-items: center; border: 1px solid rgba(42, 112, 105, .24); border-radius: 6px; background: #fffdf7; color: #365d57; }.asset-drag-handle { cursor: grab; }.asset-drag-handle:active { cursor: grabbing; }.asset-row-actions { display: flex; gap: 3px; }.asset-row-actions button { cursor: pointer; }.asset-row-actions button:disabled { opacity: .34; cursor: not-allowed; }.asset-row-actions .asset-delete { color: #a24443; border-color: rgba(162,68,67,.32); }.editor-difficulty { grid-column: 1 / -1; display: grid; gap: 3px; padding: 8px; border-radius: 8px; background: rgba(244, 235, 205, .62); color: #5c5746; }.editor-difficulty div { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }.editor-difficulty span { color: #bd7b22; font-size: 14px; letter-spacing: .08em; }.editor-difficulty b { color: #74572d; font-size: 10px; }.editor-difficulty small { color: #746d5d; font-size: 8px; line-height: 1.4; }
+@media (max-width: 680px) { .custom-asset-row { grid-template-columns: auto 34px minmax(0, 1fr); gap: 5px; }.custom-asset-row > img { width: 32px; height: 32px; }.asset-row-actions { grid-column: 2 / -1; justify-content: flex-end; }.editor-difficulty { padding: 7px; }.editor-difficulty span { font-size: 13px; } }
+
+/* 平板與窄桌機直向：不沿用寬桌機左右夾擊棋盤的配置；資訊收至底部，中央完整保留給大地圖。 */
+@media (min-width: 681px) and (max-width: 1100px) and (orientation: portrait) {
+  .game-header { left: max(18px, env(safe-area-inset-left)); right: max(18px, env(safe-area-inset-right)); top: max(16px, env(safe-area-inset-top)); }
+  .rule-desk, .inspector { top: auto; bottom: 122px; width: calc(50% - 28px); max-height: min(220px, 23dvh); overflow-y: auto; padding: 12px; }
+  .rule-desk { left: 18px; }.inspector { right: 18px; }
+  .rule-list, .chapter-card, .causal-thread, .chapter-rail { display: none; }
+  .board-caption { top: 68px; width: min(430px, calc(100vw - 120px)); }
+  .camera-dock { top: 108px; right: 18px; width: 178px; }
+  .control-dock { bottom: max(16px, env(safe-area-inset-bottom)); width: min(560px, calc(100vw - 36px)); min-width: 0; }
+}
+
+/* 大螢幕橫向：保留左右資訊欄，但在最窄可用棋盤寬度前主動收斂面板，避免地圖被壓扁。 */
+@media (min-width: 851px) and (max-width: 1180px) and (orientation: landscape) {
+  .rule-desk, .inspector { width: 218px; padding: 13px; }
+  .rule-list, .chapter-card { display: none; }
+  .board-caption { width: min(350px, 31vw); }
+  .causal-thread { left: 238px; width: calc(100vw - 476px); }
+  .camera-dock { right: 20px; width: 172px; }
+}
+
+/* 閱讀偏好只調整文字與控制台節奏，不改變棋盤本身的畫布尺寸。 */
+.text-size-small .desk-copy, .text-size-small .causal-entry p, .text-size-small .mobile-rule-status, .text-size-small .mobile-object-copy, .text-size-small .objective-card strong { font-size: 9px; }.text-size-large .desk-copy, .text-size-large .causal-entry p, .text-size-large .mobile-rule-status, .text-size-large .mobile-object-copy { font-size: 13px; line-height: 1.7; }.text-size-large .rule-tile { font-size: 14px; }.text-size-large .mobile-rule-tiles .rule-tile { font-size: 13px; }.text-size-large .objective-card strong { font-size: 13px; }.console-density-compact .rule-desk, .console-density-compact .inspector { padding: 11px; }.console-density-compact .desk-copy { margin: 9px 0; }.console-density-compact .mobile-console-body { min-height: 96px; padding: 8px 9px; }.console-density-relaxed .rule-desk, .console-density-relaxed .inspector { padding: 21px; }.console-density-relaxed .mobile-console-body { min-height: 142px; padding: 13px; }.console-density-relaxed .mobile-rule-actions button { min-height: 43px; }
+
+/* Android 手機橫式可能回報超過 850px 的 CSS 寬度；以低視窗高度補足裝置判斷，避免桌面雙側面板覆蓋棋盤。 */
+@media (orientation: landscape) and (max-height: 620px) and (pointer: coarse) {
+  .game-header { left: max(8px, env(safe-area-inset-left)); right: max(8px, env(safe-area-inset-right)); top: max(5px, env(safe-area-inset-top)); height: 42px; }
+  .brand-logo { width: 30px; height: 30px; }.brand-lockup h1 { font-size: 13px; }.brand-lockup .eyebrow { font-size: 7px; }
+  .header-meta .chapter-badge { display: none; }.header-meta { gap: 3px; }.turn-badge, .tutorial-reopen { min-height: 30px; padding: 4px 6px; font-size: 8px; }
+  .rule-desk, .inspector, .camera-dock, .control-dock, .chapter-rail, .causal-thread { display: none !important; }
+  .board-caption { top: 45px; left: 8px; width: calc(100% - 16px); }.board-key { display: none; }
+  .mobile-console { display: block !important; right: 8px; bottom: calc(97px + env(safe-area-inset-bottom)); left: 8px; max-height: 30dvh; overflow-y: auto; }
+  .mobile-console-handle { display: flex; width: 100%; min-height: 22px; align-items: center; justify-content: center; gap: 6px; border: 0; border-bottom: 1px solid #d9d2c4; background: #edf1eb; color: #687671; font-size: 8px; font-weight: 700; }.mobile-console-handle span { width: 27px; height: 3px; border-radius: 999px; background: #8bbab1; }.mobile-console-handle b { font-weight: 700; }.mobile-console-collapsed .mobile-console { bottom: calc(97px + env(safe-area-inset-bottom)); max-height: 22px; overflow: hidden; }.mobile-console-collapsed .mobile-console-tabs, .mobile-console-collapsed .mobile-console-body { display: none; }.mobile-console-collapsed .board-caption { opacity: .45; }.mobile-console-collapsed .mobile-controls { box-shadow: 0 5px 0 rgba(164,157,143,.3), 0 10px 28px rgba(44,55,52,.14); }
+  .mobile-console-tabs { min-height: 32px; }.mobile-console-tabs button { min-height: 32px; font-size: 9px; }.mobile-console-tabs span { font-size: 7px; }
+  .mobile-console-body { min-height: 78px; padding: 7px 8px; }.mobile-panel-kicker { margin-bottom: 4px; font-size: 8px; }.mobile-rule-tiles { min-height: 29px; }.mobile-rule-tiles .rule-tile { min-width: 43px; min-height: 27px; padding: 5px 6px; font-size: 9px; }.mobile-rule-actions { gap: 3px; }.mobile-rule-actions button { min-height: 29px; font-size: 8px; }.mobile-object-copy { margin-bottom: 4px; font-size: 8px; }.mobile-object-grid { gap: 3px; }.mobile-object-grid span { padding: 4px; font-size: 8px; }.mobile-object-grid b { margin-bottom: 1px; font-size: 7px; }
+  .mobile-controls { display: block !important; right: 8px; bottom: max(4px, env(safe-area-inset-bottom)); left: 8px; padding: 4px 7px; }.mobile-control-row { gap: 5px; }.mobile-dpad { grid-template-columns: repeat(3, 29px); grid-template-rows: repeat(3, 24px); gap: 1px; }.mobile-dpad .dpad-button, .mobile-dpad .dpad-core { min-width: 29px; min-height: 24px; }.mobile-transport-controls { grid-template-columns: repeat(4, 29px); gap: 3px; }.mobile-transport-controls button { min-width: 29px; min-height: 29px; }.mobile-transport-controls .demo-button { grid-column: 1 / -1; min-height: 27px; }.mobile-replay-control { margin-top: 3px; }.mobile-replay-control .replay-meta { font-size: 7px; }.mobile-replay-control input { height: 14px; }
+  .board-maximize-fab { top: 45px; right: 8px; min-height: 28px; padding: 0 7px; font-size: 8px; }.focus-mode .board-maximize-fab { top: 45px; right: 8px; }.orientation-advice { top: 44px; width: min(330px, calc(100vw - 20px)); font-size: 9px; }
+  .tutorial-card { top: 48px; width: min(330px, calc(100vw - 20px)); max-height: 42dvh; padding: 10px; }.reading-settings { top: calc(100% + 3px); max-height: 75dvh; overflow-y: auto; }.device-diagnostics { top: 47px; right: 8px; max-height: 75dvh; overflow-y: auto; }
+  .slow-device-warning { top: 47px; right: 8px; bottom: auto; width: min(220px, 28vw); padding: 8px; }.slow-device-warning small { font-size: 8px; }.slow-device-warning button { min-height: 27px; font-size: 8px; }
+}
+
+/* 即時FPS：常駐但不攔截觸控；各方向均避開操作台與右上快捷鍵。 */
+.fps-widget { position: absolute; z-index: 18; bottom: max(18px, env(safe-area-inset-bottom)); left: max(18px, env(safe-area-inset-left)); display: grid; grid-template-columns: auto auto; align-items: baseline; gap: 0 3px; min-width: 58px; padding: 7px 8px 6px; border: 1px solid #b8d2cd; background: rgba(247,246,239,.88); box-shadow: 0 5px 16px rgba(22,49,45,.12); color: #2c665f; font-variant-numeric: tabular-nums; pointer-events: none; }.fps-widget b { font-size: 16px; line-height: 1; }.fps-widget span { font-size: 8px; font-weight: 900; letter-spacing: .08em; }.fps-widget small { grid-column: 1 / -1; margin-top: 3px; color: #60837c; font-size: 8px; font-weight: 800; letter-spacing: .04em; }.fps-widget.fps-strained { border-color: #d8b47c; color: #9a6727; }.fps-widget.fps-strained small { color: #a67b45; }.fps-widget.fps-slow { border-color: #d19678; color: #a45a3d; }.fps-widget.fps-slow small { color: #b06b51; }.fps-widget.fps-sampling { opacity: .72; }.reading-setting-row > div.fps-setting-control { display: block; }.fps-setting-control button { width: 100%; }
+@media (max-width: 680px) { .fps-widget { top: 78px; bottom: auto; left: 10px; min-width: 52px; padding: 6px 7px; }.fps-widget b { font-size: 14px; } }
+@media (orientation: landscape) and (max-height: 620px) { .fps-widget { top: 46px; bottom: auto; left: 8px; min-width: 48px; padding: 5px 6px; }.fps-widget b { font-size: 12px; }.fps-widget small { margin-top: 1px; font-size: 7px; }.mobile-console-collapsed .fps-widget { opacity: .66; } }
+.reading-setting-row > div.quality-tier-control { grid-template-columns: repeat(2, 1fr); }.quality-tier-control button { font-size: 9px; }
+.daily-challenge-trigger { color: #62503e; border-color: #d4b683; background: rgba(248,239,218,.82); }.daily-completion-card { border-color: #b57a4c; background: linear-gradient(145deg, rgba(255,250,238,.98), rgba(241,228,204,.98)); }.daily-completion-card .eyebrow { color: #a26331; }.daily-completion-card > button:first-of-type { background: #9b5b30; }.daily-completion-card > button:first-of-type:hover { background: #7e4623; }
+.daily-countdown { position: absolute; z-index: 17; top: 78px; right: 24px; display: grid; grid-template-columns: auto auto; align-items: baseline; gap: 0 5px; min-width: 128px; padding: 7px 9px; border: 1px solid #d7b477; background: rgba(255,248,231,.92); box-shadow: 0 5px 16px rgba(67,47,23,.12); color: #936031; font-variant-numeric: tabular-nums; pointer-events: none; }.daily-countdown span { font-size: 8px; font-weight: 900; letter-spacing: .12em; }.daily-countdown b { font-size: 16px; line-height: 1; }.daily-countdown small { grid-column: 1 / -1; margin-top: 3px; color: #9e7957; font-size: 8px; font-weight: 700; letter-spacing: .04em; }.daily-completion-countdown { border-top: 1px solid #e0c79d; padding-top: 8px; color: #956337; font-size: 11px; }.daily-completion-countdown b { font-variant-numeric: tabular-nums; }
+@media (max-width: 680px) { .daily-challenge-trigger { min-width: 31px; padding: 4px 6px; font-size: 0; }.daily-challenge-trigger svg { width: 15px; height: 15px; }.daily-completion-card { width: min(350px, calc(100vw - 28px)); }.daily-completion-card h2 { font-size: 25px; } }
+@media (max-width: 680px) { .daily-countdown { top: 78px; right: 10px; min-width: 112px; padding: 6px 7px; }.daily-countdown b { font-size: 14px; } }
+@media (orientation: landscape) and (max-height: 620px) and (pointer: coarse) { .daily-challenge-trigger { display: none; }.daily-completion-card { width: min(390px, calc(100vw - 32px)); max-height: calc(100dvh - 26px); overflow-y: auto; }.daily-completion-card h2 { font-size: 22px; }.daily-completion-card p { margin: 7px 0; font-size: 10px; } }
+@media (orientation: landscape) and (max-height: 620px) and (pointer: coarse) { .daily-countdown { top: 45px; right: 54px; min-width: 102px; padding: 5px 6px; }.daily-countdown b { font-size: 12px; }.daily-countdown small { margin-top: 1px; font-size: 7px; }.focus-mode .daily-countdown { right: 8px; } }
+
+/* 桌機工作桌安全區：側欄固定在兩側，中央保留連續且可互動的棋盤視野。 */
+@media (min-width: 1181px) {
+  .game-overlay { overflow: hidden; }
+  .game-header { left: 32px; right: 32px; }
+  .rule-desk, .inspector { top: 116px; width: clamp(246px, 18vw, 276px); max-height: min(62vh, 560px); overflow-y: auto; }
+  .rule-desk { left: 28px; }
+  .inspector { right: 28px; }
+  .board-caption { top: 74px; width: min(430px, calc(100vw - 760px)); min-width: 260px; }
+  .board-maximize-fab { right: clamp(238px, calc(18vw + 34px), 322px); }
+  .causal-thread { left: clamp(320px, calc(18vw + 46px), 360px); top: 348px; width: min(28vw, 360px); }
+  .slow-device-warning { right: clamp(330px, calc(18vw + 48px), 380px); width: min(248px, 19vw); }
+  .chapter-rail { right: 28px; max-width: calc(100vw - 650px); overflow: hidden; }
+  .chapter-node { min-width: 38px; }
+  .control-dock { max-width: min(620px, calc(100vw - 640px)); }
+}
+/* 窄桌機橫向：優先保留棋盤寬度，資訊面板改為可捲動窄欄。 */
+@media (min-width: 851px) and (max-width: 1180px) and (orientation: landscape) {
+  .rule-desk, .inspector { top: 108px; width: clamp(208px, 22vw, 238px); max-height: min(58vh, 470px); overflow-y: auto; padding: 13px; }
+  .rule-desk { left: 14px; }
+  .inspector { right: 14px; }
+  .board-caption { top: 68px; width: min(320px, calc(100vw - 540px)); min-width: 220px; }
+  .board-maximize-fab { right: 254px; }
+  .causal-thread { left: 246px; top: 300px; width: min(28vw, 300px); }
+  .slow-device-warning { right: 258px; width: 210px; }
+  .control-dock { min-width: 440px; max-width: calc(100vw - 500px); gap: 10px; }
+  .chapter-rail { right: 14px; max-width: calc(100vw - 540px); }
+}
+/* 設定／診斷開啟時，面板置於標題列下方且保留棋盤中央的可視區。 */
+@media (min-width: 851px) {
+  .reading-settings { max-height: min(72vh, 640px); overflow-y: auto; }
+  .device-diagnostics { top: 104px; max-height: min(72vh, 640px); overflow-y: auto; }
+}
+
+.daily-reminder-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 10px 0 3px; padding: 8px 0; border-top: 1px dashed #dfd4c3; border-bottom: 1px dashed #dfd4c3; color: #687872; font-size: 10px; line-height: 1.4; }
+.daily-reminder-row > span { min-width: 0; }
+.daily-reminder-row button { flex: 0 0 auto; min-height: 30px; padding: 0 9px; }
+.daily-reminder-note { display: block; margin: 5px 0 0; color: #9a6b43; font-size: 9px; line-height: 1.45; }
+@media (max-width: 680px) { .daily-reminder-row { align-items: flex-start; flex-direction: column; gap: 6px; }.daily-reminder-row button { width: 100%; } }
+
+.daily-countdown { pointer-events: auto; }
+.daily-reminder-mini { grid-column: 1 / -1; min-height: 24px; margin-top: 5px; border: 1px solid #cba96f; background: rgba(255,253,245,.86); color: #8b6232; font-size: 9px; font-weight: 800; }
+.daily-reminder-mini:hover { background: #fff5db; }
+@media (orientation: landscape) and (max-height: 620px) and (pointer: coarse) { .daily-reminder-mini { min-height: 20px; margin-top: 2px; font-size: 8px; } }
+
+/* 高 DPI 電腦／平板橫向常以 680–850px CSS 寬度呈現；此區避免行動控制台覆蓋中央棋盤。 */
+@media (max-width: 850px) and (orientation: landscape) {
+  .game-frame { min-height: 100dvh; }
+  .mobile-console { top: auto; right: 10px; bottom: 86px; left: auto; width: min(304px, 38vw); max-height: min(238px, calc(100dvh - 142px)); overflow-y: auto; }
+  .mobile-console-body { min-height: 0; max-height: 178px; overflow-y: auto; }
+  .mobile-rule-tiles { max-width: 100%; min-width: 0; }
+  .mobile-rule-tiles .rule-tile { flex: 0 0 auto; width: auto; max-width: 118px; white-space: nowrap; }
+  .mobile-controls { top: auto; right: 10px; bottom: 8px; left: auto; width: min(382px, 47vw); max-height: 102px; overflow: hidden; padding: 5px 7px; }
+  .mobile-control-row { min-width: 0; gap: 6px; }
+  .mobile-transport-controls { min-width: 0; grid-template-columns: repeat(3, minmax(28px, 1fr)); }
+  .mobile-transport-controls .demo-button { min-width: 0; }
+  .mobile-replay-control { min-width: 0; }
+  .mobile-replay-control input { min-width: 0; }
+  .board-caption { z-index: 2; max-width: min(340px, 42vw); }
+  .board-maximize-fab { z-index: 12; }
+  .orientation-advice { z-index: 13; max-height: 72px; overflow: hidden; }
+}
+/* 寬桌機安全層：所有 UI 只佔預留區，中央 3D 畫布維持可見與可操作。 */
+@media (min-width: 851px) {
+  .game-header { z-index: 20; }
+  .rule-desk, .inspector { z-index: 10; }
+  .camera-dock { z-index: 11; }
+  .board-caption { z-index: 4; pointer-events: none; }
+  .causal-thread { z-index: 4; }
+  .control-dock { z-index: 10; }
+  .chapter-rail { z-index: 9; }
+  .slow-device-warning { z-index: 30; }
+}
+
+@media (max-width: 850px) and (orientation: landscape) {
+  .mobile-controls { right: auto; left: 10px; }
+  .mobile-console { right: 10px; left: auto; }
+}
+
+@media (min-width: 851px) {
+  .slow-device-warning { top: 142px; right: auto; left: 50%; width: min(300px, calc(100vw - 520px)); max-height: 116px; overflow: hidden; transform: translateX(-50%); }
+}
+
+/* 桌機棋盤優先 v2：資訊不再常駐夾住棋盤；面板由標題列主動開啟，並保留中央視覺安全框。 */
+.desktop-panel-actions { display: none; }
+@media (min-width: 851px) {
+  .desktop-panel-actions { display: inline-flex; align-items: center; gap: 3px; padding: 3px; border: 1px solid rgba(208, 218, 211, .9); border-radius: 8px; background: rgba(241, 247, 244, .74); box-shadow: 0 4px 12px rgba(38, 59, 54, .08); }
+  .desktop-panel-actions button { min-height: 29px; padding: 0 9px; border: 0; border-radius: 6px; background: transparent; color: #4d6963; font-size: 10px; font-weight: 800; cursor: pointer; }
+  .desktop-panel-actions button:hover, .desktop-panel-actions button.is-selected { background: #167a78; color: #fff; }
+  .rule-desk, .inspector { top: 200px; max-height: min(calc(100dvh - 226px), 560px); overflow-y: auto; scrollbar-width: thin; }
+  .rule-desk { left: max(18px, env(safe-area-inset-left)); }
+  .inspector { right: max(18px, env(safe-area-inset-right)); }
+  .camera-dock { top: 88px; right: max(24px, env(safe-area-inset-right)); }
+  .board-caption { top: 74px; }
+  .orientation-advice-active .board-caption { top: 162px; }
+  .orientation-advice-active .camera-dock { top: 88px; }
+  .control-dock { bottom: max(18px, env(safe-area-inset-bottom)); }
+  .chapter-rail { bottom: max(18px, env(safe-area-inset-bottom)); }
+  .game-overlay.desktop-panel-closed .camera-dock { box-shadow: 0 8px 20px rgba(31, 54, 50, .16); }
+}
+@media (min-width: 851px) and (max-height: 720px) {
+  .rule-desk, .inspector { top: 168px; max-height: min(calc(100dvh - 190px), 430px); }
+  .camera-dock { top: 78px; }
+  .orientation-advice-active .board-caption { top: 142px; }
+}
+/* Lawweaver 桌面安全佈局 v4.2（根治重疊：讓左右面板互斥 + 保留中央棋盤呼吸區）。
+ * 復發根因：desktopPanel 預設 closed 時 CSS 仍允許 rules/inspector 兩欄同時渲染（both 查詢參數或舊 localStorage），
+ * 而寬桌機媒體查詢只縮寬度、未限制左右欄同時出現，導致 1280–1600px 區間中央棋盤被左右夾殺。
+ * 解法：只要任一桌面面板開啟，另一欄強制隱藏（互斥顯示）；保留中央最小棋盤寬度。
+ * 此段必須放在檔案最尾端，覆蓋上方所有寬桌機媒體查詢。 */
+@media (min-width: 851px) {
+  .game-overlay.desktop-panel-rules .inspector,
+  .game-overlay.desktop-panel-inspector .rule-desk { display: none !important; }
+  .game-overlay.desktop-panel-both .board-caption { width: min(300px, calc(100vw - 620px)); min-width: 200px; }
+  .game-overlay.desktop-panel-both .control-dock { max-width: calc(100vw - 620px); }
+}
+/* LAWWEAVER-DESKTOP-V43: desktop overlap root-fix (screenshots 211037/211359).
+ * Root causes observed on desktop 1536px:
+ *  (1) .game-header is flex space-between with 9+ buttons; header-meta never wraps,
+ *      so at 1024-1400px the button row overflows the brand and tutorial/orientation cards
+ *      slide under it (c1/c2 crops: tutorial card text clipped by header zone).
+ *  (2) .board-maximize-fab uses fixed right:230-322px which assumes inspector open;
+ *      when inspector is closed the FAB floats over the chessboard/tutorial zone.
+ *  (3) .tutorial-card top:118px sits under header(22px+~48px)+orientation-advice(76px),
+ *      and .board-caption top:72-74px collides with the same band.
+ * Fix: allow header-meta wrap+scroll, push tutorial/board-caption below header band,
+ * dock FAB relative to open inspector only, keep z-order tutorial>header>panels. */
+@media (min-width: 851px) {
+  .game-header { flex-wrap: wrap; row-gap: 8px; }
+  .header-meta { flex: 1 1 auto; flex-wrap: wrap; justify-content: flex-end; min-width: 0; max-width: 100%; }
+  .tutorial-card { top: 150px; }
+  .orientation-advice-active .tutorial-card { top: 196px; }
+  .board-caption { top: 108px; }
+  .orientation-advice-active .board-caption { top: 196px; }
+  .tutorial-card, .orientation-advice { z-index: 30; }
+  .game-header { z-index: 20; }
+  .rule-desk, .inspector { z-index: 10; }
+  .game-overlay.desktop-panel-closed .board-maximize-fab,
+  .game-overlay.desktop-panel-rules .board-maximize-fab { right: 18px; }
+  .game-overlay.desktop-panel-inspector .board-maximize-fab,
+  .game-overlay.desktop-panel-both .board-maximize-fab { right: clamp(238px, calc(18vw + 34px), 322px); }
+}
+@media (min-width: 851px) and (max-width: 1180px) {
+  .tutorial-card { top: 142px; }
+  .orientation-advice-active .tutorial-card { top: 188px; }
+  .game-overlay.desktop-panel-closed .board-maximize-fab,
+  .game-overlay.desktop-panel-rules .board-maximize-fab { right: 14px; }
+}
+@media (min-width: 851px) and (max-width: 1180px) {
+  .desktop-panel-actions button { min-width: 45px; padding: 0 7px; }
+  .rule-desk, .inspector { width: clamp(208px, 22vw, 238px); padding: 13px; }
+  .camera-dock { width: 176px; padding: 8px; }
+}
+
+@media (max-width: 850px) {
+  .desktop-panel-actions { display: none !important; }
+  .game-overlay .rule-desk,
+  .game-overlay .inspector { display: none !important; }
+}
+
+/* 桌機四角分散 v4.1：規則=左上、inspector=右上、鏡頭=左下、因果線=右下（章節上方）、章節=右下。 */
+/*
+ * 數學驗證（1920×1080, dvh=1080）：
+ *   rule-desk:     top:64, max-height:min(1080-250,620)=620 → 底部 684px
+ *   inspector:     top:64, max-height:min(1080-250,620)=620 → 底部 684px
+ *   camera-dock:   bottom:18, left:18,  width:190, height:~120 → 頂部 78px（左下）
+ *   chapter-rail:  bottom:18, right:18, height:~50               → 頂部 32px（右下）
+ *   causal-thread: bottom:80, right:18, width:clamp(180,15vw,220)=220, max-height:50 → 頂部 30px（章節上方，不重疊）
+ *
+ * 重疊驗證：
+ *   - camera-dock 頂部 (78) < inspector 底部 (396)：無重疊
+ *   - causal-thread 頂部 (30) < inspector 底部 (396)：無重疊
+ *   - causal-thread 底部 (80) > chapter-rail 頂部 (32) + 高度 (50) = 82：間距 2px（可接受）
+ *   - 水平：causal-thread 在右 (right:18)、camera-dock 在左 (left:18)，無水平重疊
+ */
+@media (min-width: 851px) {
+  .rule-desk, .inspector { top: 64px; width: clamp(216px, 17vw, 260px); max-height: min(calc(100dvh - 250px), 620px); overflow-y: auto; overflow-x: hidden; }
+  .rule-desk { left: 18px; }
+  .inspector { right: 18px; }
+  .camera-dock { top: auto; right: auto; bottom: max(18px, env(safe-area-inset-bottom)); left: 18px; width: 190px; z-index: 6; }
+  .focus-mode .camera-dock { top: auto; right: auto; bottom: 86px; left: 24px; }
+  .causal-thread { right: 18px; left: auto; top: auto; bottom: 80px; width: clamp(180px, 15vw, 220px); max-height: 50px; overflow: hidden; z-index: 6; }
+  .slow-device-warning { top: 64px; }
+  .chapter-rail { right: 18px; bottom: max(18px, env(safe-area-inset-bottom)); z-index: 6; }
+}
+@media (min-width: 851px) and (max-height: 720px) {
+  .rule-desk, .inspector { top: 56px; max-height: min(calc(100dvh - 200px), 460px); overflow-y: auto; }
+  .camera-dock { bottom: 14px; width: 170px; }
+  .chapter-rail { bottom: 14px; }
+  .causal-thread { bottom: 70px; right: 18px; width: clamp(160px, 14vw, 200px); max-height: 40px; }
+}
+@media (min-width: 851px) and (max-width: 1180px) {
+  .camera-dock { width: 160px; }
+  .causal-thread { right: 18px; bottom: 75px; width: clamp(150px, 14vw, 190px); }
+}
