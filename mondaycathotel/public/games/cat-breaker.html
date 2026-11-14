@@ -1,0 +1,2526 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>貓咪吃罐罐</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100dvh;overflow:hidden;background:#020415;user-select:none}
+body{font-family:'Orbitron',monospace;display:flex;flex-direction:column;align-items:center}
+
+#bg{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+#wrap{
+  position:relative;z-index:1;
+  width:100%;max-width:700px;height:100dvh;
+  display:flex;flex-direction:column;
+}
+
+/* ── HUD ── */
+#hud{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:6px 14px;flex-shrink:0;
+  background:rgba(1,3,20,0.93);
+  border-bottom:1px solid rgba(0,210,255,0.15);
+}
+.hb{display:flex;flex-direction:column;align-items:center;min-width:56px}
+.hl{font-size:8px;letter-spacing:2px;color:rgba(0,210,255,0.5);font-family:'Rajdhani',sans-serif;text-transform:uppercase}
+.hv{font-size:clamp(13px,2.8vw,19px);font-weight:900;letter-spacing:1px;line-height:1.15}
+.cy{color:#00dcff;text-shadow:0 0 8px #00dcff88}
+.pk{color:#ff3d9a;text-shadow:0 0 8px #ff3d9a88}
+.gd{color:#ffd60a;text-shadow:0 0 8px #ffd60a88}
+.wh{color:#fff}
+.lives{display:flex;gap:5px;margin-top:3px;flex-wrap:wrap;max-width:80px}
+.ld{width:10px;height:10px;border-radius:50%;background:#ff3d9a;box-shadow:0 0 6px #ff3d9a;transition:all .3s}
+.ld.off{background:#111628;box-shadow:none}
+.ld.gold{background:#ffd60a!important;box-shadow:0 0 6px #ffd60a!important}
+
+/* ── GAME AREA ── */
+#area{flex:1;position:relative;overflow:hidden}
+
+/* Scanline overlay */
+#area::after{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:3;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,0.03) 0px,rgba(0,0,0,0.03) 1px,transparent 1px,transparent 3px);
+}
+
+#gc{position:absolute;inset:0;width:100%;height:100%;cursor:none;touch-action:none;z-index:1}
+
+/* ── POWER-UP BAR ── */
+#pub{
+  position:absolute;bottom:8px;left:50%;transform:translateX(-50%);
+  display:flex;gap:5px;pointer-events:none;z-index:5;
+}
+@media(pointer:coarse){#pub{bottom:68px}}
+.pib{
+  padding:2px 9px;border-radius:20px;
+  font-size:10px;font-weight:700;letter-spacing:1px;
+  font-family:'Rajdhani',sans-serif;white-space:nowrap;
+  animation:piblink 0.9s infinite alternate;
+}
+@keyframes piblink{to{opacity:.5}}
+
+/* ── OVERLAYS ── */
+.ovl{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:rgba(2,4,21,0.9);backdrop-filter:blur(6px);
+  z-index:20;
+}
+.ttl{
+  font-size:clamp(28px,7vw,60px);font-weight:900;letter-spacing:5px;
+  text-align:center;line-height:1.1;margin-bottom:10px;
+  background:linear-gradient(135deg,#00dcff 0%,#ff3d9a 55%,#ffd60a 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.ttl.danger{background:linear-gradient(135deg,#ff3d9a,#660020);-webkit-background-clip:text}
+.sub{
+  font-size:clamp(9px,2vw,12px);color:#8888bb;letter-spacing:4px;
+  font-family:'Rajdhani';text-transform:uppercase;margin-bottom:24px;text-align:center;
+}
+.nbtn{
+  padding:12px 34px;font-family:'Orbitron',monospace;
+  font-size:clamp(10px,2vw,13px);font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  cursor:pointer;background:rgba(0,220,255,0.1);color:#00dcff;
+  border:2px solid rgba(0,220,255,0.65);border-radius:3px;margin:4px;
+  box-shadow:0 0 14px rgba(0,220,255,0.22);transition:all .18s;
+}
+.nbtn:hover,.nbtn:active{background:rgba(0,220,255,0.2);box-shadow:0 0 24px rgba(0,220,255,0.5);transform:scale(1.03)}
+.nbtn.r{border-color:rgba(255,61,154,0.65);color:#ff3d9a;background:rgba(255,61,154,0.1);box-shadow:0 0 14px rgba(255,61,154,0.22)}
+.nbtn.r:hover,.nbtn.r:active{background:rgba(255,61,154,0.2);box-shadow:0 0 24px rgba(255,61,154,0.5)}
+.srow{display:flex;gap:clamp(14px,4vw,36px);margin:16px 0}
+.si{text-align:center}
+.sn{font-size:clamp(20px,5vw,36px);font-weight:900;color:#00dcff;text-shadow:0 0 10px #00dcff66}
+.sl2{font-size:8px;color:#8888bb;letter-spacing:2px;font-family:'Rajdhani';text-transform:uppercase;margin-top:3px}
+.lvlnum{
+  font-size:clamp(58px,13vw,96px);font-weight:900;color:#ffd60a;
+  text-shadow:0 0 22px #ffd60a,0 0 55px rgba(255,214,10,0.25);line-height:1;
+}
+.lvltx{font-size:9px;letter-spacing:5px;color:#8888bb;font-family:'Rajdhani';text-transform:uppercase;margin-bottom:5px}
+.lvldc{font-size:11px;letter-spacing:2px;color:#aaa;font-family:'Rajdhani';margin:14px 0;text-transform:uppercase}
+
+/* ── COMBO POPUP ── */
+#cpop{
+  position:absolute;top:16%;left:50%;transform:translateX(-50%);
+  pointer-events:none;z-index:15;
+  font-family:'Orbitron',monospace;font-weight:900;text-align:center;
+  opacity:0;transition:opacity .25s;text-shadow:0 0 22px currentColor;
+}
+
+/* ── HINT ── */
+#hint{
+  position:absolute;bottom:10px;left:50%;transform:translateX(-50%);
+  font-size:9px;color:rgba(255,255,255,0.18);letter-spacing:2px;
+  font-family:'Rajdhani';white-space:nowrap;pointer-events:none;z-index:4;
+}
+@media(pointer:coarse){#hint{display:none}}
+
+/* ── MOBILE BUTTONS ── */
+#mob{
+  display:none;position:absolute;bottom:6px;left:0;right:0;
+  justify-content:space-between;padding:0 16px;z-index:10;pointer-events:none;
+}
+.mb{
+  width:54px;height:54px;border-radius:50%;pointer-events:all;
+  display:flex;align-items:center;justify-content:center;font-size:19px;
+  background:rgba(0,220,255,0.1);border:2px solid rgba(0,220,255,0.38);
+  color:rgba(0,220,255,0.85);box-shadow:0 0 8px rgba(0,220,255,0.12);
+  transition:background .1s;-webkit-tap-highlight-color:transparent;cursor:pointer;
+}
+.mb:active{background:rgba(0,220,255,0.28)}
+.mb.f{background:rgba(255,61,154,0.1);border-color:rgba(255,61,154,0.38);color:rgba(255,61,154,0.85);box-shadow:0 0 8px rgba(255,61,154,0.12)}
+.mb.f:active{background:rgba(255,61,154,0.28)}
+@media(pointer:coarse){#mob{display:flex}}
+
+@media (orientation:landscape) and (max-height:360px){
+  .ovl{padding:6px}
+  .ttl{font-size:clamp(18px,7vh,25px);letter-spacing:2px;margin-bottom:4px}
+  .sub{font-size:9px;letter-spacing:2px;margin-bottom:8px}
+  .nbtn{padding:6px 18px;font-size:10px;margin:2px}
+  .srow{gap:18px;margin:8px 0}
+  .sn{font-size:20px}
+  .sl2{font-size:7px}
+  .lvlnum{font-size:clamp(40px,18vh,64px)}
+  .lvldc{font-size:9px;margin:6px 0}
+  #ss>div:last-child{margin-top:8px!important;font-size:8px!important;line-height:1.8!important}
+}
+
+/* ── Hide buttons when AI is in control ── */
+#mob.ai-hidden { display:none !important; }
+
+/* ══════════════════════════════════════════
+   LANDSCAPE MOBILE  (e.g. phone rotated)
+   Layout becomes: [sidebar HUD | game area]
+   so the full screen height is used for play.
+══════════════════════════════════════════ */
+@media (orientation:landscape) and (max-height:520px) {
+  /* Wrap switches to row: HUD left, game right */
+  #wrap { flex-direction:row; max-width:100%; }
+
+  /* HUD → vertical sidebar */
+  #hud {
+    flex-direction:column;
+    width:78px; min-width:78px;
+    height:100dvh;
+    border-right:1px solid rgba(0,210,255,0.15);
+    border-bottom:none;
+    padding:5px 3px;
+    justify-content:space-evenly;
+    align-items:center;
+    overflow:hidden;
+    flex-shrink:0;
+  }
+  .hb    { min-width:0; width:100%; text-align:center; }
+  .hl    { font-size:6px; letter-spacing:1px; }
+  .hv    { font-size:clamp(9px,1.9vh,13px); letter-spacing:0; }
+  .ld    { width:7px; height:7px; }
+  .lives { gap:3px; flex-wrap:wrap; max-width:54px; justify-content:center; }
+
+  /* Game area fills remaining space at full height */
+  #area  { flex:1; height:100dvh; }
+
+  /* Power-up bar: shift up a bit */
+  #pub       { bottom:4px; }
+  #pub .pib  { font-size:9px; padding:1px 6px; }
+
+  /* Combo pop + hint adjustments */
+  #cpop  { top:10%; font-size:18px!important; }
+  #hint  { font-size:8px; bottom:3px; }
+
+  /* AI button: smaller in landscape */
+  #ai-btn { top:5px; right:6px; font-size:7px; padding:3px 9px; }
+  #ai-bar { font-size:7px; letter-spacing:2px; padding:2px 0; }
+
+  /* No on-screen d-pad in landscape — canvas touch controls the paddle */
+  #mob { display:none !important; }
+}
+
+/* ── AI Button ── */
+#ai-btn{
+  position:absolute;top:8px;right:10px;z-index:25;
+  padding:5px 14px;font-family:'Orbitron',monospace;
+  font-size:9px;font-weight:700;letter-spacing:1px;
+  cursor:pointer;border-radius:20px;transition:all .22s;
+  border:2px solid rgba(0,220,255,0.32);
+  background:rgba(1,3,20,0.85);color:rgba(0,220,255,0.6);
+  white-space:nowrap;
+}
+#ai-btn.on{
+  border-color:#a855f7;color:#d4aaff;
+  background:rgba(168,85,247,0.18);
+  box-shadow:0 0 16px rgba(168,85,247,0.5);
+  animation:aipulse 2s ease-in-out infinite alternate;
+}
+@keyframes aipulse{to{box-shadow:0 0 28px rgba(168,85,247,0.8)}}
+
+/* AI mode status bar */
+#ai-bar{
+  position:absolute;top:0;left:0;right:0;
+  display:none;align-items:center;justify-content:center;
+  padding:3px 0;z-index:6;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(168,85,247,0.18),transparent);
+  border-bottom:1px solid rgba(168,85,247,0.3);
+  font-family:'Rajdhani',sans-serif;font-size:10px;letter-spacing:3px;
+  color:rgba(168,85,247,0.8);text-transform:uppercase;
+}
+#ai-bar.show{display:flex}
+</style>
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+
+<div id="wrap">
+  <div id="hud">
+    <div class="hb"><div class="hl">分數</div><div class="hv cy" id="hs">0</div></div>
+    <div class="hb"><div class="hl">生命</div><div class="lives" id="hlv"></div></div>
+    <div class="hb"><div class="hl">關卡</div><div class="hv gd" id="hlvl">1</div></div>
+    <div class="hb"><div class="hl">時間</div><div class="hv pk" id="ht">00:00</div></div>
+    <div class="hb"><div class="hl">連擊</div><div class="hv wh" id="hc">×1</div></div>
+  </div>
+
+  <div id="area">
+    <canvas id="gc"></canvas>
+    <div id="pub"></div>
+    <div id="cpop"></div>
+    <div id="hint">← → 移動 &nbsp;·&nbsp; 空白鍵 發射 / 雷射</div>
+
+    <!-- START -->
+    <div class="ovl" id="ss">
+      <div class="ttl">貓咪吃<br>罐罐</div>
+      <div class="sub">霓虹打磚塊 · 終極版</div>
+      <button class="nbtn" id="b-start">▶ 開始遊戲</button>
+      <div style="margin-top:20px;font-size:9px;color:#2a2a55;font-family:'Rajdhani';letter-spacing:2px;text-align:center;line-height:2.4">
+        滑鼠 / 觸控 移動板子 &nbsp;·&nbsp; 空白鍵 或點擊 發射<br>
+        接住道具 · 累積連擊 · 雷射炮擊 · 無限關卡
+      </div>
+    </div>
+
+    <!-- LEVEL TRANSITION -->
+    <div class="ovl" id="sl" style="display:none">
+      <div class="lvltx">關卡</div>
+      <div class="lvlnum" id="lnum">1</div>
+      <div class="lvldc" id="ldesc">準備好了嗎？</div>
+      <button class="nbtn" id="b-go">出發 !</button>
+    </div>
+
+    <!-- GAME OVER -->
+    <div class="ovl" id="so" style="display:none">
+      <div class="ttl danger">遊戲<br>結束</div>
+      <div class="srow">
+        <div class="si"><div class="sn" id="go-s">0</div><div class="sl2">分數</div></div>
+        <div class="si"><div class="sn" id="go-l">1</div><div class="sl2">關卡</div></div>
+        <div class="si"><div class="sn" id="go-t">00:00</div><div class="sl2">時間</div></div>
+      </div>
+      <button class="nbtn r" id="b-retry">再玩一次</button>
+    </div>
+
+    <!-- WIN -->
+    <div class="ovl" id="sw" style="display:none">
+      <div class="ttl">關卡<br>完成!</div>
+      <div class="srow">
+        <div class="si"><div class="sn" id="wn-s">0</div><div class="sl2">分數</div></div>
+        <div class="si"><div class="sn" id="wn-t">00:00</div><div class="sl2">時間</div></div>
+      </div>
+      <button class="nbtn" id="b-next">下一關 ▶</button>
+    </div>
+
+    <!-- AI STATUS BAR -->
+    <div id="ai-bar">🤖 &nbsp; AI 自動遊玩 &nbsp; 🤖</div>
+
+    <!-- AI TOGGLE BUTTON -->
+    <button id="ai-btn" onclick="toggleAI()">👤 手動</button>
+
+    <!-- MOBILE BUTTONS -->
+    <div id="mob">
+      <button class="mb" id="btn-l">◀</button>
+      <button class="mb f" id="btn-f">⚡</button>
+      <button class="mb" id="btn-r">▶</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+'use strict';
+// ═══════════════════════════════════════════════════
+//  AUDIO ENGINE
+// ═══════════════════════════════════════════════════
+let _ac = null;
+function getAC() {
+  if (!_ac) _ac = new (window.AudioContext || window.webkitAudioContext)();
+  return _ac;
+}
+function resumeAC() { try { if (getAC().state === 'suspended') getAC().resume(); } catch(e){} }
+
+function tone(freq, type, vol, dur, endFreq) {
+  try {
+    resumeAC();
+    let a = getAC();
+    let o = a.createOscillator();
+    let g = a.createGain();
+    o.connect(g); g.connect(a.destination);
+    o.type = type;
+    o.frequency.setValueAtTime(Math.max(0.1, freq), a.currentTime);
+    if (endFreq) o.frequency.exponentialRampToValueAtTime(Math.max(0.1, endFreq), a.currentTime + dur);
+    g.gain.setValueAtTime(vol, a.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.0001, a.currentTime + dur);
+    o.start(); o.stop(a.currentTime + dur);
+  } catch(e) {}
+}
+
+function noise(dur, vol, bandFreq) {
+  try {
+    resumeAC();
+    let a = getAC();
+    let buf = a.createBuffer(1, Math.floor(a.sampleRate * dur), a.sampleRate);
+    let d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    let src = a.createBufferSource();
+    let flt = a.createBiquadFilter();
+    let g = a.createGain();
+    src.buffer = buf;
+    flt.type = 'bandpass';
+    flt.frequency.value = bandFreq || 500;
+    flt.Q.value = 1.5;
+    src.connect(flt); flt.connect(g); g.connect(a.destination);
+    g.gain.setValueAtTime(vol, a.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.0001, a.currentTime + dur);
+    src.start(); src.stop(a.currentTime + dur);
+  } catch(e) {}
+}
+
+let SFX = {
+  hit:    () => { tone(240 + Math.random()*180, 'square', 0.13, 0.07, 100); },
+  brk:    () => { tone(480, 'sawtooth', 0.18, 0.1, 65); noise(0.1, 0.1, 900); },
+  hard:   () => { tone(155, 'square', 0.14, 0.06); noise(0.04, 0.07, 280); },
+  pad:    () => { tone(430, 'sine', 0.17, 0.12, 640); },
+  wall:   () => { tone(185, 'triangle', 0.07, 0.04); },
+  pu:     () => { [523,659,784,1047].forEach((f,i) => setTimeout(() => tone(f,'sine',0.2,0.13), i*65)); },
+  laser:  () => { tone(1600, 'sawtooth', 0.14, 0.07, 240); },
+  die:    () => { tone(135, 'sawtooth', 0.2, 0.4, 42); noise(0.3, 0.1, 180); },
+  clear:  () => { [784,988,1175,1396,1568].forEach((f,i) => setTimeout(() => tone(f,'sine',0.22,0.22), i*90)); },
+  combo:  (n) => { tone(440 * (1 + n * 0.07), 'sine', 0.14, 0.1); },
+};
+
+// ═══════════════════════════════════════════════════
+//  STARFIELD
+// ═══════════════════════════════════════════════════
+let bgEl  = document.getElementById('bg');
+let bgCtx = bgEl.getContext('2d');
+let stars = [];
+
+function initStars() {
+  bgEl.width  = window.innerWidth;
+  bgEl.height = window.innerHeight;
+  stars = Array.from({length: 170}, () => ({
+    x:  Math.random() * bgEl.width,
+    y:  Math.random() * bgEl.height,
+    r:  Math.random() * 1.4 + 0.2,
+    sp: Math.random() * 0.22 + 0.04,
+    a:  Math.random() * 0.8 + 0.15,
+    c:  ['#00dcff','#ff3d9a','#ffffff','#ffd60a','#a855f7'][Math.floor(Math.random()*5)]
+  }));
+}
+
+function drawStars() {
+  let W2 = bgEl.width, H2 = bgEl.height;
+  bgCtx.fillStyle = '#020415';
+  bgCtx.fillRect(0, 0, W2, H2);
+
+  // Nebula glows
+  let nebulas = [
+    [0.25, 0.35, 'rgba(0,28,90,0.17)'],
+    [0.72, 0.60, 'rgba(48,0,72,0.13)'],
+    [0.50, 0.10, 'rgba(0,18,60,0.09)'],
+  ];
+  nebulas.forEach(([rx, ry, c]) => {
+    let g = bgCtx.createRadialGradient(W2*rx, H2*ry, 0, W2*rx, H2*ry, W2*0.44);
+    g.addColorStop(0, c);
+    g.addColorStop(1, 'transparent');
+    bgCtx.fillStyle = g;
+    bgCtx.fillRect(0, 0, W2, H2);
+  });
+
+  // Stars
+  stars.forEach(s => {
+    s.y += s.sp;
+    if (s.y > H2) { s.y = 0; s.x = Math.random() * W2; }
+    bgCtx.beginPath();
+    bgCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    bgCtx.fillStyle = s.c + Math.floor(s.a * 255).toString(16).padStart(2, '0');
+    bgCtx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+
+initStars();
+drawStars();
+window.addEventListener('resize', initStars);
+
+// ═══════════════════════════════════════════════════
+//  GAME CORE
+// ═══════════════════════════════════════════════════
+let gc   = document.getElementById('gc');
+let cx   = gc.getContext('2d');
+let area = document.getElementById('area');
+
+// Canvas dimensions (updated on resize)
+let W = 480, H = 720;
+
+// ── Game state ──
+let gst = 'start';   // start | playing | over | win
+let score  = 0;
+let lives  = 3;
+let level  = 1;
+let combo  = 1;
+let totalSecs = 0;
+let timerID   = null;
+let rafID     = null;
+let lastTS    = null;
+let lastHitMs = 0;    // timestamp of last brick hit (for combo timeout)
+
+// ── Entity arrays ──
+let paddle = {};
+let balls  = [];
+let bricks = [];
+let ptcls  = [];   // particles
+let drops  = [];   // falling power-up gems
+let lasers = [];
+
+// ── Active effects ──
+let eff = { laser: 0, wide: 0, narrow: 0, shield: 0 };  // seconds remaining
+
+// ── Input ──
+let mouseX = null, touchX = null;
+let keyL = false, keyR = false;
+
+// ── AI ──
+let aiMode        = false;
+let aiLaserTimer  = 0;      // countdown before next auto-laser
+let _aiPredX      = null;   // cached ball landing prediction (for drawing)
+let _aiTrackedBall= null;   // which ball the AI is tracking (for drawing)
+let _aiChasing    = null;   // def.id of power-up being chased, null = tracking ball
+let _aiTargetBrick= null;   // target brick AI is aiming toward
+
+// ── Layout constants ──
+let PW_BASE  = 0.155;   // paddle width / W
+let PH_BASE  = 0.022;   // paddle height / H
+let BR_RATIO = 0.0175;  // ball radius / H
+let SPD_BASE = 0.52;    // ball speed (px/s) / H base
+let PU_DUR   = 10;      // power-up duration (seconds)
+
+// ═══════════════════════════════════════════════════
+//  COLORS
+// ═══════════════════════════════════════════════════
+// Particle / shard glow colours per HP (used in hitBrick & spawnShards)
+let BGLO = {
+  1: '#00e5ff', 2: '#b04fff', 3: '#ff4499', 4: '#ffd60a', 5: '#00e676',
+};
+// Cat glow colour lookup (matches CP palette body colours)
+let BCLR = {
+  1: ['#00e5ff','#0080cc'],
+  2: ['#b04fff','#6600bb'],
+  3: ['#ff4499','#aa0040'],
+  4: ['#ffd60a','#cc9500'],
+  5: ['#00e676','#007744'],
+};
+let STEEL_CLR  = ['#9da5b4','#5a6070'];
+let STEEL_GLOW = '#7080a0';
+
+// ═══════════════════════════════════════════════════
+//  POOP SYSTEM
+// ═══════════════════════════════════════════════════
+let poops        = [];  // { x, y, r, vy }
+let poopWarnings = [];  // { brId, x, y, timer }
+let POOP_WARN_DUR = 2.0;    // seconds warning before poop drops (longer = fairer)
+let POOP_MAX_BASE = 1;       // max simultaneous poops at level 1
+
+// Poop rate and cap scale with level — very rare early, gradually increasing
+function getPoopRate()  { return Math.min(0.00008 + level * 0.000055, 0.0012); }
+function getPoopMax()   { return Math.min(POOP_MAX_BASE + Math.floor(level / 3), 5); }
+let POOP_SPD_R    = 0.26;   // poop fall speed ratio of H
+
+// 預測「未來 tSec 秒後」球會落在板子的哪個 X（含牆壁、天花板、板面反彈）。
+// 用於貓大便避讓：貓大便警告→落下→掉到板子需要時間，必須用「貓大便實際落到
+// 板子的那個未來時刻」的擊球點來判斷哪裡危險，而不是用現在的擊球點——否則球
+// 早已移走，避讓完全無效（實測：用當下擊球點避讓對勝率零幫助）。
+// 回傳 null 代表目前沒有已發射的球。
+function predictBallXAt(tSec) {
+  let b = null;
+  for (let x of balls) { if (x.launched) { b = x; break; } }
+  if (!b) return null;
+  let px = b.x, pvx = b.vx, py = b.y, pvy = b.vy;
+  let minX = b.r, maxX = W - b.r, DT = 1 / 120;
+  let steps = Math.max(1, Math.round(tSec / DT));
+  for (let s = 0; s < steps; s++) {
+    px += pvx * DT; py += pvy * DT;
+    if (px < minX) { px = minX; pvx = Math.abs(pvx); }
+    if (px > maxX) { px = maxX; pvx = -Math.abs(pvx); }
+    if (py < b.r) { py = b.r; pvy = Math.abs(pvy); }            // 天花板
+    if (py >= paddle.y) { py = paddle.y; pvy = -Math.abs(pvy); } // 板面反彈
+  }
+  return px;
+}
+
+// ─── Poop update (call inside update()) ───
+function updatePoops(dt) {
+  // Generate warnings from alive non-steel cats
+  if (poops.length + poopWarnings.length < getPoopMax()) {
+    // ── 貓大便落點避讓演算法（未來擊球點版）──
+    // 對每個候選貓磚，算出它的大便從「現在」到「落到板子」的總時間
+    // （警告 0.9 秒 + 從磚落到板子的時間），再預測球在那個未來時刻會落在哪，
+    // 用那個「未來擊球點」判斷此貓磚落點是否危險（在擊球點 ±1.2 板寬內）。
+    // 為涵蓋預測誤差，對落下時刻前後各取樣一次，任一命中都算危險。
+    // 優先從「安全」貓磚掉落大便，只有完全沒有安全貓磚時才退回危險組——
+    // 保留隨機性與適度挑戰，同時大幅減少「貓大便落點 = 擊球點」的必死情況。
+    // 人類與 AI 都受惠。（實測：此版把 AI 全破率從 ~16% 提升到 ~31%。）
+    let poopV = H * POOP_SPD_R;
+    let dangerR = paddle.w * 1.2;
+    let safe = [], risky = [];
+    for (let b of bricks) {
+      if (b.steel) continue;
+      if (poopWarnings.some(pw => pw.brId === b.id)) continue;
+      let dropX = b.x + b.w / 2;
+      let risk = false;
+      let fallT = POOP_WARN_DUR + (paddle.y - (b.y + b.h)) / poopV;
+      let samples = [predictBallXAt(fallT), predictBallXAt(fallT * 0.7), predictBallXAt(fallT + 0.6)];
+      for (let fx of samples) {
+        if (fx !== null && Math.abs(dropX - fx) < dangerR) { risk = true; break; }
+      }
+      if (risk) risky.push(b);
+      else safe.push(b);
+    }
+    // 安全組優先；沒有安全組才用危險組，維持遊戲仍有威脅。
+    let pool = safe.length > 0 ? safe : risky;
+    for (let b of pool) {
+      if (Math.random() < getPoopRate()) {
+        poopWarnings.push({
+          brId: b.id,
+          x: b.x + b.w / 2,
+          y: b.y + b.h + 2,
+          timer: POOP_WARN_DUR,
+        });
+      }
+    }
+  }
+  // Countdown warnings → spawn poop
+  for (let i = poopWarnings.length - 1; i >= 0; i--) {
+    let pw = poopWarnings[i];
+    pw.timer -= dt;
+    // Remove if brick gone
+    if (!bricks.find(b => b.id === pw.brId)) { poopWarnings.splice(i,1); continue; }
+    if (pw.timer <= 0) {
+      poops.push({ x: pw.x, y: pw.y, r: Math.max(9, H * 0.024), vy: H * POOP_SPD_R });
+      poopWarnings.splice(i, 1);
+    }
+  }
+  // Move poops + collision with paddle
+  for (let i = poops.length - 1; i >= 0; i--) {
+    let p = poops[i];
+    p.y += p.vy * dt;
+    if (p.y + p.r >= paddle.y && p.y - p.r <= paddle.y + paddle.h &&
+        p.x + p.r >= paddle.x && p.x - p.r <= paddle.x + paddle.w) {
+      // 無敵中：貓大便被彈開，不扣命、不重置球
+      if (eff.shield > 0) {
+        spawnParticles(p.x, p.y, '#ffd60a', 14, 1.3);
+        poops.splice(i, 1);
+        continue;
+      }
+      lives--;
+      SFX.die();
+      refreshHUD();
+      spawnParticles(p.x, p.y, '#8B4513', 14, 1.3);
+      poops.splice(i, 1);
+      if (lives <= 0) { gameOver(); return; }
+      balls = [makeBall()];
+      continue;
+    }
+    if (p.y > H + 40) poops.splice(i, 1);
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  CAT PALETTES  (paper-craft 3D colours)
+// ═══════════════════════════════════════════════════
+let CP = [
+  null, // index 0 unused
+  { body:'#FF8C42', shade:'#C05A18', shade2:'#7A3008',
+    ear:'#FF6E9C',  eye:'#55BB44',  outline:'#3A1808',
+    stripe:'#D06020', name:'橘貓' },
+  { body:'#F2F2F2', shade:'#B8B8B8', shade2:'#888888',
+    ear:'#FFB3C6',  eye:'#4499DD',  outline:'#222222',
+    patch:'#222222', name:'賓士貓' },
+  { body:'#FFB3C6', shade:'#D87090', shade2:'#A04060',
+    ear:'#FF8FAB',  eye:'#FF9944',  outline:'#5A1A30',
+    spot:'#FF6090',  name:'粉紅貓' },
+  { body:'#9DAEC8', shade:'#6878A0', shade2:'#404E70',
+    ear:'#CCBBDD',  eye:'#88DDCC',  outline:'#1A2A3A',
+    name:'藍貓' },
+  { body:'#F5DEB3', shade:'#C8AA70', shade2:'#906040',
+    ear:'#E0B8A0',  eye:'#3388CC',  outline:'#402010',
+    mask:'#8B6040', name:'暹羅貓' },
+];
+let PU_DEFS = [
+  // 「加命」道具：掉落機率 20%，排在最前面優先判定，讓玩家與 AI 都有本錢承受貓大便等意外失誤。
+  {id:'life',  lbl:'♥',  name:'加命',   c:'#ff3d9a', bg:'rgba(255,0,80,0.22)',  rate:0.20},
+  // 「無敵」道具：掉落機率 10%，持續 5 秒，期間接到貓大便不會扣命（但仍要接球）。
+  {id:'shield',lbl:'🛡',  name:'無敵',   c:'#ffd60a', bg:'rgba(255,214,10,0.22)',rate:0.10},
+  {id:'laser', lbl:'⚡',  name:'雷射',  c:'#ff3d9a', bg:'rgba(255,61,154,0.2)',  rate:0.030},
+  {id:'wide',  lbl:'↔',  name:'加寬',   c:'#00dcff', bg:'rgba(0,220,255,0.18)', rate:0.040},
+  {id:'narrow',lbl:'↕',  name:'縮窄',   c:'#fb5607', bg:'rgba(251,86,7,0.18)',  rate:0.035},
+  {id:'multi', lbl:'⊕',  name:'多球',  c:'#a855f7', bg:'rgba(168,85,247,0.18)',rate:0.033},
+  {id:'fast',  lbl:'▲',  name:'加速',   c:'#fb5607', bg:'rgba(251,86,7,0.18)',  rate:0.033},
+  {id:'slow',  lbl:'▼',  name:'減速',   c:'#00e676', bg:'rgba(0,230,118,0.18)',rate:0.036},
+];
+
+// ═══════════════════════════════════════════════════
+//  LEVEL GENERATOR
+// ═══════════════════════════════════════════════════
+let LV_DESCS = [
+  '入門陣列 — 暖身一下',
+  '棋盤交錯 — 雙重防護',
+  '鑽石核心 — 由外到內',
+  '條紋堡壘 — 逐行攻克',
+  '鋼鐵障礙 — 繞道而行',
+  '螺旋迷宮 — 層層推進',
+  '混沌地帶 — 極限挑戰',
+];
+
+function getLvDesc(lv) {
+  return LV_DESCS[Math.min(lv - 1, LV_DESCS.length - 1)] + (lv > LV_DESCS.length ? ` [LV.${lv}]` : '');
+}
+
+function genGrid(lv) {
+  let pat      = (lv - 1) % 7;
+  let cycle    = Math.floor((lv - 1) / 7);   // full cycles through all patterns
+  let rows     = Math.min(4 + Math.floor((lv - 1) / 2), 9);
+  let cols     = Math.min(10 + Math.floor((lv - 1) / 3), 14);
+  let hpBonus  = cycle;
+  // Ultra brick: requires (1+lv) hits — scales with level!
+  let ultraHP  = 1 + lv;
+  // Rate increases from ~6% at level 1 up to 45% at level 20
+  let ultraRate = Math.min(0.06 + (lv - 1) * 0.022, 0.45);
+
+  let grid  = [];
+  let ultra = [];   // marks which cells are ultra bricks
+
+  for (let r = 0; r < rows; r++) {
+    grid[r]  = [];
+    ultra[r] = [];
+    for (let c = 0; c < cols; c++) {
+      let hp = 1;
+
+      // ── Each pattern deliberately uses ≥3 different HP values for colour variety ──
+      switch (pat) {
+        case 0: {
+          // Tri-colour wave: HP 1, 2, 3 cycling diagonally
+          hp = ((r + c) % 3) + 1;
+          break;
+        }
+        case 1: {
+          // Checkerboard with four values: HP 1–4
+          hp = ((r * 2 + c) % 4) + 1;
+          break;
+        }
+        case 2: {
+          // Diamond — depth from edge determines HP (1 outside → 5 centre)
+          let d = Math.min(r, rows - 1 - r, c, cols - 1 - c);
+          hp = Math.min(d + 1, 5);
+          break;
+        }
+        case 3: {
+          // Stripe trio: rows alternate between 3 HP values
+          let base = (r % 3) + 1;           // 1, 2, or 3
+          hp = c % 2 === 0 ? Math.min(base + 1, 4) : base;
+          break;
+        }
+        case 4: {
+          // Fortress: steel core with 4-colour exterior
+          let inCore = r >= 1 && r <= rows - 2 && c >= 2 && c <= cols - 3;
+          hp = inCore ? 99 : ((r * cols + c) % 4) + 1;
+          break;
+        }
+        case 5: {
+          // Spiral gradient: full HP 1–5 palette
+          hp = Math.min(((r * 3 + c * 2) % 5) + 1, 5);
+          break;
+        }
+        case 6: {
+          // Random mix — all five colours + occasional steel
+          if (Math.random() < 0.06 + cycle * 0.01) { hp = 99; break; }
+          // Weight toward mid HP for visual balance
+          let w = Math.random();
+          hp = w < 0.2 ? 1 : w < 0.45 ? 2 : w < 0.65 ? 3 : w < 0.82 ? 4 : 5;
+          break;
+        }
+      }
+
+      // Apply cycle bonus to non-steel bricks (caps at HP 5 for normal bricks)
+      if (hp !== 99) hp = Math.min(hp + hpBonus, 5);
+
+      // ── Randomly promote to ultra brick (HP = 1+level) ──
+      // Only if non-steel; ultra can exceed normal max-5
+      let isUltra = false;
+      if (hp !== 99 && Math.random() < ultraRate) {
+        hp      = ultraHP;   // e.g. HP 6 at level 5, HP 11 at level 10
+        isUltra = true;
+      }
+
+      grid[r][c]  = hp;
+      ultra[r][c] = isUltra;
+    }
+  }
+  return { rows, cols, grid, ultra };
+}
+
+// ═══════════════════════════════════════════════════
+//  RESIZE / INIT
+// ═══════════════════════════════════════════════════
+function resize() {
+  let r = area.getBoundingClientRect();
+  W = Math.max(1, Math.floor(r.width));
+  H = Math.max(1, Math.floor(r.height));
+  gc.width  = W;
+  gc.height = H;
+}
+
+function initPaddle() {
+  let pw = W * PW_BASE;
+  // Larger minimum height so the paddle stays visible on tiny viewports
+  let ph = Math.max(12, H * PH_BASE);
+  paddle = {
+    x: W / 2 - pw / 2,
+    y: H - ph - Math.max(8, H * 0.048),
+    w: pw,
+    h: ph,
+  };
+}
+
+function makeBall(x, y, vx, vy, launched) {
+  let r = Math.max(6, H * BR_RATIO);
+  return {
+    x: x  !== undefined ? x : paddle.x + paddle.w / 2,
+    y: y  !== undefined ? y : paddle.y - r - 1,
+    r, vx: vx || 0, vy: vy || 0,
+    launched: launched || false,
+    trail: [],
+  };
+}
+
+function getBspd() {
+  let base = H * (SPD_BASE + Math.min(level - 1, 16) * 0.017);
+  // AI plays 1.5× faster — makes auto-play more exciting to watch
+  return aiMode ? base * 1.5 : base;
+}
+
+function initLevel() {
+  resize();
+  initPaddle();
+  balls         = [makeBall()];
+  ptcls         = [];
+  drops         = [];
+  lasers        = [];
+  poops         = [];
+  poopWarnings  = [];
+  eff     = { laser: 0, wide: 0, narrow: 0, shield: 0 };
+  combo   = 1;
+  lastHitMs = 0;
+  buildBricks();
+  refreshHUD();
+  refreshPUB();
+}
+
+
+function buildBricks() {
+  bricks = [];
+  let { rows, cols, grid, ultra } = genGrid(level);
+  let gapX = W * 0.04;
+  let topY = H * 0.038;                         // small top margin
+  let bw   = (W - gapX * 2) / cols;
+  let gap  = Math.max(2, bw * 0.06);
+
+  // Bricks must all fit between topY and the paddle, with room to spare.
+  // Derive the maximum brick height from the actual available canvas height
+  // instead of a hard H-fraction cap — this keeps bricks visible even when
+  // the viewport is very short (landscape mobile, embedded preview, etc.).
+  let availH = (paddle.y - topY) * 0.93;
+  let bh     = Math.max(9, Math.min(bw * 0.42, (availH - rows * gap) / rows));
+
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      let hp = grid[r][c];
+      if (!hp) continue;
+      let steel   = (hp === 99);
+      let isUltra = ultra[r][c] === true;
+      let realHp  = steel ? 999 : hp;
+      bricks.push({
+        x:     gapX + c * bw + gap / 2,
+        y:     topY + r * (bh + gap),
+        w:     bw - gap,
+        h:     bh,
+        hp:    realHp,
+        maxHp: realHp,
+        steel,
+        ultra: isUltra,   // ← ultra hard brick (HP = 1+level)
+        fl:    0,
+        id:    r * 100 + c,
+      });
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  INPUT
+// ═══════════════════════════════════════════════════
+document.addEventListener('keydown', e => {
+  if (e.code === 'ArrowLeft'  || e.code === 'KeyA') { e.preventDefault(); keyL = true; }
+  if (e.code === 'ArrowRight' || e.code === 'KeyD') { e.preventDefault(); keyR = true; }
+  if (e.code === 'Space') {
+    e.preventDefault();
+    if (gst === 'playing') {
+      if (eff.laser > 0) fireLaser(); else launchBalls();
+    }
+  }
+});
+document.addEventListener('keyup', e => {
+  if (e.code === 'ArrowLeft'  || e.code === 'KeyA') keyL = false;
+  if (e.code === 'ArrowRight' || e.code === 'KeyD') keyR = false;
+});
+
+gc.addEventListener('mousemove', e => {
+  let r = gc.getBoundingClientRect();
+  mouseX = (e.clientX - r.left) * W / r.width;
+});
+gc.addEventListener('click', () => {
+  if (gst === 'playing') { if (eff.laser > 0) fireLaser(); else launchBalls(); }
+});
+gc.addEventListener('touchstart', e => {
+  e.preventDefault();
+  let r = gc.getBoundingClientRect();
+  touchX = (e.touches[0].clientX - r.left) * W / r.width;
+  if (gst === 'playing') { if (eff.laser > 0) fireLaser(); else launchBalls(); }
+}, { passive: false });
+gc.addEventListener('touchmove', e => {
+  e.preventDefault();
+  let r = gc.getBoundingClientRect();
+  touchX = (e.touches[0].clientX - r.left) * W / r.width;
+}, { passive: false });
+gc.addEventListener('touchend', () => { touchX = null; });
+
+// Mobile buttons
+['btn-l', 'btn-r'].forEach((id, i) => {
+  let el = document.getElementById(id);
+  let isLeft = i === 0;
+  ['touchstart','mousedown'].forEach(ev =>
+    el.addEventListener(ev, e => { e.preventDefault(); isLeft ? keyL=true : keyR=true; }, {passive:false})
+  );
+  ['touchend','touchcancel','mouseup','mouseleave'].forEach(ev =>
+    el.addEventListener(ev, e => { e.preventDefault(); isLeft ? keyL=false : keyR=false; })
+  );
+});
+document.getElementById('btn-f').addEventListener('click', () => {
+  if (gst === 'playing') { if (eff.laser > 0) fireLaser(); else launchBalls(); }
+});
+
+// Screen buttons
+document.getElementById('b-start').addEventListener('click', () => { getAC(); startGame(); });
+document.getElementById('b-go').addEventListener('click', doLevel);
+document.getElementById('b-retry').addEventListener('click', () => {
+  hideEl('so'); score=0; lives=3; level=1; totalSecs=0; combo=1; showLvl();
+});
+document.getElementById('b-next').addEventListener('click', () => {
+  hideEl('sw'); level++; showLvl();
+});
+
+// ═══════════════════════════════════════════════════
+//  GAME FLOW
+// ═══════════════════════════════════════════════════
+let showEl = id => { document.getElementById(id).style.display = 'flex'; };
+let hideEl = id => { document.getElementById(id).style.display = 'none'; };
+let fmtT = s  => String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0');
+
+function startGame() {
+  score=0; lives=3; level=1; totalSecs=0; combo=1;
+  hideEl('ss');
+  showLvl();
+}
+
+function showLvl() {
+  document.getElementById('lnum').textContent  = level;
+  document.getElementById('ldesc').textContent = getLvDesc(level);
+  showEl('sl');
+  SFX.clear();
+  // AI auto-starts the level after a brief pause for drama
+  if (aiMode) setTimeout(doLevel, 1800);
+}
+
+function doLevel() {
+  hideEl('sl');
+  initLevel();
+  gst    = 'playing';
+  lastTS = null;
+  startTimer();
+  // If AI mode was already on, immediately launch and reset laser timer
+  if (aiMode) {
+    aiLaserTimer = 0.5;
+    setTimeout(launchBalls, 200);
+  }
+}
+
+function startTimer() {
+  if (timerID) clearInterval(timerID);
+  timerID = setInterval(() => {
+    if (gst !== 'playing') return;
+    totalSecs++;
+    refreshHUD();
+    refreshPUB();   // update countdown display
+  }, 1000);
+}
+
+function launchBalls() {
+  balls.forEach(b => {
+    if (!b.launched) {
+      b.launched = true;
+      let spd  = getBspd();
+      b.vy = -spd;
+      if (aiMode) {
+        let aliveTargets = bricks.filter(bk => !bk.steel);
+        let leftCount = aliveTargets.filter(bk => (bk.x + bk.w / 2) < paddle.x + paddle.w / 2).length;
+        let rightCount = aliveTargets.filter(bk => (bk.x + bk.w / 2) >= paddle.x + paddle.w / 2).length;
+        let launchDir = leftCount > rightCount ? -1 : (rightCount > leftCount ? 1 : (paddle.x > W / 2 ? -1 : 1));
+        b.vx = launchDir * spd * (0.62 + Math.random() * 0.15);
+      } else {
+        b.vx = (Math.random() - 0.5) * spd * 0.72;
+      }
+    }
+  });
+}
+
+function fireLaser() {
+  let lspd = H * 2.6;
+  let cx2  = paddle.x + paddle.w / 2;
+  lasers.push({ x: cx2,                y: paddle.y - 2, w: 5,   vy: -lspd });
+  lasers.push({ x: cx2 - paddle.w*.26, y: paddle.y - 2, w: 3.5, vy: -lspd });
+  lasers.push({ x: cx2 + paddle.w*.26, y: paddle.y - 2, w: 3.5, vy: -lspd });
+  SFX.laser();
+}
+
+// ═══════════════════════════════════════════════════
+//  AI AUTO-PLAY
+// ═══════════════════════════════════════════════════
+
+function toggleAI() {
+  aiMode = !aiMode;
+  let btn = document.getElementById('ai-btn');
+  let bar = document.getElementById('ai-bar');
+  let mob = document.getElementById('mob');
+
+  // Immediately rescale all live balls to the new target speed
+  // (aiMode is already flipped above, so getBspd() returns the right value)
+  if (gst === 'playing') {
+    balls.forEach(b => {
+      if (!b.launched) return;
+      let cur = Math.sqrt(b.vx * b.vx + b.vy * b.vy);
+      if (cur > 0) {
+        let tgt = getBspd();
+        b.vx = (b.vx / cur) * tgt;
+        b.vy = (b.vy / cur) * tgt;
+      }
+    });
+  }
+
+  if (aiMode) {
+    btn.textContent = '🤖 AI：開啟';
+    btn.classList.add('on');
+    bar.classList.add('show');
+    mob.classList.add('ai-hidden');
+    aiLaserTimer = 0.3;
+    if (gst === 'playing') launchBalls();
+  } else {
+    btn.textContent = '👤 手動';
+    btn.classList.remove('on');
+    bar.classList.remove('show');
+    mob.classList.remove('ai-hidden');
+    keyL = false; keyR = false;
+    _aiPredX = null; _aiTrackedBall = null; _aiChasing = null;
+  }
+}
+
+/**
+ * Numerically simulate where a ball will be when it reaches targetY,
+ * accounting for wall bounces.
+ */
+function simBallToY(bx, bvx, by, bvy, targetY, br) {
+  let px = bx, pvx = bvx, py = by;
+  let minX = br, maxX = W - br;
+  // Use actual per-frame timestep so high-speed balls don't skip
+  let DT = 1 / 120;
+  for (let s = 0; s < 800; s++) {
+    px += pvx * DT;
+    py += bvy * DT;
+    if (px < minX) { px = minX;  pvx =  Math.abs(pvx); }
+    if (px > maxX) { px = maxX;  pvx = -Math.abs(pvx); }
+    if (py >= targetY) return px;
+  }
+  return px;
+}
+
+/**
+ * Simulate where ball will be at Y=targetY on the SECOND bounce
+ * (used as a fallback look-ahead when ball is going up).
+ */
+function simBallSecondArrival(b) {
+  // First simulate to ceiling then back down to paddle
+  let px = b.x, pvx = b.vx, py = b.y, pvy = b.vy;
+  let minX = b.r, maxX = W - b.r;
+  let DT = 1 / 120;
+  let hitCeiling = false;
+  for (let s = 0; s < 1200; s++) {
+    px += pvx * DT; py += pvy * DT;
+    if (px < minX) { px = minX; pvx =  Math.abs(pvx); }
+    if (px > maxX) { px = maxX; pvx = -Math.abs(pvx); }
+    if (py < b.r && !hitCeiling) { py = b.r; pvy = Math.abs(pvy); hitCeiling = true; }
+    if (hitCeiling && py >= paddle.y) return px;
+  }
+  return px;
+}
+
+/**
+ * Pick the most dangerous live ball and predict where it will reach the paddle.
+ * Returns { ball, predX }.
+ */
+// Desirability value for each power-up (higher = AI wants it more)
+// Laser and wide are prioritised: laser lets the AI blast cats directly and
+// wide makes both catching and aiming easier — together they are the key to
+// clearing every level. Multi adds more balls = more cats hit per second.
+let PU_VALUE = {
+  shield: 140, laser: 120, life: 100, wide: 95, multi: 92, slow: 60, fast: 40, narrow: 2,
+};
+
+function aiPickTarget() {
+  let live = balls.filter(b => b.launched);
+  if (live.length === 0) return { ball: null, predX: W / 2, chasing: null };
+
+  // ══ Step 1: Find the MOST DANGEROUS ball ══
+  // Priority: balls moving DOWN (vy>0) with highest Y value (closest to paddle)
+  let urgBall = null, urgScore = -Infinity;
+  for (let b of live) {
+    // Huge weight for downward-moving balls — survival first
+    let s = b.y * 2 + (b.vy > 0 ? H * 3 : 0);
+    if (s > urgScore) { urgScore = s; urgBall = b; }
+  }
+
+  // ══ Step 2: Precise prediction with wall-bounce simulation ══
+  let ballPredX;
+  if (urgBall.vy > 0) {
+    // Ball falling → predict exact landing spot
+    ballPredX = simBallToY(urgBall.x, urgBall.vx, urgBall.y, urgBall.vy, paddle.y, urgBall.r);
+  } else {
+    // Ball rising → predict where it'll land AFTER bouncing off ceiling
+    ballPredX = simBallSecondArrival(urgBall);
+  }
+
+  // ══ Step 3: Danger level (0=totally safe, 100=critical) ══
+  let danger;
+  if (urgBall.vy > 0) {
+    // Exponential danger curve: safe far up, critical near bottom
+    let proximity = urgBall.y / paddle.y;  // 0=top, 1=at paddle
+    danger = Math.pow(proximity, 1.5) * 100;
+  } else {
+    // Rising ball: low danger, depends on ball count
+    danger = Math.max(0, 20 - live.length * 8);
+  }
+  // Multiple balls reduce danger — we can afford to be adventurous
+  danger = Math.max(0, danger - (live.length - 1) * 20);
+
+  // ══ Step 4: Poop avoidance (HIGH PRIORITY — survival critical) ══
+  // Check ALL falling poops, not just those near the predicted landing
+  let worstPoop = null, worstPoopUrgency = -Infinity;
+  for (let p of poops) {
+    let ttr = (paddle.y - p.y) / Math.max(p.vy, 1);  // time to reach paddle
+    if (ttr < 0.1 || ttr > 2.5) continue;
+    // Urgency: closer poop that's heading near our target = more dangerous
+    let distFromTarget = Math.abs(p.x - ballPredX);
+    let urgency = (1 / ttr) * 100 - distFromTarget * 0.1;
+    if (urgency > worstPoopUrgency) { worstPoopUrgency = urgency; worstPoop = p; }
+  }
+
+  if (worstPoop) {
+    // Is the poop going to land near where we need to be?
+    let ttr = (paddle.y - worstPoop.y) / Math.max(worstPoop.vy, 1);
+    let poopLandX = worstPoop.x;  // poops fall straight down
+    let conflictRange = paddle.w * 0.8;
+
+    if (Math.abs(poopLandX - ballPredX) < conflictRange && ttr < 1.5) {
+      // CONFLICT: poop heading to same place as ball target
+      // Only dodge if ball is not IMMEDIATELY critical (danger < 85)
+      if (danger < 85) {
+        // Move paddle to catch ball from the opposite side of the poop
+        let sideOffset = paddle.w * 1.2;
+        let dodgePredX = poopLandX < W * 0.5
+          ? Math.min(ballPredX + sideOffset, W - paddle.w * 0.5)
+          : Math.max(ballPredX - sideOffset, paddle.w * 0.5);
+        // Only dodge if this keeps us close enough to still catch the ball
+        if (Math.abs(dodgePredX - ballPredX) < paddle.w * 1.8) {
+          ballPredX = dodgePredX;
+        }
+      }
+    } else if (Math.abs(poopLandX - (paddle.x + paddle.w / 2)) < paddle.w * 0.6 && ttr < 0.8) {
+      // Poop is about to hit our CURRENT position even if not our target
+      // Emergency dodge: move paddle center 1.5 widths away from poop
+      let dodge = paddle.w * 1.5;
+      ballPredX = poopLandX < W * 0.5 ? poopLandX + dodge : poopLandX - dodge;
+    }
+  }
+
+  // ══ Step 5: Score power-ups (chase valuable ones aggressively) ══
+  let bestDrop = null, bestDropScore = -Infinity;
+
+  // Consider power-ups whenever we're not in immediate danger. A wider window
+  // than before so the AI actively grabs laser / wide / multi — the drops that
+  // make full clears possible.
+  if (urgBall.vy < 0 || danger < 45) {
+    for (let d of drops) {
+      let ttr = (paddle.y - d.y) / Math.max(d.vy, 1);
+      if (ttr < 0.08 || ttr > 5.0) continue;
+
+      let value = PU_VALUE[d.def.id] ?? 50;
+      // Penalise if catching it would put us far from ball landing
+      let catchX  = d.x;
+      let distFromBall = Math.abs(catchX - ballPredX);
+      // Reach further for high-value drops (laser/wide/multi worth a detour).
+      let reach = value >= 90 ? paddle.w * 4.0 : paddle.w * 2.5;
+      let reachable = distFromBall < reach;
+      if (!reachable) continue;
+
+      let distPenalty = (distFromBall / W) * 30;
+      let heightBonus = (d.y / H) * 15;
+      let total = value - distPenalty + heightBonus;
+      if (total > bestDropScore) { bestDropScore = total; bestDrop = d; }
+    }
+  }
+
+  // Chase a drop when safe. High-value drops (laser/wide/multi, score high) are
+  // worth grabbing even mid-game; low-value ones only when very safe.
+  let aliveTargets = bricks.filter(b => !b.steel);
+
+  let canChase = danger < 45 && bestDropScore > 80;
+  if (bestDrop && canChase) {
+    return { ball: urgBall, predX: bestDrop.x, chasing: bestDrop };
+  }
+
+  // ══ Step 6: 甩板打斜角球瞄準機制（修正一大片無磚塊時打空氣直線球的問題）══
+  let isFlicking = false;
+  if (aliveTargets.length > 0) {
+    let landX = (urgBall.vy > 0) ? ballPredX : simBallSecondArrival(urgBall);
+
+    // 檢查球落點正上方是否有貓咪/磚塊
+    let laneHalfW = Math.max(32, paddle.w * 0.35);
+    let directTargets = aliveTargets.filter(b => Math.abs((b.x + b.w / 2) - landX) <= laneHalfW);
+    let isLaneEmpty = directTargets.length === 0;
+
+    // 統計落點左側與右側磚塊
+    let leftTargets = aliveTargets.filter(b => (b.x + b.w / 2) < landX - 10);
+    let rightTargets = aliveTargets.filter(b => (b.x + b.w / 2) > landX + 10);
+
+    // 決定目標擊球方向：-1 為打向左邊，+1 為打向右邊
+    let targetDir = 0;
+    let targetBrick = null;
+
+    if (isLaneEmpty) {
+      // 一大片無磚塊的地方：必須使用甩板打出大斜角球，偏向磚塊較多的一側
+      if (leftTargets.length > rightTargets.length) targetDir = -1;
+      else if (rightTargets.length > leftTargets.length) targetDir = 1;
+      else targetDir = landX > W * 0.5 ? -1 : 1;
+
+      let candidatePool = targetDir === -1 ? leftTargets : rightTargets;
+      if (candidatePool.length > 0) {
+        targetBrick = candidatePool.reduce((best, b) => {
+          let dist = Math.abs((b.x + b.w / 2) - landX);
+          return dist < Math.abs((best.x + best.w / 2) - landX) ? b : best;
+        }, candidatePool[0]);
+      }
+    } else if (Math.abs(urgBall.vx) < getBspd() * 0.25) {
+      // 球呈直線上下跳動：使用甩板打破死循環
+      targetDir = leftTargets.length >= rightTargets.length ? -1 : 1;
+    } else {
+      // 普通瞄準偏多的一側
+      targetDir = leftTargets.length > rightTargets.length ? -1 : 1;
+    }
+
+    _aiTargetBrick = targetBrick || (aliveTargets.length > 0 ? aliveTargets[0] : null);
+
+    // 甩板原理：
+    // 要打非常左邊的磚塊 (targetDir = -1) -> 在球接觸板時快速往右，板子中心移到 landX 右側，球落在板子左側，反向彈出左斜角球
+    // 要打非常右邊的磚塊 (targetDir = +1) -> 在球接觸板時快速往左，板子中心移到 landX 左側，球落在板子右側，反向彈出右斜角球
+    let offsetRatio = isLaneEmpty ? 0.76 : 0.62;
+    // desiredRel: 左斜角需 rel < 0，右斜角需 rel > 0
+    let desiredRel = targetDir === -1 ? -offsetRatio : offsetRatio;
+    let targetPaddleCenter = landX - desiredRel * (paddle.w / 2);
+
+    // 甩板時機：
+    // 當球仍在上方時，板子居中於落點 landX 迎球；
+    // 當球接近接觸板時（0.22秒內或距離接觸板很近）快速甩動到目標位置！
+    let ttr = urgBall.vy > 0 ? (paddle.y - urgBall.y) / Math.max(urgBall.vy, 1) : 999;
+    if (urgBall.vy > 0 && (ttr <= 0.22 || urgBall.y >= paddle.y - paddle.h * 4)) {
+      ballPredX = targetPaddleCenter;
+      isFlicking = true;
+    } else {
+      ballPredX = landX;
+    }
+
+    // 安全邊界保護：確保球絕對落在板子安全範圍內，絕不漏球
+    let maxSafeShift = (paddle.w / 2) * 0.82;
+    ballPredX = Math.max(landX - maxSafeShift, Math.min(landX + maxSafeShift, ballPredX));
+  } else {
+    _aiTargetBrick = null;
+  }
+
+  return { ball: urgBall, predX: ballPredX, chasing: null, isFlicking };
+}
+
+// Does any destructible cat sit above one of the paddle's three laser columns?
+// Used so the AI only fires the laser when it will actually hit a cat, instead
+// of blasting empty space.
+function aiLaserHasTarget() {
+  let cx2    = paddle.x + paddle.w / 2;
+  let cols   = [cx2, cx2 - paddle.w * 0.26, cx2 + paddle.w * 0.26];
+  let tol    = Math.max(14, paddle.w * 0.09);  // laser beam half-width margin
+  for (let br of bricks) {
+    if (br.steel) continue;                    // steel cats can't be destroyed
+    for (let col of cols) {
+      if (col >= br.x - tol && col <= br.x + br.w + tol) return true;
+    }
+  }
+  return false;
+}
+
+function aiControl(dt) {
+  // ── Auto-launch immediately ──
+  launchBalls();
+
+  // ── Aimed laser fire: only shoot when a cat is above a laser column ──
+  if (eff.laser > 0) {
+    aiLaserTimer -= dt;
+    if (aiLaserTimer <= 0 && aiLaserHasTarget()) {
+      fireLaser();
+      aiLaserTimer = 0.12 + Math.random() * 0.12;   // rapid aimed bursts
+    } else if (aiLaserTimer <= 0) {
+      aiLaserTimer = 0.05;
+    }
+  }
+
+  // ── Get best target ──
+  let { ball, predX, chasing, isFlicking } = aiPickTarget();
+  _aiPredX       = predX;
+  _aiTrackedBall = ball;
+  _aiChasing     = chasing;
+
+  // ── Move paddle toward target ──
+  let jitter   = chasing ? 0 : Math.sin(Date.now() * 0.003) * paddle.w * 0.012;
+  let targetCX = predX + jitter;
+  let targetPX = Math.max(0, Math.min(W - paddle.w, targetCX - paddle.w / 2));
+
+  let diff = targetPX - paddle.x;
+
+  // 甩板時大幅提高移板速度與靈敏度，使接觸球瞬間產生「快速甩動」的效果
+  let ballSpeed  = ball ? Math.sqrt(ball.vx ** 2 + ball.vy ** 2) : getBspd();
+  let speedMult  = isFlicking ? 2.6 : (chasing ? 1.1 : Math.min(1.6, 1.2 + ballSpeed / (getBspd() * 2)));
+  let maxSpd     = W * (isFlicking ? 3.2 : 1.4) * dt * speedMult;
+
+  let distFrac = Math.min(Math.abs(diff) / (W * 0.1), 1.0);
+  let move = Math.sign(diff) * Math.min(Math.abs(diff) * (isFlicking ? 2.8 : (1.2 + distFrac)), maxSpd);
+  paddle.x = Math.max(0, Math.min(W - paddle.w, paddle.x + move));
+}
+
+// ═══════════════════════════════════════════════════
+//  UPDATE
+// ═══════════════════════════════════════════════════
+function update(dt) {
+  // ── Effect timers ──
+  if (eff.laser  > 0) { eff.laser  -= dt; if (eff.laser  < 0) { eff.laser  = 0; } }
+  if (eff.wide   > 0) { eff.wide   -= dt; if (eff.wide   < 0) { eff.wide   = 0; recalcPW(); } }
+  if (eff.narrow > 0) { eff.narrow -= dt; if (eff.narrow < 0) { eff.narrow = 0; recalcPW(); } }
+  if (eff.shield > 0) { eff.shield -= dt; if (eff.shield < 0) { eff.shield = 0; } }
+
+  // ── Paddle movement ──
+  if (aiMode) {
+    // AI takes full control of the paddle
+    aiControl(dt);
+  } else {
+    // Human control (keyboard + mouse/touch)
+    let pspd = W * 0.88 * dt;
+    if (keyL) paddle.x -= pspd;
+    if (keyR) paddle.x += pspd;
+    if (!keyL && !keyR) {
+      let tx = touchX !== null ? touchX : mouseX;
+      if (tx !== null) {
+        let dest = tx - paddle.w / 2;
+        paddle.x += (dest - paddle.x) * 0.2;
+      }
+    }
+    paddle.x = Math.max(0, Math.min(W - paddle.w, paddle.x));
+    _aiPredX = null; _aiTrackedBall = null;
+  }
+
+  // ── Balls ──
+  for (let bi = balls.length - 1; bi >= 0; bi--) {
+    let b = balls[bi];
+
+    if (!b.launched) {
+      b.x = paddle.x + paddle.w / 2;
+      b.y = paddle.y - b.r - 1;
+      continue;
+    }
+
+    // Trail
+    b.trail.push({ x: b.x, y: b.y });
+    if (b.trail.length > 10) b.trail.shift();
+
+    b.x += b.vx * dt;
+    b.y += b.vy * dt;
+
+    // Left / right walls
+    if (b.x - b.r < 0)  { b.x = b.r;   b.vx =  Math.abs(b.vx); SFX.wall(); }
+    if (b.x + b.r > W)  { b.x = W-b.r;  b.vx = -Math.abs(b.vx); SFX.wall(); }
+    // Ceiling
+    if (b.y - b.r < 0)  { b.y = b.r;   b.vy =  Math.abs(b.vy); SFX.wall(); }
+
+    // ── Paddle collision ──
+    if (
+      b.vy > 0 &&
+      b.y + b.r >= paddle.y &&
+      b.y - b.r <= paddle.y + paddle.h &&
+      b.x + b.r >= paddle.x &&
+      b.x - b.r <= paddle.x + paddle.w
+    ) {
+      b.y = paddle.y - b.r;
+      let rel  = (b.x - (paddle.x + paddle.w / 2)) / (paddle.w / 2);  // -1 to +1
+      let spd  = getBspd();
+      b.vx = rel * spd * 1.1;
+      // Normalize so speed is constant
+      let mag  = Math.sqrt(b.vx * b.vx + spd * spd);
+      b.vx = (b.vx / mag) * spd;
+      b.vy = -Math.sqrt(Math.max(0, spd * spd - b.vx * b.vx));
+
+      SFX.pad();
+      spawnParticles(b.x, paddle.y, '#00dcff', 8, 0.8);
+      // Reset combo if too long since last brick hit
+      if (Date.now() - lastHitMs > 2500) { combo = 1; refreshHUD(); }
+    }
+
+    // ── Brick collisions ──
+    for (let i = bricks.length - 1; i >= 0; i--) {
+      let br = bricks[i];
+      // Circle-AABB closest point test
+      let nx = Math.max(br.x, Math.min(b.x, br.x + br.w));
+      let ny = Math.max(br.y, Math.min(b.y, br.y + br.h));
+      let dx = b.x - nx, dy = b.y - ny;
+      if (dx * dx + dy * dy >= b.r * b.r) continue;
+
+      // Determine bounce axis (minimum overlap)
+      let oL = (b.x + b.r) - br.x;
+      let oR = (br.x + br.w) - (b.x - b.r);
+      let oT = (b.y + b.r) - br.y;
+      let oB = (br.y + br.h) - (b.y - b.r);
+      let mn = Math.min(oL, oR, oT, oB);
+
+      if      (mn === oL) { b.x = br.x - b.r;       b.vx = -Math.abs(b.vx); }
+      else if (mn === oR) { b.x = br.x + br.w + b.r; b.vx =  Math.abs(b.vx); }
+      else if (mn === oT) { b.y = br.y - b.r;        b.vy = -Math.abs(b.vy); }
+      else                { b.y = br.y + br.h + b.r;  b.vy =  Math.abs(b.vy); }
+
+      hitBrick(br, i);
+      break;   // one brick per ball per frame
+    }
+
+    // Lost off bottom
+    if (b.y > H + 30) {
+      balls.splice(bi, 1);
+    }
+  }
+
+  // ── All balls gone → lose life ──
+  if (balls.length === 0) {
+    lives--;
+    SFX.die();
+    refreshHUD();
+    if (lives <= 0) { gameOver(); return; }
+    balls = [makeBall()];
+    eff   = { laser: 0, wide: 0, narrow: 0, shield: 0 };
+    recalcPW();
+    refreshPUB();
+  }
+
+  // ── Lasers ──
+  for (let i = lasers.length - 1; i >= 0; i--) {
+    let la = lasers[i];
+    la.y += la.vy * dt;
+    if (la.y < -40) { lasers.splice(i, 1); continue; }
+
+    let laserHit = false;
+    for (let j = bricks.length - 1; j >= 0; j--) {
+      let br = bricks[j];
+      if (la.x < br.x || la.x > br.x+br.w || la.y < br.y || la.y > br.y+br.h) continue;
+      spawnParticles(la.x, la.y, '#ff3d9a', 9, 1.3);
+      if (!br.steel) hitBrick(br, j);
+      else { br.fl = 5; SFX.hard(); }
+      laserHit = true;
+      break;
+    }
+    if (laserHit) { lasers.splice(i, 1); }
+  }
+
+  // ── Drops (power-up gems) ──
+  for (let i = drops.length - 1; i >= 0; i--) {
+    let p = drops[i];
+    p.y   += p.vy * dt;
+    p.rot += dt * 2.0;
+    if (
+      p.y + p.r >= paddle.y &&
+      p.y - p.r <= paddle.y + paddle.h &&
+      p.x       >= paddle.x &&
+      p.x       <= paddle.x + paddle.w
+    ) {
+      applyPU(p.def);
+      spawnParticles(p.x, p.y, p.def.c, 22, 1.6);
+      drops.splice(i, 1);
+      continue;
+    }
+    if (p.y > H + 30) { drops.splice(i, 1); }
+  }
+
+  // ── Particles ──
+  for (let i = ptcls.length - 1; i >= 0; i--) {
+    let p = ptcls[i];
+    p.x   += p.vx;
+    p.y   += p.vy;
+    p.vy  += 0.07 * (H / 600);
+    p.vx  *= 0.97;
+    p.life -= p.dec;
+    if (p.shard) p.ang += p.av;
+    if (p.life <= 0) { ptcls.splice(i, 1); }
+  }
+
+  // ── Poop system ──
+  updatePoops(dt);
+
+  // ── Win check ──
+  if (bricks.filter(b => !b.steel).length === 0) { winLevel(); }
+}
+
+// ═══════════════════════════════════════════════════
+//  BRICK HIT
+// ═══════════════════════════════════════════════════
+function hitBrick(br, idx) {
+  lastHitMs = Date.now();
+  if (br.steel) { br.fl = 6; SFX.hard(); return; }
+
+  br.hp--;
+  br.fl = 8;
+
+  if (br.hp <= 0) {
+    let glow = BGLO[Math.min(br.maxHp, 5)] || '#00e5ff';
+    spawnShards(br.x + br.w/2, br.y + br.h/2, glow);
+    spawnParticles(br.x + br.w/2, br.y + br.h/2, glow, 16, 1.4);
+    tryDropPU(br.x + br.w/2, br.y + br.h/2);
+    score  += br.maxHp * 100 * combo;
+    combo++;
+    bricks.splice(idx, 1);
+    SFX.brk();
+    refreshHUD();
+    if (combo >= 3) showComboFX();
+  } else {
+    SFX.hit();
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  POWER-UPS
+// ═══════════════════════════════════════════════════
+function recalcPW() {
+  let w = W * PW_BASE;
+  if (eff.wide   > 0) w = W * PW_BASE * 1.65;
+  if (eff.narrow > 0) w = W * PW_BASE * 0.55;
+  paddle.w = w;
+}
+
+// ── 動態掉落率平衡 ──
+// 每款道具有「基礎掉落率 rate」與「有效掉落率 effRate」。掉落判定用 effRate：
+//   · 某道具實際掉落後 → 該道具 effRate 減少（基礎率的 10%），比較不容易再掉。
+//   · 其餘沒掉的道具    → effRate 增加（各自基礎率的 10%），比較容易掉。
+// 讓道具種類隨遊戲進行更均衡地輪流出現。effRate 夾在 [0, 基礎率×3] 避免失衡。
+function adjustDropRates(droppedId) {
+  for (let d of PU_DEFS) {
+    if (d.effRate === undefined) d.effRate = d.rate;
+    let step = d.rate * 0.10;                 // 以各自基礎率的 10% 為調整步長
+    if (d.id === droppedId) d.effRate -= step;  // 掉過的：下次更難再掉
+    else                    d.effRate += step;  // 沒掉的：下次更容易掉
+    d.effRate = Math.max(0, Math.min(d.rate * 3, d.effRate));
+  }
+}
+
+function tryDropPU(x, y) {
+  for (let d of PU_DEFS) {
+    let r = (d.effRate === undefined) ? d.rate : d.effRate;
+    if (Math.random() < r) {
+      drops.push({
+        x, y,
+        r:   Math.max(12, H * 0.017),
+        vy:  H * 0.18,
+        rot: 0,
+        def: d,
+      });
+      adjustDropRates(d.id);   // 更新所有道具的有效掉落率
+      break;  // max 1 drop per brick
+    }
+  }
+}
+
+function applyPU(def) {
+  SFX.pu();
+  switch (def.id) {
+    case 'laser':
+      eff.laser = PU_DUR;
+      break;
+    case 'wide':
+      eff.wide    = PU_DUR;
+      paddle.w    = W * PW_BASE * 1.65;
+      break;
+    case 'narrow':
+      eff.narrow  = PU_DUR;
+      paddle.w    = W * PW_BASE * 0.55;
+      break;
+    case 'life':
+      lives = Math.min(lives + 1, 7);
+      refreshHUD();
+      break;
+    case 'shield':
+      eff.shield = 5;   // 無敵持續 5 秒
+      break;
+    case 'multi': {
+      if (balls.length < 6) {
+        let ref = balls[0];
+        if (!ref) break;
+        let spd = getBspd();
+        balls.push(makeBall(ref.x, ref.y,  spd * 0.68, -spd * 0.73, true));
+        balls.push(makeBall(ref.x, ref.y, -spd * 0.68, -spd * 0.73, true));
+      }
+      break;
+    }
+    case 'fast':
+      balls.forEach(b => { b.vx *= 1.35; b.vy *= 1.35; });
+      break;
+    case 'slow':
+      balls.forEach(b => { b.vx *= 0.65; b.vy *= 0.65; });
+      break;
+  }
+  refreshPUB();
+}
+
+// ═══════════════════════════════════════════════════
+//  PARTICLES
+// ═══════════════════════════════════════════════════
+function spawnParticles(x, y, c, n, sm) {
+  let sc = (H / 600) * (sm || 1);
+  for (let i = 0; i < n; i++) {
+    let a   = Math.random() * Math.PI * 2;
+    let spd = (Math.random() * 2.5 + 0.5) * sc;
+    ptcls.push({
+      x, y,
+      vx: Math.cos(a) * spd,
+      vy: Math.sin(a) * spd - 0.5,
+      r: Math.random() * 3 + 1,
+      life: 1,
+      dec:  Math.random() * 0.028 + 0.018,
+      c,
+      glow: true,
+    });
+  }
+}
+
+function spawnShards(x, y, c) {
+  let sc = H / 600;
+  for (let i = 0; i < 9; i++) {
+    ptcls.push({
+      x: x + (Math.random() - 0.5) * 18,
+      y: y + (Math.random() - 0.5) * 8,
+      vx: (Math.random() - 0.5) * 5 * sc,
+      vy: (Math.random() - 0.75) * 5 * sc,
+      w:  Math.random() * 10 + 4,
+      ht: Math.random() * 4  + 2,
+      life: 1,
+      dec:  Math.random() * 0.02 + 0.02,
+      c,
+      shard: true,
+      ang: Math.random() * Math.PI * 2,
+      av:  (Math.random() - 0.5) * 0.28,
+    });
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  COMBO FX
+// ═══════════════════════════════════════════════════
+let cpopEl = document.getElementById('cpop');
+let comboFXTimer = null;
+
+function showComboFX() {
+  cpopEl.style.fontSize = Math.min(22 + combo * 2, 46) + 'px';
+  cpopEl.style.color    = combo >= 9 ? '#ffd60a' : combo >= 6 ? '#ff3d9a' : '#a855f7';
+  cpopEl.textContent    = `連擊 ×${combo}`;
+  cpopEl.style.opacity  = '1';
+  clearTimeout(comboFXTimer);
+  comboFXTimer = setTimeout(() => { cpopEl.style.opacity = '0'; }, 750);
+  SFX.combo(combo);
+}
+
+// ═══════════════════════════════════════════════════
+//  HUD
+// ═══════════════════════════════════════════════════
+function refreshHUD() {
+  document.getElementById('hs').textContent   = score.toLocaleString();
+  document.getElementById('hlvl').textContent = level;
+  document.getElementById('ht').textContent   = fmtT(totalSecs);
+
+  // Lives dots
+  let lv = document.getElementById('hlv');
+  lv.innerHTML = '';
+  let show3 = Math.max(3, lives);
+  for (let i = 0; i < show3; i++) {
+    let d = document.createElement('div');
+    if (i >= lives)  { d.className = 'ld off'; }
+    else if (i >= 3) { d.className = 'ld gold'; }
+    else             { d.className = 'ld'; }
+    lv.appendChild(d);
+  }
+
+  // Combo HUD
+  let ce = document.getElementById('hc');
+  ce.textContent   = `×${combo}`;
+  ce.style.color   = combo >= 9 ? '#ffd60a' : combo >= 6 ? '#ff3d9a' : combo >= 3 ? '#a855f7' : '#fff';
+  ce.style.textShadow = combo >= 3 ? '0 0 8px currentColor' : 'none';
+}
+
+function refreshPUB() {
+  let bar = document.getElementById('pub');
+  bar.innerHTML = '';
+  let add = (lbl, c, bg, t) => {
+    let el = document.createElement('div');
+    el.className = 'pib';
+    el.style.cssText = `background:${bg};border:1px solid ${c};color:${c}`;
+    el.textContent   = lbl + ' ' + Math.max(0, Math.ceil(t)) + 's';
+    bar.appendChild(el);
+  };
+  if (eff.shield > 0) add('🛡 無敵', '#ffd60a', 'rgba(255,214,10,0.18)',  eff.shield);
+  if (eff.laser  > 0) add('⚡ 雷射',  '#ff3d9a', 'rgba(255,61,154,0.18)', eff.laser);
+  if (eff.wide   > 0) add('↔ 加寬',   '#00dcff', 'rgba(0,220,255,0.15)',   eff.wide);
+  if (eff.narrow > 0) add('↕ 縮窄', '#fb5607', 'rgba(251,86,7,0.15)',    eff.narrow);
+}
+
+// ═══════════════════════════════════════════════════
+//  GAME OVER / WIN
+// ═══════════════════════════════════════════════════
+function gameOver() {
+  gst = 'over';
+  clearInterval(timerID);
+  document.getElementById('go-s').textContent = score.toLocaleString();
+  document.getElementById('go-l').textContent = level;
+  document.getElementById('go-t').textContent = fmtT(totalSecs);
+  if (aiMode) {
+    // AI mourns briefly then restarts
+    setTimeout(() => {
+      hideEl('so');
+      score=0; lives=3; level=1; totalSecs=0; combo=1;
+      showLvl();
+    }, 3200);
+    setTimeout(() => showEl('so'), 350);
+  } else {
+    setTimeout(() => showEl('so'), 350);
+  }
+}
+
+function winLevel() {
+  if (gst !== 'playing') return;
+  gst = 'win';
+  clearInterval(timerID);
+  SFX.clear();
+
+  // Confetti burst
+  let ci = 0;
+  let burst = setInterval(() => {
+    let c = ['#00dcff','#ff3d9a','#ffd60a','#a855f7','#00e676'][Math.floor(Math.random()*5)];
+    spawnParticles(Math.random()*W, Math.random()*H*0.6, c, 6, 2.0);
+    if (++ci > 90) clearInterval(burst);
+  }, 20);
+
+  document.getElementById('wn-s').textContent = score.toLocaleString();
+  document.getElementById('wn-t').textContent = fmtT(totalSecs);
+
+  if (aiMode) {
+    // AI auto-advances to next level after a short celebration pause
+    setTimeout(() => { hideEl('sw'); level++; showLvl(); }, 2800);
+    setTimeout(() => showEl('sw'), 1600);
+  } else {
+    setTimeout(() => showEl('sw'), 1600);
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════════════
+
+// Rounded-rect path helper
+function rrect(x, y, w, h, r) {
+  let R = Math.min(r, w/2, h/2);
+  cx.beginPath();
+  cx.moveTo(x + R, y);
+  cx.lineTo(x + w - R, y);        cx.arcTo(x+w, y,   x+w, y+R,   R);
+  cx.lineTo(x + w, y + h - R);    cx.arcTo(x+w, y+h, x+w-R, y+h, R);
+  cx.lineTo(x + R, y + h);        cx.arcTo(x,   y+h, x,   y+h-R, R);
+  cx.lineTo(x, y + R);            cx.arcTo(x,   y,   x+R, y,     R);
+  cx.closePath();
+}
+
+// ═══════════════════════════════════════════════════
+//  PAPER-CRAFT 3D DRAWING FUNCTIONS
+// ═══════════════════════════════════════════════════
+
+// ── Shared: cat body + ears path ──────────────────
+function pathCatBody(mx, my, bw, bh) {
+  let earH = bh * 0.28;
+  let top  = my - bh * 0.44;
+  let bot  = my + bh * 0.44;
+  let R    = Math.min(bw * 0.18, bh * 0.18, 10);
+  cx.beginPath();
+  // Left ear triangle
+  cx.moveTo(mx - bw*0.38, top + earH*0.85);
+  cx.lineTo(mx - bw*0.20, top - earH*0.55);
+  cx.lineTo(mx - bw*0.04, top + earH*0.85);
+  // Top edge (flat between ears)
+  cx.lineTo(mx + bw*0.04, top + earH*0.85);
+  // Right ear triangle
+  cx.lineTo(mx + bw*0.20, top - earH*0.55);
+  cx.lineTo(mx + bw*0.38, top + earH*0.85);
+  // Body rounded corners
+  cx.arcTo(mx + bw*0.44, top + earH*0.85, mx + bw*0.44, top + earH*0.85 + R, R);
+  cx.lineTo(mx + bw*0.44, bot - R);
+  cx.arcTo(mx + bw*0.44, bot, mx + bw*0.44 - R, bot, R);
+  cx.lineTo(mx - bw*0.44 + R, bot);
+  cx.arcTo(mx - bw*0.44, bot, mx - bw*0.44, bot - R, R);
+  cx.lineTo(mx - bw*0.44, top + earH*0.85 + R);
+  cx.arcTo(mx - bw*0.44, top + earH*0.85, mx - bw*0.44 + R, top + earH*0.85, R);
+  cx.closePath();
+}
+
+// ── Inner ear fill ─────────────────────────────────
+function drawInnerEars(mx, my, bw, bh, color) {
+  let earH = bh * 0.28;
+  let top  = my - bh * 0.44;
+  cx.fillStyle = color;
+  // Left inner
+  cx.beginPath();
+  cx.moveTo(mx - bw*0.34, top + earH*0.78);
+  cx.lineTo(mx - bw*0.20, top - earH*0.18);
+  cx.lineTo(mx - bw*0.08, top + earH*0.78);
+  cx.closePath(); cx.fill();
+  // Right inner
+  cx.beginPath();
+  cx.moveTo(mx + bw*0.08, top + earH*0.78);
+  cx.lineTo(mx + bw*0.20, top - earH*0.18);
+  cx.lineTo(mx + bw*0.34, top + earH*0.78);
+  cx.closePath(); cx.fill();
+}
+
+// ── Cat face (eyes, nose, whiskers, mouth) ─────────
+function drawCatFace(mx, my, bw, bh, pal, hpFrac, isPooping, b) {
+  let earH  = bh * 0.28;
+  let faceTop = my - bh * 0.44 + earH * 0.9;
+  let faceH   = bh * 0.88 - earH * 0.9;
+  let eyeY  = faceTop + faceH * 0.30;
+  let eyeDX = bw * 0.165;
+  let eyeR  = Math.max(2.5, Math.min(bh * 0.12, bw * 0.09));
+  let scared = hpFrac < 0.35;
+  let mid    = hpFrac < 0.65;
+  let scale  = isPooping ? 1.7 : scared ? 1.35 : mid ? 1.1 : 0.92;
+  let er     = eyeR * scale;
+  let noseY  = faceTop + faceH * 0.58;
+  let mouthY = faceTop + faceH * 0.72;
+  let ns     = Math.max(2, bh * 0.046);
+
+  // ── Whites ──
+  cx.fillStyle = '#fff';
+  for (let ex of [mx-eyeDX, mx+eyeDX]) {
+    cx.beginPath(); cx.ellipse(ex, eyeY, er*1.12, er, 0, 0, Math.PI*2); cx.fill();
+  }
+  // ── Iris ring ──
+  let irisC = pal.eye || '#44AA66';
+  cx.strokeStyle = irisC; cx.lineWidth = Math.max(1, er*0.3);
+  for (let ex of [mx-eyeDX, mx+eyeDX]) {
+    cx.beginPath(); cx.arc(ex, eyeY, er*0.7, 0, Math.PI*2); cx.stroke();
+  }
+  // ── Pupils (vertical slit) ──
+  let pw = isPooping ? er*0.52 : scared ? er*0.62 : er*0.26;
+  cx.fillStyle = '#100808';
+  for (let ex of [mx-eyeDX, mx+eyeDX]) {
+    cx.beginPath(); cx.ellipse(ex, eyeY, pw, er*0.78, 0, 0, Math.PI*2); cx.fill();
+  }
+  // ── Eye shine ──
+  cx.fillStyle = 'rgba(255,255,255,0.9)';
+  for (let ex of [mx-eyeDX, mx+eyeDX]) {
+    cx.beginPath(); cx.arc(ex+er*0.28, eyeY-er*0.26, er*0.21, 0, Math.PI*2); cx.fill();
+  }
+  // ── Nose (heart shape) ──
+  cx.fillStyle = '#FF9999';
+  cx.beginPath();
+  cx.moveTo(mx, noseY + ns);
+  cx.lineTo(mx - ns*1.1, noseY - ns*0.1);
+  cx.lineTo(mx + ns*1.1, noseY - ns*0.1);
+  cx.closePath(); cx.fill();
+  // ── Philtrum ──
+  cx.strokeStyle = '#66666640'; cx.lineWidth = Math.max(0.5, bh*0.018);
+  cx.beginPath(); cx.moveTo(mx, noseY+ns); cx.lineTo(mx, mouthY-ns*0.2); cx.stroke();
+  // ── Mouth ──
+  cx.strokeStyle = '#333'; cx.lineWidth = Math.max(1, bh*0.03); cx.lineCap='round';
+  if (isPooping) {
+    // Strained squiggle
+    cx.beginPath();
+    cx.moveTo(mx-ns*2, mouthY);
+    cx.quadraticCurveTo(mx-ns, mouthY-ns, mx, mouthY+ns*0.5);
+    cx.quadraticCurveTo(mx+ns, mouthY+ns*1.5, mx+ns*2, mouthY);
+    cx.stroke();
+    // Effort lines
+    cx.strokeStyle='#FF6644'; cx.lineWidth=Math.max(0.8,bh*0.022);
+    for (let sign of [-1,1]) {
+      cx.beginPath();
+      cx.moveTo(mx+sign*eyeDX*1.5, eyeY-er*0.5);
+      cx.lineTo(mx+sign*eyeDX*1.9, eyeY-er*1.1);
+      cx.stroke();
+    }
+  } else if (!scared && !mid) {
+    // Happy W-mouth + blush
+    cx.beginPath();
+    cx.moveTo(mx-ns*2.2, mouthY-ns*0.4);
+    cx.quadraticCurveTo(mx-ns*0.7, mouthY+ns*1.5, mx, mouthY+ns*0.5);
+    cx.quadraticCurveTo(mx+ns*0.7, mouthY+ns*1.5, mx+ns*2.2, mouthY-ns*0.4);
+    cx.stroke();
+    cx.fillStyle = 'rgba(255,130,130,0.38)';
+    cx.beginPath(); cx.ellipse(mx-eyeDX*2, eyeY+er, er*0.95, er*0.5, 0, 0, Math.PI*2); cx.fill();
+    cx.beginPath(); cx.ellipse(mx+eyeDX*2, eyeY+er, er*0.95, er*0.5, 0, 0, Math.PI*2); cx.fill();
+  } else if (mid) {
+    // Wavy worried
+    cx.beginPath();
+    cx.moveTo(mx-ns*2, mouthY+ns*0.4);
+    cx.quadraticCurveTo(mx, mouthY-ns*0.3, mx+ns*2, mouthY+ns*0.4);
+    cx.stroke();
+  } else {
+    // Scared open-O
+    cx.fillStyle='#220000';
+    cx.beginPath(); cx.ellipse(mx, mouthY, ns*0.8, ns*1.1, 0, 0, Math.PI*2); cx.fill();
+    cx.strokeStyle='#333'; cx.stroke();
+  }
+  // ── Whiskers ──
+  cx.strokeStyle='rgba(80,80,80,0.75)'; cx.lineWidth=Math.max(0.5,bh*0.016);
+  let wl = bw*0.44;
+  for (let sign of [-1,1]) {
+    for (let [yoff, yend] of [[-bh*0.04,-bh*0.05],[0,0],[bh*0.04,bh*0.03]]) {
+      cx.beginPath();
+      cx.moveTo(mx+sign*ns*1.2, noseY+yoff);
+      cx.lineTo(mx+sign*wl, noseY+yend);
+      cx.stroke();
+    }
+  }
+  // ── HP dots (bottom of face) ──
+  if (b && !b.ultra && !b.steel && b.maxHp > 1) {
+    let dots = Math.min(b.maxHp, 5);
+    let dotY = my + bh*0.38;
+    for (let d=0; d<dots; d++) {
+      let dotX = mx + (d-(dots-1)/2)*bh*0.15;
+      cx.fillStyle = d < b.hp ? 'rgba(255,255,255,0.82)' : 'rgba(255,255,255,0.12)';
+      cx.beginPath(); cx.arc(dotX, dotY, Math.max(1.5, bh*0.038), 0, Math.PI*2); cx.fill();
+    }
+  }
+  // ── Tuxedo chest patch ──
+  if (b && b.maxHp===2 && !b.ultra) {
+    cx.fillStyle='rgba(255,255,255,0.85)';
+    cx.beginPath(); cx.ellipse(mx, my+bh*0.12, bw*0.2, bh*0.2, 0, 0, Math.PI*2); cx.fill();
+  }
+  // ── Siamese dark face mask ──
+  if (b && b.maxHp===5 && !b.ultra) {
+    cx.fillStyle='rgba(80,40,20,0.28)';
+    cx.beginPath(); cx.ellipse(mx, eyeY-er*0.1, er*2.5, er*1.8, 0, 0, Math.PI*2); cx.fill();
+  }
+}
+
+// ── Draw a normal cat brick ────────────────────────
+function drawCatBrick(b) {
+  let { x:bx, y:by, w:bw, h:bh } = b;
+  let fl = b.fl > 0; if(fl) b.fl--;
+  let mx = bx+bw/2, my = by+bh/2;
+  if (b.steel) { drawRobotCat(b, mx, my, bw, bh, fl); return; }
+  if (b.ultra) { drawBossCat(b,  mx, my, bw, bh, fl); return; }
+
+  let pal  = CP[Math.min(b.maxHp, 5)] || CP[1];
+  let hpF  = b.hp / b.maxHp;
+  let d    = Math.max(2, Math.min(bh*0.07, 4));
+  let isPooping = poopWarnings.some(pw => pw.brId === b.id);
+  cx.save();
+
+  // ── Paper-craft 3D shadow layers ──
+  cx.save(); cx.translate(d*2, d*2); cx.globalAlpha=0.28;
+  pathCatBody(mx,my,bw,bh); cx.fillStyle=pal.shade2; cx.fill();
+  cx.globalAlpha=1; cx.restore();
+  cx.save(); cx.translate(d, d); cx.globalAlpha=0.5;
+  pathCatBody(mx,my,bw,bh); cx.fillStyle=pal.shade; cx.fill();
+  cx.globalAlpha=1; cx.restore();
+
+  // ── Main body ──
+  pathCatBody(mx,my,bw,bh);
+  cx.fillStyle = fl ? '#ffffff' : pal.body; cx.fill();
+  // Bold outline
+  cx.strokeStyle = fl ? '#aaa' : pal.outline; cx.lineWidth=Math.max(1.5,bh*0.045); cx.lineJoin='round';
+  pathCatBody(mx,my,bw,bh); cx.stroke();
+
+  // ── White shine patch (top-left of body) ──
+  if (!fl) {
+    cx.save(); cx.globalAlpha=0.2;
+    pathCatBody(mx,my,bw,bh); cx.clip();
+    cx.fillStyle='#fff';
+    cx.beginPath(); cx.ellipse(mx-bw*0.18, my-bh*0.2, bw*0.22, bh*0.18, -0.4, 0, Math.PI*2); cx.fill();
+    cx.restore();
+  }
+
+  // ── Inner ears ──
+  if (!fl) drawInnerEars(mx, my, bw, bh, fl ? '#ccc' : pal.ear);
+
+  // ── Face ──
+  if (!fl) drawCatFace(mx, my, bw, bh, pal, hpF, isPooping, b);
+
+  // ── Poop-warning exclamation mark ──
+  if (isPooping && !fl) {
+    let pw = poopWarnings.find(p => p.brId === b.id);
+    let blink = pw ? Math.sin(Date.now()*0.014) > 0 : false;
+    if (blink) {
+      cx.font=`bold ${Math.max(10,bh*0.55)}px sans-serif`;
+      cx.textAlign='center'; cx.textBaseline='bottom';
+      cx.fillText('💩', mx, by-2);
+    }
+  }
+  cx.restore();
+}
+
+// ── Boss Cat (ultra HP) ───────────────────────────
+function drawBossCat(b, mx, my, bw, bh, fl) {
+  let hpF   = b.hp / b.maxHp;
+  let hue   = Math.round(280-(1-hpF)*230);
+  let glowC = `hsl(${hue},100%,60%)`;
+  let pulse = 0.6 + 0.4*Math.sin(Date.now()*0.004);
+  let d     = Math.max(2.5, Math.min(bh*0.08, 5));
+
+  cx.save();
+  if (!fl) { cx.shadowColor=glowC; cx.shadowBlur=10*pulse; }
+
+  // Shadows
+  cx.save(); cx.translate(d*2,d*2); cx.globalAlpha=0.3;
+  pathCatBody(mx,my,bw,bh); cx.fillStyle=`hsl(${hue-20},60%,10%)`; cx.fill();
+  cx.globalAlpha=1; cx.restore();
+  cx.save(); cx.translate(d,d); cx.globalAlpha=0.5;
+  pathCatBody(mx,my,bw,bh); cx.fillStyle=`hsl(${hue-10},70%,18%)`; cx.fill();
+  cx.globalAlpha=1; cx.restore();
+
+  // Body
+  cx.shadowBlur=0;
+  pathCatBody(mx,my,bw,bh);
+  cx.fillStyle = fl ? '#fff' : `hsl(${hue-20},80%,14%)`; cx.fill();
+  cx.strokeStyle = fl ? '#aaa' : glowC; cx.lineWidth=Math.max(2,bh*0.05); cx.lineJoin='round';
+  cx.shadowColor=glowC; cx.shadowBlur=fl?0:8*pulse;
+  pathCatBody(mx,my,bw,bh); cx.stroke();
+  cx.shadowBlur=0;
+
+  drawInnerEars(mx,my,bw,bh, fl?'#888':`hsl(${hue+30},100%,68%)`);
+  if (!fl) {
+    drawCatFace(mx,my,bw,bh,{ eye:glowC }, hpF, false, b);
+    // Crown
+    let crH = bh*0.24, crW = bw*0.46;
+    let crY = my - bh*0.44 - crH*0.9;
+    cx.fillStyle='#FFD700'; cx.strokeStyle='#B8860B'; cx.lineWidth=Math.max(1,bh*0.03); cx.lineJoin='round';
+    cx.beginPath();
+    cx.moveTo(mx-crW*0.5, crY+crH);
+    cx.lineTo(mx-crW*0.5, crY+crH*0.5);
+    cx.lineTo(mx-crW*0.22, crY+crH*0.85);
+    cx.lineTo(mx,            crY);
+    cx.lineTo(mx+crW*0.22, crY+crH*0.85);
+    cx.lineTo(mx+crW*0.5, crY+crH*0.5);
+    cx.lineTo(mx+crW*0.5, crY+crH);
+    cx.closePath(); cx.fill(); cx.stroke();
+    // Crown gem
+    cx.fillStyle=glowC; cx.shadowColor=glowC; cx.shadowBlur=6;
+    cx.beginPath(); cx.arc(mx, crY+crH*0.28, Math.max(2.5,crH*0.3), 0, Math.PI*2); cx.fill();
+    cx.shadowBlur=0;
+    // HP number
+    let fs = Math.min(Math.round(bh*0.5), Math.round(bw*0.32));
+    cx.fillStyle=glowC; cx.shadowColor=glowC; cx.shadowBlur=8;
+    cx.font=`900 ${fs}px Orbitron`; cx.textAlign='center'; cx.textBaseline='middle';
+    cx.fillText(b.hp, mx, my+bh*0.08);
+    cx.shadowBlur=0;
+  }
+  cx.restore();
+}
+
+// ── Robot Cat (steel / indestructible) ────────────
+function drawRobotCat(b, mx, my, bw, bh, fl) {
+  let d = Math.max(2, bh*0.06);
+  cx.save();
+
+  cx.save(); cx.translate(d*1.5,d*1.5); cx.globalAlpha=0.32;
+  pathCatBody(mx,my,bw,bh); cx.fillStyle='#111'; cx.fill();
+  cx.globalAlpha=1; cx.restore();
+  cx.save(); cx.translate(d*0.7,d*0.7); cx.globalAlpha=0.5;
+  pathCatBody(mx,my,bw,bh); cx.fillStyle='#333'; cx.fill();
+  cx.globalAlpha=1; cx.restore();
+
+  pathCatBody(mx,my,bw,bh);
+  cx.fillStyle = fl ? '#fff' : '#8899BB'; cx.fill();
+  cx.strokeStyle = fl ? '#888' : '#445566'; cx.lineWidth=Math.max(1.5,bh*0.045); cx.lineJoin='round';
+  pathCatBody(mx,my,bw,bh); cx.stroke();
+  drawInnerEars(mx,my,bw,bh, fl?'#aaa':'#CC8899');
+
+  if (!fl) {
+    // Plate lines
+    cx.strokeStyle='#5577AA88'; cx.lineWidth=Math.max(1,bh*0.028);
+    cx.beginPath(); cx.moveTo(mx,b.y+bh*0.1); cx.lineTo(mx,b.y+bh*0.9); cx.stroke();
+    // LED eyes
+    let earH = bh*0.28, top = my-bh*0.44+earH*0.9;
+    let eyeY = top+(bh*0.88-earH*0.9)*0.3;
+    let er = Math.max(2.5, Math.min(bh*0.1, bw*0.08));
+    cx.shadowColor='#00FF88'; cx.shadowBlur=10;
+    cx.fillStyle='#00FF88';
+    for (let ex of [mx-bw*0.165, mx+bw*0.165]) {
+      cx.fillRect(ex-er, eyeY-er*0.65, er*2, er*1.3);
+    }
+    cx.shadowBlur=0;
+    // Rivets
+    cx.fillStyle='#AABBCC';
+    for (let [rx,ry] of [[0.22,0.28],[0.78,0.28],[0.22,0.72],[0.78,0.72]]) {
+      cx.beginPath(); cx.arc(b.x+bw*rx, b.y+bh*ry, Math.max(1.5,bh*0.04), 0, Math.PI*2); cx.fill();
+    }
+    // Antenna
+    cx.strokeStyle='#99AABB'; cx.lineWidth=Math.max(1,bh*0.025);
+    cx.beginPath(); cx.moveTo(mx,my-bh*0.44); cx.lineTo(mx,my-bh*0.6); cx.stroke();
+    cx.fillStyle='#FF4444'; cx.shadowColor='#FF4444'; cx.shadowBlur=6;
+    cx.beginPath(); cx.arc(mx, my-bh*0.62, Math.max(2,bh*0.05), 0, Math.PI*2); cx.fill();
+    cx.shadowBlur=0;
+  }
+  cx.restore();
+}
+
+// ── Cat Food Can (ball) ────────────────────────────
+function drawCanBall(b) {
+  // Trail
+  b.trail.forEach((t,i) => {
+    let a = (i/b.trail.length)*0.42, r = b.r*(i/b.trail.length)*0.65;
+    if (r<0.5) return;
+    cx.beginPath(); cx.arc(t.x,t.y,r,0,Math.PI*2);
+    cx.fillStyle=`rgba(255,200,80,${a.toFixed(3)})`; cx.fill();
+  });
+
+  cx.save();
+  cx.translate(b.x, b.y);
+  let r  = b.r;
+  let cw = r * 1.55;   // half-width
+  let ch = r * 1.85;   // half-height
+  let rv = r * 0.28;   // rim oval height
+  let rot = b.launched ? (b.x / (r*1.6)) * 0.5 : 0;
+  cx.rotate(rot);
+
+  // ── Paper-craft shadow ──
+  cx.save(); cx.translate(2.5,2.5); cx.globalAlpha=0.38;
+  cx.fillStyle='#7A4800';
+  cx.beginPath();
+  cx.moveTo(-cw, -ch+rv); cx.lineTo(-cw, ch-rv); cx.lineTo(cw, ch-rv); cx.lineTo(cw, -ch+rv);
+  cx.closePath(); cx.fill();
+  cx.globalAlpha=1; cx.restore();
+
+  // ── Bottom rim ──
+  cx.fillStyle='#D4A020';
+  cx.beginPath(); cx.ellipse(0, ch-rv*0.5, cw, rv, 0, 0, Math.PI*2); cx.fill();
+
+  // ── Label body ──
+  let labelC = ['#FF6B6B','#4ECDC4','#FFE66D','#A78BFA','#6EE7B7'][(level-1)%5];
+  cx.fillStyle=labelC;
+  cx.beginPath();
+  cx.moveTo(-cw,-ch+rv); cx.lineTo(-cw,ch-rv);
+  cx.ellipse(0,ch-rv,cw,rv*0.55,0,Math.PI,0,true);
+  cx.lineTo(cw,-ch+rv);
+  cx.ellipse(0,-ch+rv,cw,rv*0.55,0,0,Math.PI,true);
+  cx.closePath(); cx.fill();
+
+  // ── White label stripe ──
+  cx.fillStyle='rgba(255,255,255,0.22)';
+  cx.fillRect(-cw*0.75, -ch*0.18, cw*1.5, ch*0.36);
+
+  // ── Fish icon 🐟 ──
+  cx.font=`${Math.max(8,r*0.88)}px sans-serif`;
+  cx.textAlign='center'; cx.textBaseline='middle';
+  cx.fillText('🐟', 0, 0);
+
+  // ── Top rim ──
+  cx.fillStyle='#FFD700'; cx.strokeStyle='#B8860B'; cx.lineWidth=Math.max(1,r*0.07);
+  cx.beginPath(); cx.ellipse(0,-ch+rv,cw,rv,0,0,Math.PI*2); cx.fill(); cx.stroke();
+
+  // ── Highlight stripe ──
+  cx.fillStyle='rgba(255,255,255,0.28)';
+  cx.beginPath();
+  cx.moveTo(-cw*0.28,-ch+rv); cx.lineTo(-cw*0.14,ch-rv);
+  cx.lineTo(cw*0.14,ch-rv); cx.lineTo(cw*0.28,-ch+rv);
+  cx.closePath(); cx.fill();
+
+  // ── Outline ──
+  cx.strokeStyle='#8B5E00'; cx.lineWidth=Math.max(1.2,r*0.09); cx.lineJoin='round';
+  cx.beginPath();
+  cx.moveTo(-cw,-ch+rv); cx.lineTo(-cw,ch-rv); cx.lineTo(cw,ch-rv); cx.lineTo(cw,-ch+rv);
+  cx.stroke();
+  cx.restore();
+}
+
+// ── Person holding tray (paddle) ──────────────────
+function drawPersonPaddle() {
+  let { x:px, y:py, w:pw, h:ph } = paddle;
+  cx.save();
+  let pcx = px + pw/2;
+  let trayY = py;
+
+  // ── Tray shadow ──
+  cx.fillStyle = eff.laser>0?'#880040':eff.wide>0?'#004488':eff.narrow>0?'#882200':'#C8A040';
+  cx.beginPath(); cx.roundRect(px+3, trayY+3, pw, ph, ph/2); cx.fill();
+
+  // ── Tray main ──
+  let trayC = eff.laser>0?'#FF3D9A':eff.wide>0?'#00DCFF':eff.narrow>0?'#FB5607':'#FFE082';
+  cx.shadowColor=trayC; cx.shadowBlur=16;
+  cx.fillStyle=trayC;
+  cx.beginPath(); cx.roundRect(px, trayY, pw, ph, ph/2); cx.fill();
+  cx.shadowBlur=0;
+
+  // ── Tray shine ──
+  cx.fillStyle='rgba(255,255,255,0.32)';
+  cx.beginPath(); cx.roundRect(px+pw*0.06, trayY, pw*0.88, ph*0.45, ph*0.4); cx.fill();
+
+  // ── Tray outline ──
+  let trayOL = eff.laser>0?'#880040':eff.wide>0?'#004488':eff.narrow>0?'#882200':'#C8A040';
+  cx.strokeStyle=trayOL; cx.lineWidth=Math.max(1.5,ph*0.15); cx.lineJoin='round';
+  cx.beginPath(); cx.roundRect(px, trayY, pw, ph, ph/2); cx.stroke();
+
+  // ── Laser nozzles ──
+  if (eff.laser>0) {
+    let nzXs=[pcx,pcx-pw*0.27,pcx+pw*0.27];
+    cx.fillStyle='#FF3D9A'; cx.shadowColor='#FF3D9A'; cx.shadowBlur=14;
+    nzXs.forEach(nx=>{
+      cx.fillRect(nx-2, trayY-8, 4, 9);
+      cx.beginPath(); cx.arc(nx, trayY-8, 3.5, 0, Math.PI*2); cx.fill();
+    });
+    cx.shadowBlur=0;
+  }
+
+  // ── Person (only when paddle is tall enough) ──
+  let personW = Math.min(pw*0.22, 36);
+  let headR   = personW*0.44;
+  let bodyH   = Math.min(ph*2.8, personW*2.2);
+  let headY   = trayY + ph + bodyH + headR*0.8;
+
+  // Arms
+  cx.strokeStyle='#F5C5A3'; cx.lineWidth=Math.max(2,personW*0.17); cx.lineCap='round';
+  cx.beginPath(); cx.moveTo(pcx-personW*0.4, trayY+ph+bodyH*0.08);
+  cx.quadraticCurveTo(pcx-pw*0.34, trayY+ph*0.5, px+pw*0.1, trayY+ph*0.35); cx.stroke();
+  cx.beginPath(); cx.moveTo(pcx+personW*0.4, trayY+ph+bodyH*0.08);
+  cx.quadraticCurveTo(pcx+pw*0.34, trayY+ph*0.5, px+pw*0.9, trayY+ph*0.35); cx.stroke();
+
+  // Body shadow
+  cx.fillStyle='#4A6ACC';
+  cx.beginPath(); cx.roundRect(pcx-personW*0.37+2, trayY+ph+2, personW*0.74, bodyH*0.55, personW*0.1); cx.fill();
+  // Body
+  cx.fillStyle='#7B9CFF';
+  cx.beginPath(); cx.roundRect(pcx-personW*0.37, trayY+ph, personW*0.74, bodyH*0.55, personW*0.1); cx.fill();
+  cx.strokeStyle='#3A4A9A'; cx.lineWidth=Math.max(1,personW*0.1);
+  cx.beginPath(); cx.roundRect(pcx-personW*0.37, trayY+ph, personW*0.74, bodyH*0.55, personW*0.1); cx.stroke();
+
+  // Head shadow
+  cx.fillStyle='#C49060';
+  cx.beginPath(); cx.arc(pcx+1.5, headY+1.5, headR, 0, Math.PI*2); cx.fill();
+  // Head
+  cx.fillStyle='#F5C5A3';
+  cx.beginPath(); cx.arc(pcx, headY, headR, 0, Math.PI*2); cx.fill();
+  cx.strokeStyle='#D49060'; cx.lineWidth=Math.max(1,headR*0.12);
+  cx.beginPath(); cx.arc(pcx, headY, headR, 0, Math.PI*2); cx.stroke();
+
+  // Cat ears on person's head (they love cats!)
+  cx.fillStyle='#FF88AA';
+  for (let sign of [-1,1]) {
+    cx.beginPath();
+    cx.moveTo(pcx+sign*headR*0.65, headY-headR*0.45);
+    cx.lineTo(pcx+sign*headR*0.92, headY-headR*1.3);
+    cx.lineTo(pcx+sign*headR*0.3, headY-headR*0.72);
+    cx.closePath(); cx.fill();
+    cx.strokeStyle='#CC4488'; cx.lineWidth=Math.max(0.8,headR*0.1);
+    cx.beginPath();
+    cx.moveTo(pcx+sign*headR*0.65, headY-headR*0.45);
+    cx.lineTo(pcx+sign*headR*0.92, headY-headR*1.3);
+    cx.lineTo(pcx+sign*headR*0.3, headY-headR*0.72);
+    cx.stroke();
+  }
+
+  // Face
+  let eyeY2=headY-headR*0.1, er2=headR*0.18;
+  cx.fillStyle='#222';
+  for (let ex of [pcx-headR*0.32,pcx+headR*0.32]) {
+    cx.beginPath(); cx.arc(ex, eyeY2, er2, 0, Math.PI*2); cx.fill();
+  }
+  cx.fillStyle='#fff';
+  for (let ex of [pcx-headR*0.32,pcx+headR*0.32]) {
+    cx.beginPath(); cx.arc(ex+er2*0.38, eyeY2-er2*0.32, er2*0.34, 0, Math.PI*2); cx.fill();
+  }
+  // Happy smile
+  cx.strokeStyle='#884422'; cx.lineWidth=Math.max(0.8,headR*0.1); cx.lineCap='round';
+  cx.beginPath(); cx.arc(pcx, headY+headR*0.22, headR*0.26, 0.1, Math.PI-0.1); cx.stroke();
+  cx.restore();
+}
+
+// ── Falling Poop ──────────────────────────────────
+function drawPoopObj(p) {
+  cx.save();
+  cx.translate(p.x, p.y);
+  let r = p.r;
+  let layers = [
+    [r*0.88, r*0.44,  r*0.08,  '#5D4037'],
+    [r*0.70, r*0.40, -r*0.38,  '#6D4C41'],
+    [r*0.50, r*0.34, -r*0.73,  '#795548'],
+    [r*0.30, r*0.25, -r*1.02,  '#8D6E63'],
+  ];
+
+  // Shadow
+  cx.save(); cx.translate(2.5,2.5); cx.globalAlpha=0.32;
+  layers.forEach(([rw,rh,yoff]) => {
+    cx.fillStyle='#2A1005';
+    cx.beginPath(); cx.ellipse(0,yoff,rw,rh,0,0,Math.PI*2); cx.fill();
+  });
+  cx.globalAlpha=1; cx.restore();
+
+  // Layers
+  layers.forEach(([rw,rh,yoff,c]) => {
+    cx.fillStyle=c;
+    cx.beginPath(); cx.ellipse(0,yoff,rw,rh,0,0,Math.PI*2); cx.fill();
+    // Highlight
+    cx.fillStyle='rgba(255,200,150,0.14)';
+    cx.beginPath(); cx.ellipse(-rw*0.25,yoff-rh*0.24,rw*0.28,rh*0.2,-0.3,0,Math.PI*2); cx.fill();
+  });
+
+  // Outlines
+  cx.strokeStyle='#3E1A05'; cx.lineWidth=Math.max(1,r*0.06);
+  layers.forEach(([rw,rh,yoff]) => {
+    cx.beginPath(); cx.ellipse(0,yoff,rw,rh,0,0,Math.PI*2); cx.stroke();
+  });
+
+  // Cute face on poop
+  let fy = layers[1][2];
+  let er = r*0.13;
+  cx.fillStyle='#100808';
+  for (let ex of [-r*0.24,r*0.24]) { cx.beginPath(); cx.arc(ex,fy,er,0,Math.PI*2); cx.fill(); }
+  cx.fillStyle='rgba(255,255,255,0.88)';
+  for (let ex of [-r*0.24,r*0.24]) { cx.beginPath(); cx.arc(ex+er*0.38,fy-er*0.28,er*0.33,0,Math.PI*2); cx.fill(); }
+  cx.strokeStyle='#200A0A'; cx.lineWidth=Math.max(0.8,r*0.04); cx.lineCap='round';
+  cx.beginPath(); cx.arc(0,fy+er*0.6,r*0.19,0.1,Math.PI-0.1); cx.stroke();
+
+  // Steam wisps
+  cx.strokeStyle='rgba(180,160,130,0.45)'; cx.lineWidth=Math.max(1,r*0.06);
+  for (let [sx,sy] of [[-r*0.36, layers[3][2]-r*0.1],[0,layers[3][2]-r*0.18],[r*0.36,layers[3][2]-r*0.1]]) {
+    cx.beginPath(); cx.moveTo(sx,sy);
+    cx.quadraticCurveTo(sx-r*0.1,sy-r*0.38,sx+r*0.09,sy-r*0.58); cx.stroke();
+  }
+  cx.restore();
+}
+
+// ═══════════════════════════════════════════════════
+//  RENDER  — Cat Feast Edition
+// ═══════════════════════════════════════════════════
+function render() {
+  cx.clearRect(0, 0, W, H);
+
+  // Background grid (subtle)
+  cx.strokeStyle = 'rgba(0,170,255,0.028)'; cx.lineWidth = 1;
+  let gs = Math.round(H/16);
+  for (let x=0; x<W; x+=gs) { cx.beginPath(); cx.moveTo(x,0); cx.lineTo(x,H); cx.stroke(); }
+  for (let y=0; y<H; y+=gs) { cx.beginPath(); cx.moveTo(0,y); cx.lineTo(W,y); cx.stroke(); }
+
+  // ── Cats (bricks) ──
+  let now = Date.now();
+  for (let b of bricks) drawCatBrick(b);
+
+  // ── Particles ──
+  for (let p of ptcls) {
+    cx.save(); cx.globalAlpha = Math.max(0, p.life);
+    if (p.shard) {
+      cx.translate(p.x,p.y); cx.rotate(p.ang);
+      cx.fillStyle=p.c; cx.shadowColor=p.c; cx.shadowBlur=4;
+      cx.fillRect(-p.w/2,-p.ht/2,p.w,p.ht);
+    } else {
+      cx.beginPath(); cx.arc(p.x,p.y,Math.max(0.5,p.r),0,Math.PI*2);
+      cx.fillStyle=p.c;
+      if(p.glow){cx.shadowColor=p.c;cx.shadowBlur=p.r*3.5;}
+      cx.fill();
+    }
+    cx.restore();
+  }
+
+  // ── Falling power-up gems ──
+  for (let p of drops) {
+    cx.save(); cx.translate(p.x,p.y); cx.rotate(p.rot);
+    cx.shadowColor=p.def.c; cx.shadowBlur=16;
+    cx.beginPath();
+    for (let i=0;i<12;i++) {
+      let a=i*Math.PI/6, ri=i%2===0?p.r:p.r*0.48;
+      let x2=ri*Math.sin(a), y2=-ri*Math.cos(a);
+      i===0?cx.moveTo(x2,y2):cx.lineTo(x2,y2);
+    }
+    cx.closePath(); cx.fillStyle=p.def.bg; cx.strokeStyle=p.def.c; cx.lineWidth=2;
+    cx.fill(); cx.stroke();
+    cx.shadowBlur=0; cx.fillStyle='#fff';
+    cx.font=`bold ${Math.round(p.r*0.88)}px Rajdhani`;
+    cx.textAlign='center'; cx.textBaseline='middle';
+    cx.fillText(p.def.lbl, 0, 0);
+    cx.restore();
+  }
+
+  // ── Falling poop ──
+  for (let p of poops) drawPoopObj(p);
+
+  // ── Lasers ──
+  for (let la of lasers) {
+    cx.save(); cx.shadowColor='#ff3d9a'; cx.shadowBlur=22;
+    let lg=cx.createLinearGradient(la.x,la.y,la.x,la.y-32);
+    lg.addColorStop(0,'rgba(255,61,154,0.95)'); lg.addColorStop(1,'rgba(255,61,154,0)');
+    cx.fillStyle=lg; cx.fillRect(la.x-la.w/2,la.y-34,la.w,36);
+    cx.restore();
+  }
+
+  // ── Cat food cans (balls) ──
+  for (let b of balls) drawCanBall(b);
+
+  // ── Person+tray (paddle) ──
+  drawPersonPaddle();
+
+  // ── Launch hint ──
+  if (gst==='playing' && balls.length>0 && !balls[0].launched) {
+    cx.save();
+    cx.font=`${Math.max(9,H*0.016)}px Rajdhani`;
+    cx.fillStyle = aiMode ? 'rgba(168,85,247,0.55)' : 'rgba(255,200,80,0.6)';
+    cx.textAlign='center'; cx.textBaseline='bottom';
+    cx.fillText(aiMode ? '🤖 AI 自動發射中…' : '🐟 丟出罐頭！TAP / SPACE',
+                W/2, paddle.y-balls[0].r-8);
+    cx.restore();
+  }
+
+  // ── AI Visualization ──
+  if (aiMode && gst==='playing') {
+    cx.save();
+
+    // ── Highlight the cat the AI is currently aiming at ──
+    if (_aiTargetBrick) {
+      let tb2 = _aiTargetBrick;
+      let pulse = 0.5 + 0.5 * Math.sin(Date.now() * 0.008);
+      // Pulsing red/orange glow ring around target brick
+      cx.strokeStyle = `rgba(255,80,0,${0.5 + 0.4*pulse})`;
+      cx.lineWidth   = 3;
+      cx.shadowColor = '#ff5000';
+      cx.shadowBlur  = 14 + 8*pulse;
+      cx.setLineDash([5,4]);
+      cx.beginPath();
+      cx.rect(tb2.x-3, tb2.y-3, tb2.w+6, tb2.h+6);
+      cx.stroke();
+      cx.setLineDash([]);
+      cx.shadowBlur = 0;
+      // Arrow line from paddle to target brick
+      cx.beginPath();
+      cx.moveTo(paddle.x + paddle.w/2, paddle.y);
+      cx.lineTo(tb2.x + tb2.w/2, tb2.y + tb2.h);
+      cx.strokeStyle = `rgba(255,120,0,${0.25 + 0.15*pulse})`;
+      cx.lineWidth   = 1.5;
+      cx.setLineDash([4,8]);
+      cx.stroke();
+      cx.setLineDash([]);
+      // "🎯" label above target
+      cx.font = `${Math.max(10, tb2.h*0.75)}px sans-serif`;
+      cx.textAlign    = 'center';
+      cx.textBaseline = 'bottom';
+      cx.fillText('🎯', tb2.x + tb2.w/2, tb2.y - 2);
+    }
+
+    if (_aiChasing) {
+      let drop = _aiChasing;
+      // Gold dash to targeted drop
+      cx.beginPath(); cx.moveTo(paddle.x+paddle.w/2, paddle.y);
+      cx.lineTo(drop.x, drop.y);
+      cx.strokeStyle='rgba(255,214,10,0.45)'; cx.lineWidth=2;
+      cx.setLineDash([5,7]); cx.stroke(); cx.setLineDash([]);
+      // Ring around drop
+      cx.beginPath(); cx.arc(drop.x, drop.y, drop.r+7, 0, Math.PI*2);
+      cx.strokeStyle='rgba(255,214,10,0.7)'; cx.lineWidth=2;
+      cx.shadowColor='#ffd60a'; cx.shadowBlur=14; cx.stroke();
+      cx.shadowBlur=0;
+      cx.font=`bold ${Math.max(9,H*0.014)}px Orbitron`;
+      cx.fillStyle='#ffd60a'; cx.textAlign='center'; cx.textBaseline='bottom';
+      cx.fillText(`⬆ ${drop.def.name}`, paddle.x+paddle.w/2, paddle.y-6);
+    } else if (_aiPredX!==null && _aiTrackedBall!==null) {
+      let tb=_aiTrackedBall;
+      cx.beginPath(); cx.moveTo(tb.x,tb.y); cx.lineTo(_aiPredX,paddle.y);
+      cx.strokeStyle='rgba(168,85,247,0.3)'; cx.lineWidth=1.5;
+      cx.setLineDash([5,8]); cx.stroke(); cx.setLineDash([]);
+      cx.beginPath(); cx.arc(_aiPredX,paddle.y+paddle.h*0.5,5,0,Math.PI*2);
+      cx.fillStyle='rgba(168,85,247,0.75)'; cx.shadowColor='#a855f7'; cx.shadowBlur=12; cx.fill();
+      cx.beginPath(); cx.arc(tb.x,tb.y,tb.r+4,0,Math.PI*2);
+      cx.strokeStyle='rgba(168,85,247,0.52)'; cx.lineWidth=1.5; cx.shadowBlur=8; cx.stroke();
+      cx.shadowBlur=0;
+      cx.font=`bold ${Math.max(9,H*0.014)}px Orbitron`;
+      cx.fillStyle=_aiTargetBrick?'#ff8000':'rgba(168,85,247,0.78)';
+      cx.textAlign='center'; cx.textBaseline='bottom';
+      cx.fillText(_aiTargetBrick?'🎯 瞄準中':'🤖 AI', paddle.x+paddle.w/2, paddle.y-6);
+    }
+    // Scan sweep
+    let scanY=(Math.sin(now*0.0006)*0.5+0.5)*H*0.52;
+    cx.beginPath(); cx.moveTo(0,scanY); cx.lineTo(W,scanY);
+    let sg2=cx.createLinearGradient(0,0,W,0);
+    sg2.addColorStop(0,'rgba(168,85,247,0)');
+    sg2.addColorStop(0.5,_aiChasing?'rgba(255,214,10,0.08)':'rgba(168,85,247,0.08)');
+    sg2.addColorStop(1,'rgba(168,85,247,0)');
+    cx.strokeStyle=sg2; cx.shadowBlur=0; cx.lineWidth=6; cx.stroke();
+    cx.restore();
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  MAIN LOOP
+// ═══════════════════════════════════════════════════
+function loop(ts) {
+  rafID = requestAnimationFrame(loop);
+  if (lastTS === null) { lastTS = ts; return; }
+  let dt = Math.min((ts - lastTS) / 1000, 0.05);
+  lastTS = ts;
+  if (gst === 'playing') update(dt);
+  if (gst !== 'start')   render();
+}
+
+// ═══════════════════════════════════════════════════
+//  RESIZE HANDLER
+// ═══════════════════════════════════════════════════
+window.addEventListener('resize', () => {
+  if (gst === 'playing') {
+    let oldW = W, oldH = H;
+    let oldRatio = oldW / Math.max(oldH, 1);
+    resize();
+    let newRatio = W / Math.max(H, 1);
+
+    // Scale entity positions
+    if (oldW > 0) paddle.x = (paddle.x / oldW) * W;
+    paddle.y = H - paddle.h - Math.max(8, H * 0.048);
+    if (oldW > 0 && oldH > 0) {
+      balls.forEach(b => { b.x = (b.x/oldW)*W; b.y = (b.y/oldH)*H; });
+      drops.forEach(p => { p.x = (p.x/oldW)*W; p.y = (p.y/oldH)*H; });
+    }
+
+    // If orientation flipped (portrait↔landscape), rebuild bricks with new
+    // canvas dimensions while preserving remaining HP so progress is kept.
+    if (Math.abs(newRatio - oldRatio) > 0.5) {
+      let hpMap = {};
+      bricks.forEach(b => { hpMap[b.id] = { hp: b.hp, ultra: b.ultra }; });
+      buildBricks();
+      bricks.forEach(b => {
+        if (hpMap[b.id] !== undefined) {
+          b.hp    = hpMap[b.id].hp;
+          b.ultra = hpMap[b.id].ultra;
+        }
+      });
+      // Keep only bricks that were still alive before the resize
+      bricks = bricks.filter(b => hpMap[b.id] !== undefined);
+    }
+  } else {
+    resize();
+  }
+  initStars();
+});
+
+// ═══════════════════════════════════════════════════
+//  BOOTSTRAP
+// ═══════════════════════════════════════════════════
+resize();
+refreshHUD();
+rafID = requestAnimationFrame(loop);
+
+// Expose the AI toggle to HTML onclick attribute
+window.toggleAI = toggleAI;
+
+})();
+</script>
+</body>
+</html>

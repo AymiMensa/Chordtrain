@@ -160,6 +160,7 @@ const games = [
                       { name: "kerykeion星盤", path: "kerykeion-main/scripts/glyph_playground.html", color: "#8FA0B0" },
                        { name: "3D 奇珍 樂器館", path: "3D_INSTRUMENTS.html", color: "#B8A0A8" },
                       { name: "星盤模擬器", path: "stellarium-web-master/index.html", color: "#8FA8B8" },
+                       { name: "實時星空天文模擬器", path: "stellarium-web-sky/index.html", color: "#B89495" },
                       { name: "台灣瘋狂大賽車", path: "TaiwanRun-main/index.html", color: "#A88FBB" },
                     ];
 
