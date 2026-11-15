@@ -1109,7 +1109,8 @@ export default function Home() {
       window.clearInterval(aiDemoTimerRef.current);
       aiDemoTimerRef.current = null;
     }
-    const targetLevel = PLAYABLE_LEVELS[targetIndex] ?? snapshot.level;
+    const safeIndex = Math.max(0, Math.min(PLAYABLE_LEVELS.length - 1, targetIndex));
+    const targetLevel = PLAYABLE_LEVELS[safeIndex] ?? snapshot.level;
     const path = computeAIDemoPath(targetLevel);
     if (path.length === 0) {
       showAssistNotice("本關沒有可用的 A* 解路徑，無法啟動電腦AI展示。");
@@ -1117,6 +1118,13 @@ export default function Home() {
       aiDemoModeRef.current = false;
       return;
     }
+    // 若剛進入新章節首關，顯示 chapter opening 碑文；否則清掉上一關殘留的碑文，避免阻擋操作
+    if (safeIndex % 10 === 0 && safeIndex > 0) { setDialogueIndex(0); setMonument({ chapter: chapterForLevel(safeIndex), phase: "opening" }); }
+    else setMonument(null);
+    // 關鍵修正：先真正載入目標關卡（並重置），再同步 levelIndex，
+    // 讓快速跳轉展示與自動連續破關都在「正確的關卡」上播放正確的解路徑。
+    world.setLevel(targetLevel);
+    setLevelIndex(safeIndex);
     world.reset();
     const charges = resetAssistCharges();
     setUndoCharges(charges.undo);
@@ -1229,6 +1237,8 @@ export default function Home() {
 
   const goToLevel = (index: number, bypassModulo = false) => {
     const nextIndex = bypassModulo ? index : index % PLAYABLE_LEVELS.length;
+    // Show the chapter-opening monument when entering a chapter-boundary level;
+    // otherwise clear any stale monument so it can't block the resolution card.
     const level = PLAYABLE_LEVELS[nextIndex];
     world.setLevel(level);
     setLevelIndex(nextIndex);
@@ -1259,6 +1269,10 @@ export default function Home() {
       setCampaignFinished(true);
       return;
     }
+    // Bypass the modulo wrapping in goToLevel so "Go to Next Level" advances to the
+    // next campaign level directly (index maps straight to the array, LV12 -> LV13).
+    // Using bypassModulo=true ensures no wrapping occurs, which is important for
+    // level transitions especially when levelIndex might be at boundary values.
     goToLevel(levelIndex + 1, true);
   };
 
