@@ -131,6 +131,7 @@ const games = [
                       { name: "貓咪排序遊戲", path: "Sort.html", color: "#B8A89A" },
                       { name: "格智", path: "lattice-mind/dist/public/index.html", color: "#9AAFA8" },
                       { name: "Echoes of the Grid 迴音網格", path: "echoes-of-the-grid/dist/public/index.html", color: "#A3B0A4" },
+                      { name: "實時星空天文模擬器", path: "stellarium-web-sky/dist/index.html", color: "#A8B8C8" },
                       { name: "Lawweaver 界律編織者", path: "lawweaver/dist/public/index.html", color: "#A8A5A2", onLoad: (e) => useLawweaverGameAI(lawweaverRef) },
                       { name: "Starweave Duet 星紗雙譜", path: "Starweave Duet/index.html", color: "#8E9DA6" },
                       { name: "Starweave Duet 星紗雙譜 · 雙界協奏", path: "starweave-duet/index.html", color: "#9AA8B8" },

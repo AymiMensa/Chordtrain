@@ -1614,7 +1614,7 @@ export default function Home() {
               <h2>恭喜過關！</h2>
               <p>封印已承認這條因果鏈。你完成了本關的可解路徑，現在可以帶著這份紀錄前往下一個石室。</p>
               <div className="clear-stats"><span><small>經過時間</small><strong>{formatElapsed(elapsedSeconds)}</strong></span><span><small>完成步數</small><strong>{snapshot.state.turn} 步</strong></span><span><small>最短主解</small><strong>{solveResult.moves} 步</strong></span><span className="star-stat"><small>{currentRating?.label}</small><strong>{currentRating ? starGlyphs(currentRating.stars) : "☆☆☆"}</strong></span></div>
-              <div><button className="primary-action next-level" onClick={goToNextLevel}><Play size={16} />前往下一關</button><button className="quiet-action" onClick={resetRound}><RotateCcw size={16} />重玩本關</button></div>
+              <div style={{position: 'relative', zIndex: 1000}}><button className="primary-action next-level" onClick={goToNextLevel} style={{zIndex: 1000}}><Play size={16} />前往下一關</button><button className="quiet-action" onClick={resetRound} style={{zIndex: 1000}}><RotateCcw size={16} />重玩本關</button></div>
             </>
           ) : (
             <>
