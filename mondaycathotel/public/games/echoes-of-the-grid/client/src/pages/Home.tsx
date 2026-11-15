@@ -1273,7 +1273,30 @@ export default function Home() {
     // next campaign level directly (index maps straight to the array, LV12 -> LV13).
     // Using bypassModulo=true ensures no wrapping occurs, which is important for
     // level transitions especially when levelIndex might be at boundary values.
-    goToLevel(levelIndex + 1, true);
+    const nextIndex = levelIndex + 1;
+    const level = PLAYABLE_LEVELS[nextIndex];
+    world.setLevel(level);
+    setLevelIndex(nextIndex);
+    setSolveResult(EMPTY_SOLVE_RESULT);
+    setCurrentSolveResult(EMPTY_SOLVE_RESULT);
+    setOptimalSolveReady(false);
+    setSolutionIntent("none");
+    solutionCacheRef.current = null;
+    setElapsedSeconds(0);
+    setStartedAt(Date.now());
+    const charges = resetAssistCharges();
+    setUndoCharges(charges.undo);
+    setHintCharges(charges.hint);
+    setAssistNotice(null);
+    setHintConfirmOpen(false);
+    closeHintDisplay();
+    setRescueOpen(false);
+    setTutorialActive(false);
+    setCampaignFinished(false);
+    setLeftRailOpen(false);
+    setRightRailOpen(false);
+    setDrawer("none");
+    if (nextIndex % 10 === 0) { setDialogueIndex(0); setMonument({ chapter: chapterForLevel(nextIndex), phase: "opening" }); }
   };
 
   const loadEditor = () => {
