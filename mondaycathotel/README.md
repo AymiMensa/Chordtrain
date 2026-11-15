@@ -84,12 +84,6 @@ VITE_SUPABASE_PUBLISHABLE_KEY=your_supabase_anon_key
   - 接球前居中準備，接觸瞬間爆發性加速甩拍，並加上 82% 板寬安全邊界防護，兼顧大角度反彈與 100% 不漏球。
 - **自動發球優化**：AI 自動發球時改為依磚塊數量以斜角開球，避免開局即打入中空區。
 
-
-### [2026/11/11] 新增「3D 樂器館」小遊戲（Aymi設計第57款）
-- **新增遊戲按鈕**：於「管理後台」／「店休設定與充電」最下方遊戲區新增「3D 樂器館」按鈕，按下即啟動模擬器，路徑為 `public/games/3D_INSTRUMENTS.html`，使用獨立莫蘭迪色 `#B8A0A8`（與現有遊戲按鈕顏色區分）。
-- **嚴格響應式 UI**：新增針對手機直式、手機橫式（高度＜560px）、平板、電腦及所有瀏覽器（Edge / Safari / Brave / Chrome / Firefox）的媒體查詢，確保 iframe 後 UI 不重疊、不超出畫面、字體不互疊、不溢出；手機橫式畫面極扁時會隱藏側欄與提示文字、收縮按鈕與字體，並以 `overflow:hidden` + `overflow-x:hidden` 防止橫向溢出；Three.js 畫布 (`#viewport canvas`) 固定為 100% 寬高並設定 `min-height:120px`；側欄與各窗格在桌機保留可捲動行為。
-- **驗證**：手機橫式/直式、平板、電腦於多種瀏覽器載入後 UI 正常顯示，按鈕啟動模擬器無誤，不影響原有排列功能。
-
 ### [2026/11/15] 修正「Echoes of the Grid 迴音網格」LV13 過關 bug
 - **Bug 修正**：於「管理後台」／「店休設定與充電」遊戲區的 Echoes of the Grid 遊戲中，修正「前往下一關」按鈕被 UI 覆蓋導致無法點擊的問題。在 Home.tsx 中為 next-level 按鈕添加 z-index: 1000 的層級設定，確保按鈕互動層級高於其他固定層元素，使用戶現在可以正常切換關卡。
 - **檔案變更**：public/games/echoes-of-the-grid/client/src/pages/Home.tsx - 新增 next-level 按鈕的 z-index 設定（由 100 調整為 1000，確保在所有情況下按鈕互動層級足夠高）
