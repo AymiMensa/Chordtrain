@@ -1,8 +1,8 @@
-﻿import { useEffect, useState, useRef } from " react\;
+import { useEffect, useState, useRef } from "react";
 export interface LawweaverAIState { isPlaying: boolean; currentLevel: number; levelsCleared: number; totalTurns: number; lastAction: string; }
-import { useState } from " react\;
+import { useState } from "react";
 export function useLawweaverAI(initialLevel: LawweaverAIChallenge) {
-  const [state, setState] = useState(LawweaverAIState);
+  const [state, setState] = useState({ isPlaying: false, currentLevel: 0, levelsCleared: 0, totalTurns: 0, lastAction: "" } as LawweaverAIState);
   const iterationRef = { current: 0 };
   const MAX_ITERATIONS = 80;
 
