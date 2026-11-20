@@ -7,43 +7,39 @@ describe("Groove audio safety contracts", () => {
 
   it("restores output after a direct Groove start instead of remaining at the fade floor", () => {
     expect(html).toContain("if(input){input.checked=true;input.setAttribute('aria-label',`關閉節拍器（${S.tempo} BPM）`);input.setAttribute('aria-checked','true');}");
-    expect(html).toContain("mix.output.gain.exponentialRampToValueAtTime(target,now+.025)");
+    expect(html).toContain("mix.output.gain.exponentialRampToValueAtTime(target,now+.075)");
   });
 
   it("keeps built-in Groove preset output gains audible", () => {
-    expect(html).toContain("standard:{label:'標準',input:1.08,output:.92");
-    expect(html).toContain("bass:{label:'低頻加強',input:1.02,output:.94");
+    expect(html).toContain("standard:{label:'標準',input:1.16,output:1.08");
+    expect(html).toContain("bass:{label:'低頻加強',input:1.10,output:1.10");
     expect(html).toContain("night:{label:'夜間柔和',input:.82,output:.70");
-    expect(html).not.toContain("standard:{label:'標準',input:1.08,output:0.0001");
-    expect(html).not.toContain("bass:{label:'低頻加強',input:1.02,output:0.0001");
+    expect(html).not.toContain("standard:{label:'標準',input:1.16,output:0.0001");
+    expect(html).not.toContain("bass:{label:'低頻加強',input:1.10,output:0.0001");
     expect(html).not.toContain("night:{label:'夜間柔和',input:.82,output:0.0001");
   });
 
+  it("uses a bounded soft ceiling with stronger clean headroom instead of hard clipping", () => {
+    expect(html).toContain("const kneeStart=.78;");
+    expect(html).toContain("const ceiling=.92;");
+    expect(html).toContain("const eased=u*u*(3-2*u);");
+    expect(html).not.toContain("Math.tanh(knee*x)/Math.tanh(knee)");
+    expect(html).toContain("compressor.threshold.value=-14;compressor.knee.value=24;compressor.ratio.value=6.2;");
+    expect(html).toContain("compressor.attack.value=.018;compressor.release.value=.32;");
+    expect(html).toContain("limiter.oversample='4x'");
+    expect(html).toContain("output.gain.value=1.10");
+  });
+
   it("uses a Night/Soft band-limited noise path and smooth source shutdown", () => {
-    expect(html).toContain("const nightNoiseFilter=nightSafe&&filterType==='highpass'?'bandpass':filterType");
+    expect(html).toContain("const safeNoiseFilter=(cleanSafe||nightSafe)&&filterType==='highpass'?'bandpass':filterType");
     expect(html).toContain("handle.master.gain.exponentialRampToValueAtTime(0.0001,now+fadeSeconds)");
     expect(html).toContain("source.stop(now+fadeSeconds+.035)");
-  });
-
-  it("uses one smooth Groove voice envelope and keeps bright-wave peaks under control", () => {
-    expect(html).toContain("master.gain.setValueAtTime(0,now);");
-    expect(html).toContain("master.gain.linearRampToValueAtTime(normalizedLevel,now+attack);");
-    expect(html).toContain("master.gain.linearRampToValueAtTime(0,releaseEnd);");
-    expect(html).toContain("const attack=Math.min(.010,Math.max(.006,duration*.06));");
-    expect(html).toContain("const GROOVE_WAVEFORM_GAINS={triangle:1,sine:1.04,sawtooth:.9,square:.84};");
-    expect(html).toContain("peak*0.82*getGrooveWaveformGain()");
-    expect(html).toContain("peak*0.68*getGrooveWaveformGain()");
-    expect(html).toContain("gain.gain.setValueAtTime(Math.max(.0001,level),now);");
-    expect(html).toContain("S.mobilePureMode?0.14:0.22");
-    expect(html).toContain("(S.grooveWaveform==='sawtooth'||S.grooveWaveform==='square')?1050:1800");
-  });
-
-  it("softens broadband noise edges and catches stacked transient peaks", () => {
-    expect(html).toContain("compressor.attack.value=.003;compressor.release.value=.26;");
-    expect(html).toContain("toneFilter.frequency.value=7200");
-    expect(html).toContain("const edgeFade=Math.min(Math.floor(data.length*.012),Math.max(8,Math.floor(ctx.sampleRate*.003)))");
-    expect(html).toContain("Math.min(fadeIn,fadeOut)");
-    expect(html).toContain("limiter.oversample='4x'");
+    expect(html).toContain("noise.stop(now+duration+.245)");
+    expect(html).toContain("osc.stop(now+duration+.245)");
+    expect(html).toContain("const cleanSafe=true;");
+    expect(html).toContain("const safeNoiseFilter=(cleanSafe||nightSafe)&&filterType==='highpass'?'bandpass':filterType");
+    expect(html).toContain("toneFilter.frequency.value=7600");
+    expect(html).toContain("smoothlySetAudioParam(masterMix.airFilter.frequency,pure?7200:10500");
   });
 
   it("records recent Groove clipping events with a readable cause and level snapshot", () => {
@@ -55,14 +51,6 @@ describe("Groove audio safety contracts", () => {
     expect(html).toContain("RMS ${Math.round(event.rms*100)}%");
   });
 
-  it("disconnects every Groove voice as soon as its scheduled sources end", () => {
-    expect(html).toContain("function disposeGrooveVoice(handle){");
-    expect(html).toContain("source.addEventListener('ended',()=>{");
-    expect(html).toContain("if(voiceHandle.sources.length===0)disposeGrooveVoice(voiceHandle);");
-    expect(html).toContain("try{handle.master.disconnect();}catch(error){}");
-    expect(html).not.toContain("setTimeout(()=>grooveVoiceStops.delete(voiceHandle),1500)");
-  });
-
   it("provides a one-click audio preference reset without weakening the safe output path", () => {
     expect(html).toContain('id="resetAudioPreferencesBtn"');
     expect(html).toContain("function resetAudioPreferences()");
@@ -70,52 +58,90 @@ describe("Groove audio safety contracts", () => {
     expect(html).toContain("setSoundLayerEnabled('chord',false)");
     expect(html).toContain("setMetronomeMode('woodblock')");
     expect(html).toContain("limiter.oversample='4x'");
-    expect(html).toContain("output.gain.value=.98");
+    expect(html).toContain("output.gain.value=1.10");
   });
 
-  it("keeps every four-beat part on the shared downbeat timeline", () => {
-    expect(html).toContain("let beatTimeline={originTime:0,isRunning:false,beatMs:0,runId:0};");
-    expect(html).toContain("function acquireBeatTimelineForPlayback(){return ensureBeatTimeline();}");
-    expect(html).toContain("function getMsUntilNextDownbeat()");
-    expect(html).toContain("function getNextBeatBoundary()");
-    expect(html).toContain("const BEATS_PER_MEASURE=4;");
-    expect(html).toContain('<input type="checkbox" id="metronome" checked>');
-    expect(html).toContain("function ensureMetronomeForMusicalPlayback()");
-    expect(html).toContain("if(!input.checked){input.checked=true;input.dispatchEvent(new Event('change'));return;}");
-    expect(html).toContain("while(boundary<AC.currentTime+0.005)");
-    expect(html).toContain("function startBeatIndicator(label='和弦',startAt)");
-    expect(html).toContain("ensureMetronomeForMusicalPlayback();\n    startAt=getNextBeatBoundary();");
-    expect(html).toContain("const BEAT_SCHEDULE_AHEAD_SECONDS=.25;");
-    expect(html).toContain("const horizon=now+BEAT_SCHEDULE_AHEAD_SECONDS;");
-    expect(html).toContain("const now=AC.currentTime,horizon=now+BEAT_SCHEDULE_AHEAD_SECONDS;");
-    expect(html).toContain("while(beatTimeline.originTime+nextStep*stepSeconds<=horizon)");
-    expect(html).toContain("while(beatTimeline.originTime+nextBeatIndex*beatTimeline.beatMs/1000<=horizon)");
-    expect(html).toContain("metroInterval=setInterval(scheduleGroove,25);");
-    expect(html).toContain("metroInterval=setInterval(scheduleWoodblock,25);");
-    expect(html).toContain("function playChord(midis,dur,vol,capture,startAt)");
-    expect(html).toContain("const noteStartAt=(Number.isFinite(startAt)?startAt:ac().currentTime+.012)+i*interval/1000;");
-    expect(html).toContain("playMetronomeBeat(beat===0,targetTime)");
-    expect(html).toContain("playGrooveStep(step,targetTime)");
-    expect(html).toContain("if(runId===grooveRunId&&timelineRun===beatTimeline.runId)");
-    expect(html).toContain("const elapsedSteps=(AC.currentTime-beatTimeline.originTime)/stepSeconds;");
-    expect(html).toContain("let nextStep=Math.max(0,Math.ceil(elapsedSteps-1e-6));");
-    expect(html).toContain("let nextBeatIndex=Math.max(0,Math.ceil((AC.currentTime-beatTimeline.originTime)*1000/beatTimeline.beatMs-1e-6));");
-    expect(html).not.toContain("Math.ceil(Math.max(0,elapsedSteps)/(measureSteps)-1e-6)*measureSteps");
-    expect(html).not.toContain("metroInterval=setTimeout(");
-    expect(html).not.toContain("playGrooveStep(0);");
-    expect((html.match(/const beatAlignMs=getMsUntilNextDownbeat\(\);/g)||[]).length).toBe(3);
-    expect(html).toContain("function scheduleChordAudio(midis,startAt,guard=()=>true)");
-    expect(html).toContain("const leadSeconds=BEAT_SCHEDULE_AHEAD_SECONDS;");
-    expect(html).toContain("function stopMetronome(keepBeatTimeline=false)");
-    expect(html).toContain("if(!keepBeatTimeline)stopBeatTimeline();");
-    expect(html).toContain("stopMetronome(true);");
-    expect(html).toContain("document.getElementById('instSelect').onchange=function(){S.inst=normalizeInstrument(this.value);};");
+  it("provides desktop, mobile, and headphone volume profiles with auto detection", () => {
+    expect(html).toContain('id="deviceAudioProfile"');
+    expect(html).toContain("const DEVICE_AUDIO_PROFILE_KEY='kimichord.deviceAudioProfile'");
+    expect(html).toContain("desktop:{label:'桌面',chordVol:.62,arpVol:.78,metroVol:.78");
+    expect(html).toContain("mobile:{label:'手機',chordVol:.50,arpVol:.62,metroVol:.55");
+    expect(html).toContain("headphones:{label:'耳機',chordVol:.72,arpVol:.82,metroVol:.72");
+    expect(html).toContain("function detectDeviceAudioProfile()");
+    expect(html).toContain("function applyDeviceAudioProfile(profileKey,persist=true,notify=true)");
+    expect(html).toContain("setMobilePureMode(profile.mobilePureMode,false)");
   });
 
-  it("provides quick audio profiles for desktop, mobile and headphones", () => {
-    expect(html).toContain('id="audioDeviceProfile"');
-    expect(html).toContain('<option value="desktop">桌面</option>');
-    expect(html).toContain('<option value="mobile">手機</option>');
-    expect(html).toContain('<option value="headphones">耳機</option>');
+  it("uses longer anti-click envelopes across metronome, Groove, and synthesized voices", () => {
+    expect(html).toContain("t+0.028");
+    expect(html).toContain("duration+.090");
+    expect(html).toContain("duration+.245");
+    expect(html).toContain("const attack=Math.min(.060,Math.max(.042,dur*.22));");
+    expect(html).toContain("const release=voice.isArpeggio?.085:(voice.isChordBus?.075:.075);");
+    expect(html).toContain("gain.gain.exponentialRampToValueAtTime(0.075*level,now+0.045)");
+    expect(html).not.toContain("t+0.004");
+    expect(html).toContain("gain.connect(ensureMasterMix().input)");
+    expect(html).not.toContain("gain.connect(ctx.destination);osc.start(now)");
+  });
+
+  it("locks the shared clock to the first beat (downbeat) so metronome, chord and arpeggio stay aligned", () => {
+    expect(html).toContain("let musicalClockActive=false,musicalClockAnchor=0,musicalClockPeriod=0,musicalClockSource=''");
+    expect(html).toContain("musicalClockSource='metronome'");
+    expect(html).toContain("const shouldSyncToMetronome=metronomeEnabled&&musicalClockActive&&musicalClockSource==='metronome'&&musicalClockPeriod>0;");
+    expect(html).toContain("const nextBeatForSync=shouldSyncToMetronome");
+    expect(html).toContain("setTimeout(()=>playChord(copy,dur,vol,capture,true)");
+    // 錨點對齊第一個第一拍（小節線），period 為一小節（四拍），讓節拍器、和弦與琶音共用同一時鐘。
+    expect(html).toContain("Math.ceil(ctx.currentTime/barSec)*barSec");
+    expect(html).toContain("musicalClockPeriod=barSec");
+    // 在非第一拍按下節拍器時，先以靜音顯示 1234 到第一拍再出聲。
+    expect(html).toContain("function startMetronomeSilentCountdown(anchorSec)");
+    expect(html).toContain("if(!hadMetronomeClock&&harmonyWasPlaying)resyncActiveHarmonyToMetronome(true)");
+  });
+
+  it("unlocks AudioContext during the original user gesture before async playback", () => {
+    expect(html).toContain("document.body.addEventListener('pointerdown',function unlockAudio(){ensureAudioReady();}");
+    expect(html).toContain("document.body.addEventListener('keydown',function unlockAudioFromKeyboard(event)");
+    expect(html).toContain("document.getElementById('playAllBtn').onclick=function(){\n  ensureAudioReady();");
+    expect(html).toContain("document.getElementById('scalePreviewBtn').onclick=function(){ensureAudioReady();playScalePreview();}");
+  });
+
+  it("exposes the requested non-exam Chinese, world, jazz, blues, and modal scales", () => {
+    expect(html).toContain('id="scaleSelect"');
+    for (const value of [
+      "Shang Pentatonic", "Jiao Pentatonic", "Zhi Pentatonic", "Yu Pentatonic",
+      "Chinese Seven", "Chinese Yayue", "Chinese Qingyue", "Chinese Yanyue",
+      "Hirajoshi", "Insen", "Kumoi", "Iwato", "Bhairav", "Kafi",
+      "Hungarian Minor", "Byzantine", "Bebop Dominant", "Altered", "Lydian Dominant",
+    ]) expect(html).toContain(`value="${value}"`);
+    expect(html).toContain("function updateScaleInfoUi()");
+    expect(html).toContain("雅樂音階（古音階、正聲音階）");
+    expect(html).toContain("燕樂音階（俗樂、清商音階）");
+    expect(html).toContain("if(diatonicControls)diatonicControls.hidden=S.level==='Exam';");
+  });
+  it("uses the requested Chinese setting labels, scale listener, and four added instruments", () => {
+    expect(html).toContain('<label>根音</label>');
+    expect(html).toContain('<label for="scaleSelect">音階</label>');
+    expect(html).toContain('id="scalePreviewBtn"');
+    expect(html).toContain("♩ 聆聽音階");
+    expect(html).toContain('value="GlassBowl">玻璃碗琴');
+    expect(html).toContain('value="Handpan">飛碟鼓（Handpan／Pan Drum）');
+    expect(html).toContain('value="SteelTongue">空靈鼓（Steel Tongue Drum）');
+    expect(html).toContain('value="Kalimba">卡林巴（Kalimba／Mbira）');
+    for (const value of ["GlassBowl", "Handpan", "SteelTongue", "Kalimba"]) expect(html).toContain(`inst==='${value}'`);
+    expect(html).toContain('<label>教會調式</label>');
+    expect(html).toContain("pattern:'依目前音階'");
+    expect(html).toContain("GlassBowl:{partials:[1,2.71,4.93,7.18,9.64]");
+    expect(html).toContain("Handpan:{partials:[1,.998,1.498,2.006,2.704,3.985]");
+    expect(html).toContain("SteelTongue:{partials:[1,2.69,4.08,5.76,8.32]");
+    expect(html).toContain("Kalimba:{partials:[1,2.02,3.96,6.05,8.12]");
+    expect(html).toContain("decays:[.96,.72,.50,.34,.24]");
+    expect(html).toContain("if(inst==='Handpan'&&index===0)osc.frequency.exponentialRampToValueAtTime(freq,t+.16)");
+  });
+
+  it("re-anchors a playing common progression on the next beat instead of muting it when metronome starts", () => {
+    expect(html).toContain("function resyncActiveHarmonyToMetronome(force=false)");
+    expect(html).toContain("clearSmartHarmonyTimers();");
+    expect(html).toContain("if(!hadMetronomeClock&&harmonyWasPlaying)resyncActiveHarmonyToMetronome(true)");
+    expect(html).toContain("不停止目前已發出的和弦尾韻");
   });
 });

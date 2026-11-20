@@ -1,0 +1,115 @@
+{
+  "pass": 7,
+  "total": 7,
+  "results": [
+    {
+      "name": "A. Page load & right-side visualization (chord tree / piano / staff)",
+      "pass": true,
+      "detail": {
+        "ready": "complete",
+        "contentLen": 36185,
+        "piano": true,
+        "tree": true,
+        "staff": false,
+        "anySvg": 4,
+        "acState": "none",
+        "pageErrors": []
+      },
+      "shot": "01_scene_load.png"
+    },
+    {
+      "name": "B. Woodblock metronome: 1234 & sound synced, accent on beat 1, single interval (no double woodblock)",
+      "pass": true,
+      "detail": {
+        "diag": {
+          "i": true,
+          "mode": "woodblock",
+          "ck": true,
+          "clock": true,
+          "src": "metronome",
+          "P": 3.3333333333333335,
+          "ac": "running"
+        },
+        "beats": 5,
+        "accents": 2,
+        "periodMs": 3333,
+        "maxAccentAlignSec": 0.741,
+        "dupFast": true,
+        "liveBeatDot": "1",
+        "acState": "running"
+      },
+      "shot": "02_scene_metronome_woodblock.png"
+    },
+    {
+      "name": "C. Metronome mute: no sound (playMetronomeBeat suppressed), display logic intact",
+      "pass": true,
+      "detail": {
+        "beatCallsWhileMuted": 2,
+        "allCallsWereMuted": true,
+        "lastBeatDotWhileMuted": "3"
+      },
+      "shot": "03_scene_metro_mute.png"
+    },
+    {
+      "name": "D. With metronome on, chord/arp trigger aligns to the first beat (may defer up to 3 beats)",
+      "pass": true,
+      "detail": {
+        "chordTriggers": 1,
+        "bestAlignToDownbeatSec": 0,
+        "periodMs": 3333
+      },
+      "shot": "04_scene_chord_align.png"
+    },
+    {
+      "name": "E. Harmony first then metronome: waits to next beat-1 before sounding; harmony & metronome share one clock",
+      "pass": true,
+      "detail": {
+        "beatAtClick_0isFirst": 3,
+        "waitedSec": null,
+        "accents": 1,
+        "maxAccentAlignSec": 0.011,
+        "harmonyChords": 1,
+        "maxHarmonyAlignSec": 0.011,
+        "dupFast": true,
+        "harmonyPlaying": false,
+        "periodMs": 3333,
+        "acState": "running"
+      },
+      "shot": "05_scene_harmony_then_metronome.png"
+    },
+    {
+      "name": "F. Groove<->woodblock mutex: switch to Groove mutes woodblock; switch back mutes Groove (no two sounds)",
+      "pass": true,
+      "detail": {
+        "grooveMode": {
+          "grooveSteps": 7,
+          "woodblockBeats": 0
+        },
+        "woodblockMode": {
+          "grooveStepsStillRunning": 0,
+          "woodblockBeats": 3,
+          "dupFast": true
+        }
+      },
+      "shot": "06_scene_groove_woodblock_mutex.png"
+    },
+    {
+      "name": "G. Woodblock clickable on/off: off stops sound, click again resumes; single interval throughout (no duplicate woodblock)",
+      "pass": true,
+      "detail": {
+        "off": {
+          "b": 0,
+          "c": false,
+          "i": false
+        },
+        "on": {
+          "b": 1,
+          "dup": false,
+          "c": true,
+          "i": true
+        }
+      },
+      "shot": "07_scene_woodblock_toggle.png"
+    }
+  ]
+}

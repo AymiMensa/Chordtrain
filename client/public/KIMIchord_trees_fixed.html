@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -541,9 +541,10 @@ body{background:var(--bg);font-family:'Inter',-apple-system,BlinkMacSystemFont,'
 }
 
 .exam-settings-toggle{margin:4px 0;width:100%;}.exam-hint-toggle{display:flex;align-items:center;gap:5px;color:var(--text3);font-size:8px;margin-top:5px}.exam-hint-toggle input{accent-color:var(--accent)}.exam-score-chart{height:64px;display:flex;align-items:flex-end;gap:3px;padding:6px;border:1px solid var(--border);border-radius:4px;background:var(--bg);margin:6px 0}.exam-score-chart span{flex:1;min-width:2px;background:var(--accent);border-radius:2px 2px 0 0}.exam-completion{margin-top:6px;padding:6px;border:1px solid var(--green);border-radius:5px;background:color-mix(in srgb,var(--green) 8%,var(--bg));font-size:9px}.exam-completion-stats{display:flex;flex-wrap:wrap;gap:5px 12px;margin:6px 0;color:var(--text2)}.exam-completion-stats span{white-space:nowrap}.exam-completion-stats strong{color:var(--text)}.progression-tools,.progression-io{display:grid;grid-template-columns:minmax(0,1fr) repeat(2,minmax(0,auto));gap:4px;margin-top:5px}.progression-io{grid-template-columns:repeat(2,minmax(0,1fr))}.progression-summary{margin-top:5px;padding:5px;border:1px solid var(--border);border-radius:4px;color:var(--text2);font-size:8px;line-height:1.35;max-height:56px;overflow:auto;word-break:break-word}.piano-mini:has(.exam-hint){min-height:224px}.p-mini-w.exam-hint,.p-mini-b.exam-hint{box-shadow:inset 0 0 0 3px #4c8df7;background:#dbeafe;color:#123}.p-mini-b.exam-hint{background:#2563eb;color:#fff}.piano-mini .piano{min-height:100%}.exam-stage{width:100%;min-width:0}.exam-stage .exam-piano-stage{width:calc(100% + 18px);margin-left:-9px;padding-left:0;padding-right:0}.exam-stage .exam-piano-stage .piano-mini{width:100%;max-width:none;margin-left:0;margin-right:0;border-left:0;border-right:0;border-radius:0}.exam-stage .exam-piano-stage .visual-label{padding-left:9px;padding-right:9px}.exam-panel-actions{display:flex;justify-content:center;margin-top:7px}.exam-fullscreen-btn{min-width:132px}.exam-focus-active{background:var(--bg)}.exam-focus-active .topbar,.exam-focus-active .sidebar,.exam-focus-active .sidebar-overlay,.exam-focus-active .copyright{display:none!important}.exam-focus-active .main-layout{height:100vh}.exam-focus-active .content{padding:0;overflow-x:hidden;overflow-y:auto;background:var(--bg)}.exam-focus-active .exam-panel{margin:0;border-left:0;border-right:0;border-top:0;border-radius:0;padding:clamp(10px,2vw,18px)}.exam-focus-active .exam-stage .exam-piano-stage{width:100%;margin-left:0;min-height:0}.exam-focus-active .exam-stage .exam-piano-stage .visual-label{padding:10px clamp(10px,2vw,18px)}.exam-focus-active .exam-stage .exam-piano-stage .piano-mini{height:clamp(220px,52svh,500px)!important;min-height:0}.exam-focus-active .exam-history-panel{display:none}@media(max-width:700px){.progression-tools,.progression-io{grid-template-columns:1fr 1fr}.progression-tools .sb-input{grid-column:1/-1}.exam-completion{font-size:8px}.piano-mini{max-width:100%;overflow:hidden}.exam-stage .exam-piano-stage{width:calc(100% + 24px);margin-left:-12px}.exam-stage .exam-piano-stage .visual-label{padding-left:12px;padding-right:12px}}
+.exam-controls{min-width:0;max-width:100%;overflow:hidden}.exam-controls .sb-row{display:grid;grid-template-columns:minmax(52px,auto) minmax(0,1fr) minmax(0,auto);align-items:center;gap:5px;min-width:0}.exam-controls .sb-row>label{min-width:0;overflow-wrap:anywhere}.exam-controls .exam-question-limit{display:block;width:100%;min-width:0;max-width:100%;box-sizing:border-box}.exam-controls .exam-inline-note{min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere;line-height:1.2}.exam-controls input[type="range"]{min-width:0;max-width:100%}
+@media(max-width:360px){.exam-controls .sb-row{grid-template-columns:minmax(48px,.8fr) minmax(0,1fr);gap:4px}.exam-controls .sb-row>.exam-inline-note,.exam-controls .sb-row>output{grid-column:2;justify-self:start}.exam-controls .exam-question-limit{font-size:12px}.exam-controls .sb-row>label{font-size:10px}}
 .exam-focus-active .exam-panel{width:100%;max-width:none}
 .exam-paused-notice{display:flex;align-items:center;justify-content:center;gap:7px;margin:8px 0;padding:9px 12px;border:1px solid var(--accent);border-radius:7px;background:color-mix(in srgb,var(--accent) 12%,var(--panel));color:var(--text);font-size:12px;font-weight:700}.exam-paused-notice[hidden]{display:none}.exam-focus-active .exam-paused-notice{margin:12px max(12px,env(safe-area-inset-right)) 8px;min-height:40px;font-size:clamp(12px,1.2vw,16px)}
-body.scale-degree-quiz-mode .sidebar{display:none!important}body.scale-degree-quiz-mode .content{width:100%;min-width:0}.degree-quiz-page{width:min(100%,960px);margin:0 auto;padding:clamp(12px,3vw,28px);color:var(--text)}.degree-quiz-card{padding:clamp(14px,3vw,24px);border:1px solid color-mix(in srgb,var(--accent) 42%,var(--border));border-radius:14px;background:var(--panel);box-shadow:0 12px 34px rgba(15,23,42,.1);min-width:0}.degree-quiz-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}.degree-quiz-head h2{font-size:clamp(19px,3vw,28px);color:var(--white);overflow-wrap:anywhere}.degree-quiz-head p{margin-top:4px;color:var(--text2);font-size:clamp(12px,1.5vw,14px);line-height:1.55}.degree-quiz-setup{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:end;gap:10px;margin:18px 0;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--bg)}.degree-quiz-field{display:grid;gap:6px;min-width:0}.degree-quiz-field label{font-size:12px;color:var(--text2)}.degree-quiz-field input,.degree-quiz-answer{width:100%;min-width:0;height:42px;padding:8px 10px;border:1px solid var(--border-hover);border-radius:7px;background:var(--panel);color:var(--text);font:600 16px inherit}.degree-quiz-btn{min-height:42px;padding:8px 14px;border:1px solid var(--border-hover);border-radius:7px;background:var(--panel-hover);color:var(--text);font:700 13px inherit;cursor:pointer}.degree-quiz-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}.degree-quiz-btn:hover{filter:brightness(1.08)}.degree-quiz-score{margin:12px 0;padding:12px;border-radius:8px;background:color-mix(in srgb,var(--accent) 10%,var(--bg));color:var(--text);font-weight:700;font-size:15px;overflow-wrap:anywhere}.degree-quiz-list{display:grid;gap:10px;margin:12px 0}.degree-quiz-question{display:grid;grid-template-columns:minmax(0,1fr) minmax(110px,180px);align-items:center;gap:10px;min-width:0;padding:12px;border:1px solid var(--border);border-radius:9px;background:var(--bg)}.degree-quiz-question.is-wrong{border:2px solid var(--red);background:color-mix(in srgb,var(--red) 8%,var(--bg))}.degree-quiz-question.is-correct{border-color:var(--green)}.degree-quiz-prompt{min-width:0;line-height:1.6;font-size:clamp(13px,1.7vw,16px);overflow-wrap:anywhere}.degree-quiz-answer{font-weight:700}.degree-quiz-feedback{grid-column:1/-1;color:var(--text2);font-size:12px;overflow-wrap:anywhere}.degree-quiz-question.is-wrong .degree-quiz-feedback{color:var(--red)}.degree-quiz-question.is-correct .degree-quiz-feedback{color:var(--green)}.degree-quiz-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.degree-quiz-actions .degree-quiz-btn{flex:1 1 180px}@media(max-width:600px){.degree-quiz-page{padding:8px}.degree-quiz-card{border-radius:10px}.degree-quiz-setup{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.degree-quiz-field{grid-column:1/-1}.degree-quiz-setup .degree-quiz-btn{width:100%;padding:8px}.degree-quiz-question{grid-template-columns:minmax(0,1fr);gap:7px;padding:10px}.degree-quiz-feedback{grid-column:auto}.degree-quiz-actions{display:grid;grid-template-columns:1fr}.degree-quiz-actions .degree-quiz-btn{width:100%}}
 .exam-pause-overlay{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:max(20px,env(safe-area-inset-top)) max(20px,env(safe-area-inset-right)) max(20px,env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left));background:rgba(11,22,39,.58);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}.exam-pause-overlay-card{width:min(440px,100%);padding:clamp(22px,5vw,38px);border:1px solid color-mix(in srgb,var(--accent) 55%,#fff);border-radius:16px;background:color-mix(in srgb,var(--panel) 94%,#10213d);box-shadow:0 24px 70px rgba(0,0,0,.35);text-align:center}.exam-pause-overlay-title{margin:0;color:var(--text);font-size:clamp(24px,5vw,38px);font-weight:800;letter-spacing:.04em}.exam-pause-overlay-copy{margin:10px 0 20px;color:var(--text2);font-size:clamp(13px,2vw,16px);line-height:1.55}.exam-pause-overlay .sb-btn{min-width:180px;min-height:44px;font-size:15px}.exam-hint-btn[aria-pressed="true"]{border-color:#2563eb;background:#2563eb;color:#fff}
 </style>
 </head>
@@ -600,7 +601,7 @@ body.scale-degree-quiz-mode .sidebar{display:none!important}body.scale-degree-qu
         <h3>三種難度</h3>
         <ul>
           <li><strong>初學者：</strong>從單音根音與基本三和弦開始，點擊樹上的節點即可聆聽並加入和弦進行。</li>
-          <li><strong>調內：</strong>依目前的 KEY、SCALE 與 MODE 展示調內七個和弦，卡片下方會以完整三和弦或七和弦呈現。</li>
+          <li><strong>調內：</strong>依目前的根音、音階與教會調式展示調內七個和弦，卡片下方會以完整三和弦或七和弦呈現。</li>
           <li><strong>中級：</strong>按根音分組探索多種和弦類型與轉位，展開分類即可播放各個和弦格。</li>
         </ul>
       </section>
@@ -608,8 +609,8 @@ body.scale-degree-quiz-mode .sidebar{display:none!important}body.scale-degree-qu
         <h3>設定與控制項</h3>
         <ul>
           <li><strong>難度：</strong>切換初學者、調內、中級內容。</li>
-          <li><strong>KEY／SCALE／MODE：</strong>選擇調性、音階與調式；MODE 會依主音建立正確七級音階。以 C 為例：Ionian＝C-D-E-F-G-A-B-C（全全半全全全半）；Dorian＝C-D-Eb-F-G-A-Bb-C（全半全全全半全）；Phrygian＝C-Db-Eb-F-G-Ab-Bb-C（半全全全半全全）；Lydian＝C-D-E-F#-G-A-B-C（全全全半全全半）；Mixolydian＝C-D-E-F-G-A-Bb-C（全全半全全半全）；Aeolian＝C-D-Eb-F-G-Ab-Bb-C（全半全全半全全）；Locrian＝C-Db-Eb-F-Gb-Ab-Bb-C（半全全半全全全）。</li>
-          <li><strong>樂器：</strong>切換空靈鼓、鋼琴、拇指琴、豎琴或鐵琴音色。</li>
+          <li><strong>根音／音階／教會調式：</strong>選擇根音、音階與教會調式；教會調式會依主音建立正確七級音階。以 C 為例：Ionian＝C-D-E-F-G-A-B-C（全全半全全全半）；Dorian＝C-D-Eb-F-G-A-Bb-C（全半全全全半全）；Phrygian＝C-Db-Eb-F-G-Ab-Bb-C（半全全全半全全）；Lydian＝C-D-E-F#-G-A-B-C（全全全半全全半）；Mixolydian＝C-D-E-F-G-A-Bb-C（全全半全全半全）；Aeolian＝C-D-Eb-F-G-Ab-Bb-C（全半全全半全全）；Locrian＝C-Db-Eb-F-Gb-Ab-Bb-C（半全全半全全全）。</li>
+          <li><strong>樂器：</strong>切換長笛、鋼琴、吉他、豎琴或銅管音色。</li>
           <li><strong>和弦／琶音開關與音量：</strong>各自滑桿左側的「開／關」按鈕可獨立啟用或靜音和弦音、琶音；滑桿調整對應音量，速度控制 BPM。</li>
           <li><strong>調式音級 1–7：</strong>這七格是七種 MODE 的快捷選擇，而不是七個都相同的 Ionian：1＝Ionian、2＝Dorian、3＝Phrygian、4＝Lydian、5＝Mixolydian、6＝Aeolian、7＝Locrian。點擊後會同步更新 MODE、和弦樹、鋼琴、五線譜與播放音階。</li>
           <li><strong>隨機／手動：</strong>滑鼠懸停或手指觸壓按鈕即可查看提示。隨機模式由系統依目前所選調式與風格安排進行；手動模式依目前調式的固定風格順序安排智慧和聲目標。</li>
@@ -664,7 +665,7 @@ body.scale-degree-quiz-mode .sidebar{display:none!important}body.scale-degree-qu
   <div class="sidebar" id="sidebar">
     <div class="sb-section">
       <h4>設定</h4>
-      <div class="sb-row"><label>難度</label><select class="sb-select" id="levelSelect"><option value="Beginner">初學者</option><option value="Diatonic">調內</option><option value="Intermediate">和弦種類圖</option><option value="Exam">隨堂考試</option><option value="ScaleDegreeQuiz">音級換算題庫</option></select></div>
+      <div class="sb-row"><label>難度</label><select class="sb-select" id="levelSelect"><option value="Beginner">初學者</option><option value="Diatonic">調內</option><option value="Intermediate">和弦種類圖</option><option value="Exam">隨堂考試</option></select></div>
       <div id="examControls" class="exam-controls" hidden>
         <div class="exam-card-title">隨堂考試</div>
         <button class="sb-btn exam-settings-toggle" id="examSettingsToggle" type="button" aria-expanded="true">設定（可收合）</button>
@@ -688,9 +689,16 @@ body.scale-degree-quiz-mode .sidebar{display:none!important}body.scale-degree-qu
         </div>
       </div>
       <div id="diatonicControls">
-        <div class="sb-row"><label>KEY</label><select class="sb-select" id="keySelect"><option>C</option><option>C#</option><option>D</option><option>Eb</option><option>E</option><option>F</option><option>F#</option><option>G</option><option>Ab</option><option>A</option><option>Bb</option><option>B</option></select></div>
-        <div class="sb-row"><label>SCALE</label><select class="sb-select" id="scaleSelect"><option>Major</option><option>Natural Minor</option><option>Harmonic Minor</option><option>Dorian</option><option>Mixolydian</option></select></div>
-        <div class="sb-row"><label>MODE</label><select class="sb-select" id="modeSelect"><option>1st (Ionian)</option><option>2nd (Dorian)</option><option>3rd (Phrygian)</option><option>4th (Lydian)</option><option>5th (Mixolydian)</option><option>6th (Aeolian)</option><option>7th (Locrian)</option></select></div>
+        <div class="sb-row"><label>根音</label><select class="sb-select" id="keySelect" aria-label="選擇根音"><option>C</option><option>C#</option><option>D</option><option>Eb</option><option>E</option><option>F</option><option>F#</option><option>G</option><option>Ab</option><option>A</option><option>Bb</option><option>B</option></select></div>
+        <div class="sb-row"><label for="scaleSelect">音階</label><select class="sb-select scale-select" id="scaleSelect" aria-label="選擇音階">
+          <optgroup label="西方大小調與教會調式"><option value="Major">自然大調（Major / Ionian）</option><option value="Natural Minor">自然小調（Aeolian）</option><option value="Melodic Minor">旋律小調（Jazz Minor）</option><option value="Harmonic Minor">和聲小調</option><option value="Neapolitan Minor">拿坡里小調</option><option value="Dorian">Dorian</option><option value="Phrygian">Phrygian</option><option value="Lydian">Lydian</option><option value="Mixolydian">Mixolydian</option><option value="Locrian">Locrian</option></optgroup>
+          <optgroup label="藍調與爵士"><option value="Blues">經典六音藍調</option><option value="Major Blues">大調藍調</option><option value="Bebop Dominant">咆嘯屬音階（Bebop Dominant）</option><option value="Altered">變化音階（Altered / Super Locrian）</option><option value="Lydian Dominant">利第安屬音階</option></optgroup>
+          <optgroup label="五聲與中國音階"><option value="Major Pentatonic">宮調五聲音階（Major Pentatonic）</option><option value="Shang Pentatonic">商調五聲音階</option><option value="Jiao Pentatonic">角調五聲音階</option><option value="Zhi Pentatonic">徵調五聲音階</option><option value="Yu Pentatonic">羽調五聲音階</option><option value="Chinese Seven">中國七聲音階</option><option value="Chinese Yayue">雅樂音階</option><option value="Chinese Qingyue">清樂音階</option><option value="Chinese Yanyue">燕樂音階</option></optgroup>
+          <optgroup label="日本音階"><option value="Hirajoshi">日本平調子（Hirajoshi）</option><option value="Insen">日本陰旋律（Insen）</option><option value="Kumoi">日本陰旋律（Kumoi）</option><option value="Iwato">日本岩戶音階（Iwato）</option></optgroup>
+          <optgroup label="世界音階"><option value="Bhairav">印度拜拉夫拉格（Raga Bhairav）</option><option value="Kafi">印度卡菲拉格（Raga Kafi）</option><option value="Hungarian Minor">吉普賽小調（Hungarian / Gypsy Minor）</option><option value="Byzantine">拜占庭雙和聲（Byzantine / Arabic Hijaz）</option></optgroup>
+        </select></div>
+        <div class="scale-info" id="scaleInfo" aria-live="polite" aria-label="目前音階說明"><strong id="scaleInfoName">自然大調</strong><span id="scaleInfoFormula">公式：全全半全全全半</span><span id="scaleInfoDescription">西方大調核心音階。</span></div>
+        <div class="sb-row"><label>教會調式</label><select class="sb-select" id="modeSelect" aria-label="選擇教會調式"><option>1st (Ionian)</option><option>2nd (Dorian)</option><option>3rd (Phrygian)</option><option>4th (Lydian)</option><option>5th (Mixolydian)</option><option>6th (Aeolian)</option><option>7th (Locrian)</option></select></div>
       </div>
     </div>
 
@@ -710,7 +718,7 @@ body.scale-degree-quiz-mode .sidebar{display:none!important}body.scale-degree-qu
         <div class="mode-opt on" id="modeRandom" role="button" tabindex="0" aria-pressed="true" data-tooltip="隨機：由系統依目前調式的七個音級與所選風格安排和弦進行。">⌁ 隨機</div>
         <div class="mode-opt" id="modeManual" role="button" tabindex="0" aria-pressed="false" data-tooltip="手動：依目前調式的七個音級與固定風格順序安排智慧和聲目標。">⌁ 手動</div>
       </div>
-      <button class="sb-btn" id="scalePreviewBtn" type="button" title="依目前 KEY、MODE 與 BPM 逐音播放音階" aria-pressed="false">♩ 音階預覽</button>
+      <button class="sb-btn" id="scalePreviewBtn" type="button" title="依目前根音、音階與速度逐音播放" aria-label="聆聽目前音階" aria-pressed="false">♩ 聆聽音階</button>
       <div class="scale-preview-status" id="scalePreviewStatus" aria-live="polite" hidden><span>預覽：</span><strong id="scalePreviewNote">準備中</strong><span id="scalePreviewBeat">第 0／8 音</span></div>
       <button class="sb-btn" id="generateBtn">⌁ 生成</button>
       <button class="sb-btn green" id="playAllBtn">▷ 播放</button>
@@ -736,14 +744,18 @@ body.scale-degree-quiz-mode .sidebar{display:none!important}body.scale-degree-qu
 
     <div class="sb-section" id="soundControlsSection">
       <h4>♫ 聲音</h4>
-      <div class="sb-row exam-irrelevant"><label>樂器</label><select class="sb-select" id="instSelect"><option value="TongueDrum">空靈鼓</option><option value="Piano">鋼琴</option><option value="Kalimba">拇指琴</option><option value="Harp">豎琴</option><option value="Vibraphone">鐵琴</option></select></div>
+      <div class="sb-row exam-irrelevant"><label>樂器</label><select class="sb-select" id="instSelect"><option value="Flute">長笛</option><option value="Piano">鋼琴</option><option value="Guitar">吉他</option><option value="Harp">豎琴</option><option value="Brass">銅管</option><option value="GlassBowl">玻璃碗琴</option><option value="Handpan">飛碟鼓（Handpan／Pan Drum）</option><option value="SteelTongue">空靈鼓（Steel Tongue Drum）</option><option value="Kalimba">卡林巴（Kalimba／Mbira）</option></select></div>
       <div class="slider-row sound-slider-row exam-irrelevant"><button class="sound-toggle" id="chordToggle" type="button" aria-label="開啟和弦音" aria-pressed="false" title="開啟／關閉和弦音">關</button><div class="slider-stack"><label><span>和弦</span><span id="chordVol">50%</span></label><input type="range" min="0" max="100" value="50" id="chordSlider"></div></div>
       <div class="slider-row sound-slider-row exam-irrelevant"><button class="sound-toggle on" id="arpToggle" type="button" aria-label="關閉琶音音" aria-pressed="true" title="開啟／關閉琶音音">開</button><div class="slider-stack"><label><span>琶音</span><span id="arpVol">70%</span></label><input type="range" min="0" max="100" value="70" id="arpSlider"></div></div>
        <div class="slider-row"><label><span>速度（30–300 BPM）</span><span id="tempoVal">72</span></label><input type="range" min="30" max="300" value="72" id="tempoSlider"></div>
        <div class="slider-row"><label><span>節拍器音量</span><span id="metroVol">65%</span></label><input type="range" min="0" max="100" value="65" id="metroSlider" aria-label="節拍器音量 65%"></div>
-        <div class="sb-row exam-irrelevant"><label for="audioDeviceProfile">裝置音量</label><select class="sb-select" id="audioDeviceProfile" aria-label="裝置音量設定"><option value="desktop">桌面</option><option value="mobile">手機</option><option value="headphones">耳機</option></select></div>
+      <div class="sb-row exam-irrelevant"><label for="deviceAudioProfile">裝置音量設定</label><select class="sb-select" id="deviceAudioProfile" aria-label="選擇裝置音量設定"><option value="desktop">桌面</option><option value="mobile">手機</option><option value="headphones">耳機</option></select></div>
+      <div class="field-hint exam-irrelevant" id="deviceAudioProfileHint">桌面：完整動態；手機：保守輸出與揚聲器保護；耳機：較寬動態與清晰細節。</div>
+      <div class="sb-row exam-irrelevant"><label for="mobilePureMode"><span>手機純淨模式</span> <span class="field-hint">（降低手機揚聲器雜音）</span></label><input type="checkbox" id="mobilePureMode" role="switch" aria-describedby="mobilePureModeHint"></div>
+      <div class="field-hint exam-irrelevant" id="mobilePureModeHint">保守輸出、較長起收音與頻寬保護；耳機或外接喇叭可關閉以保留完整動態。</div>
       <button class="sb-btn exam-irrelevant" id="resetAudioPreferencesBtn" type="button" title="清除本機儲存的音訊、Groove 與播放監視器偏好並恢復安全預設">↺ 重設所有音訊偏好</button>
-      <div class="sb-row" style="margin-top:8px"><label><input type="checkbox" id="metronome" checked> 節拍器</label></div>
+      <div class="sb-row" style="margin-top:8px"><label><input type="checkbox" id="metronome"> 節拍器</label></div>
+      <div class="sb-row" style="margin-top:6px"><label><input type="checkbox" id="metroMute" role="switch" aria-checked="false"> 節拍器靜音（僅顯示 1234，不出聲）</label></div>
       <div class="sb-row"><label>節拍器音色</label></div>
        <div class="mode-toggle metro-mode-toggle" id="metronomeMode" role="group" aria-label="節拍器音色模式"><button class="mode-opt on" id="woodblockModeBtn" type="button" aria-pressed="true">木魚</button><button class="mode-opt" id="grooveModeBtn" type="button" aria-pressed="false">Groove</button></div>
       <div class="groove-controls" id="grooveControls" hidden>
@@ -938,9 +950,65 @@ const CHORD_STEPS={
 const SCALES={
   'Major':[0,2,4,5,7,9,11],
   'Natural Minor':[0,2,3,5,7,8,10],
+  'Melodic Minor':[0,2,3,5,7,9,11],
   'Harmonic Minor':[0,2,3,5,7,8,11],
+  'Neapolitan Minor':[0,1,3,5,7,8,11],
   'Dorian':[0,2,3,5,7,9,10],
+  'Phrygian':[0,1,3,5,7,8,10],
+  'Lydian':[0,2,4,6,7,9,11],
   'Mixolydian':[0,2,4,5,7,9,10],
+  'Locrian':[0,1,3,5,6,8,10],
+  'Blues':[0,3,5,6,7,10],
+  'Major Blues':[0,2,3,4,7,9],
+  'Bebop Dominant':[0,2,4,5,7,9,10,11],
+  'Altered':[0,1,3,4,6,8,10],
+  'Lydian Dominant':[0,2,4,6,7,9,10],
+  'Major Pentatonic':[0,2,4,7,9],
+  'Shang Pentatonic':[0,3,5,7,10],
+  'Jiao Pentatonic':[0,3,5,8,10],
+  'Zhi Pentatonic':[0,2,5,7,9],
+  'Yu Pentatonic':[0,3,5,7,10],
+  'Chinese Seven':[0,2,4,5,7,9,11],
+  'Chinese Yayue':[0,2,4,6,7,9,11],
+  'Chinese Qingyue':[0,2,4,5,7,9,11],
+  'Chinese Yanyue':[0,2,4,5,7,9,10],
+  'Hirajoshi':[0,2,3,7,8],
+  'Insen':[0,1,5,7,10],
+  'Kumoi':[0,2,3,7,9],
+  'Iwato':[0,1,5,6,10],
+  'Bhairav':[0,1,4,5,7,8,11],
+  'Kafi':[0,2,3,5,7,9,10],
+  'Hungarian Minor':[0,2,3,6,7,8,11],
+  'Byzantine':[0,1,4,5,7,8,11],
+};
+const SCALE_INFO={
+  'Major':{label:'自然大調（Major / Ionian）',formula:'全全半全全全半',note:'西方大調核心音階。'},
+  'Natural Minor':{label:'自然小調（Aeolian）',formula:'全半全全半全全',note:'自然小調與 Aeolian 相同。'},
+  'Melodic Minor':{label:'旋律小調（Jazz Minor）',formula:'全半全全全全半',note:'上行旋律小調；爵士常用固定旋律小調。'},
+  'Harmonic Minor':{label:'和聲小調',formula:'全半全全半增二度半',note:'升高第七音，形成強烈屬功能。'},
+  'Neapolitan Minor':{label:'拿坡里小調',formula:'半全全全半全半',note:'降二級並保留升七級。'},
+  'Blues':{label:'經典六音藍調',formula:'1 ♭3 4 ♭5 5 ♭7',note:'小三度、降五度與降七度構成藍調語彙。'},
+  'Major Blues':{label:'大調藍調',formula:'1 2 ♭3 3 5 6',note:'大調五聲加入藍調三度。'},
+  'Bebop Dominant':{label:'咆嘯屬音階',formula:'1 2 3 4 5 6 ♭7 7',note:'八音爵士屬音階，讓和弦音落在強拍。'},
+  'Altered':{label:'變化音階（Super Locrian）',formula:'1 ♭2 ♭3 ♭4 ♭5 ♭6 ♭7',note:'屬七變化和弦常用。'},
+  'Lydian Dominant':{label:'利第安屬音階',formula:'1 2 3 ♯4 5 6 ♭7',note:'屬七和弦搭配升四度。'},
+  'Major Pentatonic':{label:'宮調五聲音階',formula:'1 2 3 5 6',note:'明亮、穩定的五聲音階。'},
+  'Shang Pentatonic':{label:'商調五聲音階',formula:'1 ♭3 4 5 ♭7',note:'以商音為核心的五聲色彩。'},
+  'Jiao Pentatonic':{label:'角調五聲音階',formula:'1 ♭3 4 ♭6 ♭7',note:'以角音為核心，色彩較內省。'},
+  'Zhi Pentatonic':{label:'徵調五聲音階',formula:'1 2 5 6 1',note:'以徵音為核心，明朗而具歌唱性。'},
+  'Yu Pentatonic':{label:'羽調五聲音階',formula:'1 ♭3 4 5 ♭7',note:'以羽音為核心，帶自然小調色彩。'},
+  'Chinese Seven':{label:'中國七聲音階',formula:'1 2 3 4 5 6 7',note:'清樂音階；以 C 為宮時等同自然大調。'},
+  'Chinese Yayue':{label:'雅樂音階（古音階、正聲音階）',formula:'1 2 3 ♯4 5 6 7',note:'加入變徵（♯4）與變宮（7），常見於古代宮廷雅樂。'},
+  'Chinese Qingyue':{label:'清樂音階（新音階、下徵音階）',formula:'1 2 3 4 5 6 7',note:'加入清角（4）與變宮（7），結構同自然大調。'},
+  'Chinese Yanyue':{label:'燕樂音階（俗樂、清商音階）',formula:'1 2 3 4 5 6 ♭7',note:'加入清角（4）與閏（♭7），帶隋唐俗樂色彩。'},
+  'Hirajoshi':{label:'日本平調子',formula:'1 2 ♭3 5 ♭6',note:'日本傳統五聲音階。'},
+  'Insen':{label:'日本陰旋律（Insen）',formula:'1 ♭2 4 5 ♭7',note:'半音與空五度形成陰鬱色彩。'},
+  'Kumoi':{label:'日本陰旋律（Kumoi）',formula:'1 2 ♭3 5 6',note:'日本傳統五聲音階變體。'},
+  'Iwato':{label:'日本岩戶音階',formula:'1 ♭2 4 ♭5 ♭7',note:'無三度的空靈五聲音階。'},
+  'Bhairav':{label:'印度拜拉夫拉格',formula:'1 ♭2 3 4 5 ♭6 7',note:'印度古典音階，大小二度並置。'},
+  'Kafi':{label:'印度卡菲拉格',formula:'1 2 ♭3 4 5 6 ♭7',note:'接近自然小調的印度拉格。'},
+  'Hungarian Minor':{label:'吉普賽小調',formula:'1 2 ♭3 ♯4 5 ♭6 7',note:'兩個增二度形成強烈異國色彩。'},
+  'Byzantine':{label:'拜占庭雙和聲（Arabic Hijaz）',formula:'1 ♭2 3 4 5 ♭6 7',note:'兩個增二度的中東色彩音階。'}
 };
 const MODE_DATA={
   '1st (Ionian)':{key:'Ionian',intervals:[0,2,4,5,7,9,11],pattern:'全全半全全全半',description:'自然大調；C-D-E-F-G-A-B-C'},
@@ -955,8 +1023,8 @@ const MODE_ORDER=['1st (Ionian)','2nd (Dorian)','3rd (Phrygian)','4th (Lydian)',
 function getActiveModeData(mode=S.mode){
   if(typeof S!=='undefined'&&S.modeScaleEnabled===false){
     const intervals=SCALES[S.scale]||SCALES.Major;
-    const labels={Major:'自然大調', 'Natural Minor':'自然小調', 'Harmonic Minor':'和聲小調', Dorian:'Dorian', Mixolydian:'Mixolydian'};
-    return{key:labels[S.scale]||S.scale,intervals,pattern:'依目前 SCALE',description:`目前使用 ${labels[S.scale]||S.scale} 音階`};
+    const labels={Major:'自然大調', 'Natural Minor':'自然小調', 'Melodic Minor':'旋律小調', 'Harmonic Minor':'和聲小調', 'Neapolitan Minor':'拿坡里小調', Blues:'經典六音藍調', 'Major Blues':'大調藍調', 'Bebop Dominant':'咆嘯屬音階', Altered:'變化音階', 'Lydian Dominant':'利第安屬音階', 'Major Pentatonic':'宮調五聲音階', 'Shang Pentatonic':'商調五聲音階', 'Jiao Pentatonic':'角調五聲音階', 'Zhi Pentatonic':'徵調五聲音階', 'Yu Pentatonic':'羽調五聲音階', 'Chinese Seven':'中國七聲音階', 'Chinese Yayue':'雅樂音階', 'Chinese Qingyue':'清樂音階', 'Chinese Yanyue':'燕樂音階', Hirajoshi:'日本平調子', Insen:'日本陰旋律（Insen）', Kumoi:'日本陰旋律（Kumoi）', Iwato:'日本岩戶音階', Bhairav:'印度拜拉夫拉格', Kafi:'印度卡菲拉格', 'Hungarian Minor':'吉普賽小調', Byzantine:'拜占庭雙和聲', Dorian:'Dorian', Phrygian:'Phrygian', Lydian:'Lydian', Mixolydian:'Mixolydian', Locrian:'Locrian'};
+    return{key:labels[S.scale]||S.scale,intervals,pattern:'依目前音階',description:`目前使用 ${labels[S.scale]||S.scale} 音階`};
   }
   return MODE_DATA[mode]||MODE_DATA['1st (Ionian)'];
 }
@@ -1007,7 +1075,16 @@ function spellNote(root,interval,degreeSteps){
 }
 
 function spellScaleNotes(key,scale){
-  return getActiveScaleIntervals(scale,S.mode).map((interval,degree)=>spellNote(key,interval,degree).name);
+  const intervals=getActiveScaleIntervals(scale,S.mode);
+  // 五聲、藍調與世界音階不一定能以七個字母音級逐級拼寫；
+  // 對這些音階採用單升／單降的可讀音名，避免出現 E#、F##、G###。
+  if(intervals.length!==7){
+    const flatKey=String(key||'').includes('b')||intervals.some(interval=>[1,3,6,8,10].includes(interval));
+    const names=flatKey?['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B']:['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+    const rootPc=notePitchClass(key);
+    return intervals.map(interval=>interval===0?key:names[(rootPc+interval)%12]);
+  }
+  return intervals.map((interval,degree)=>spellNote(key,interval,degree).name);
 }
 
 function spellChord(root,q){
@@ -1017,25 +1094,21 @@ function spellChord(root,q){
 }
 
 // ===== STATE =====
-const LEGACY_INSTRUMENT_MAP={Flute:'TongueDrum',長笛:'TongueDrum',Guitar:'Kalimba',吉他:'Kalimba'};
-function normalizeInstrument(inst){return LEGACY_INSTRUMENT_MAP[inst]||inst;}
-let S={level:'Beginner',key:'C',scale:'Major',mode:'1st (Ionian)',modeScaleEnabled:true,inst:'TongueDrum',chordVol:0.5,arpVol:0.7,chordEnabled:false,arpEnabled:true,tempo:72,metroVol:0.65,arpMode:'四分音符',cycleCount:2,theme:'earth',harmonyStyle:'popular',harmonyDensity:4,harmonySubstitution:'none',harmonyCadence:'authentic',metroMode:'woodblock',grooveCategory:'four',groove:'disco',grooveWaveform:'triangle',grooveMixPreset:'standard',noteMode:'random',notes:[1,1,1,1,1,1,1],loop:false,progression:[],vis:'piano',activeChord:null,activeCardRoot:null,intermediateOpenGroups:{},intermediateRoot:'C',intermediateType:'Major',customProgression:[{note:'C',q:'Major'},{note:'G',q:'Major'},{note:'A',q:'Minor'},{note:'F',q:'Major'}],examActive:false,examPaused:false,examPauseCount:0,examPauseStartedAt:0,examPauseTotalMs:0,examQuestion:null,examSelected:[],examFeedback:{},examQuestionCount:0,examCorrectCount:0,examWrongCount:0,examReactionTotal:0,examBeat:0,examStartedAt:0,examDifficulty:'triad',examKeys:[],examChordTypes:[],examHistoryVisible:false,examHistory:[],examKeyboardHint:false,examAnswerReference:false,examStaffNotes:[],examCombo:0,examQuestionTransition:0,examMistakeNotes:{},examSettingsCollapsed:false,examFullscreen:false,examScoreSeries:[],examReportVisible:false,examBeatsPerQuestion:4,examQuestionBpm:72,examPreviousTempo:72 ,beginnerInputWindow:[],beginnerRecentInput:[],beginnerRecommendations:[],beginnerPinned:false,beginnerInputTimer:null,beginnerPreviewTimer:null,beginnerPreviewIndex:null,beginnerKeyInfo:{name:'C',confidence:0,modulationProbability:0},beginnerPracticeLog:[],progressionSearch:'',progressionFavorites:[]};
-const SCALE_DEGREE_NAMES=['主音','上主音','中音','下屬音','屬音','下中音','導音'];
-const MAJOR_SCALE_INTERVALS=[0,2,4,5,7,9,11];
-const SCALE_DEGREE_KEYS=['C','C#','D','Eb','E','F','F#','G','Ab','A','Bb','B'];
-let scaleDegreeQuiz={count:8,questions:[],checked:false};
+let S={level:'Beginner',key:'C',scale:'Major',mode:'1st (Ionian)',modeScaleEnabled:true,inst:'Flute',chordVol:0.5,arpVol:0.7,chordEnabled:false,arpEnabled:true,tempo:72,metroVol:0.65,metroMute:false,arpMode:'四分音符',cycleCount:2,theme:'earth',harmonyStyle:'popular',harmonyDensity:4,harmonySubstitution:'none',harmonyCadence:'authentic',metroMode:'woodblock',grooveCategory:'four',groove:'disco',grooveWaveform:'triangle',grooveMixPreset:'standard',noteMode:'random',notes:[1,1,1,1,1,1,1],loop:false,progression:[],vis:'piano',activeChord:null,activeCardRoot:null,intermediateOpenGroups:{},intermediateRoot:'C',intermediateType:'Major',customProgression:[{note:'C',q:'Major'},{note:'G',q:'Major'},{note:'A',q:'Minor'},{note:'F',q:'Major'}],examActive:false,examPaused:false,examPauseCount:0,examPauseStartedAt:0,examPauseTotalMs:0,examQuestion:null,examSelected:[],examFeedback:{},examQuestionCount:0,examCorrectCount:0,examWrongCount:0,examReactionTotal:0,examBeat:0,examStartedAt:0,examDifficulty:'triad',examKeys:[],examChordTypes:[],examHistoryVisible:false,examHistory:[],examKeyboardHint:false,examAnswerReference:false,examStaffNotes:[],examCombo:0,examQuestionTransition:0,examMistakeNotes:{},examSettingsCollapsed:false,examFullscreen:false,examScoreSeries:[],examReportVisible:false,examBeatsPerQuestion:4,examQuestionBpm:72,examPreviousTempo:72 ,beginnerInputWindow:[],beginnerRecentInput:[],beginnerRecommendations:[],beginnerPinned:false,beginnerInputTimer:null,beginnerPreviewTimer:null,beginnerPreviewIndex:null,beginnerKeyInfo:{name:'C',confidence:0,modulationProbability:0},beginnerPracticeLog:[],progressionSearch:'',progressionFavorites:[]};
 const BEGINNER_INPUT_WINDOW_MS=1200;
 const BEGINNER_RECOMMENDATION_HOLD_MS=6000;
 let AC=null,loopInterval=null,metroInterval=null,isRecording=false,arpTimers=[];
-const BEATS_PER_MEASURE=4;
-const BEAT_SCHEDULE_AHEAD_SECONDS=.25;
-let beatTimeline={originTime:0,isRunning:false,beatMs:0,runId:0};
-let beatTimelinePreserved=null;
 let scalePreviewTimers=[],scalePreviewRun=0,scalePreviewActive=false;
 let smartHarmonyTimers=[],smartHarmonyFinishTimer=null,smartHarmonyRun=0,lastSmartHarmonyProgression=[];
 let intermediatePreviewRun=0,intermediatePreviewFinishTimer=null,intermediatePreviewActive=false,intermediatePreviewKey='',intermediatePreviewNodes=new Set();
 let customProgressionRun=0,customProgressionTimers=[],customProgressionFinishTimer=null,customProgressionActive=false,customProgressionCurrentSlot=-1,customRecordingRun=0,customRecordingStartTimer=null,customRecordingStopTimer=null,customChordSearchQuery='',customChordSearchTargetIndex=0,customFileActionsOpen=false,customProgressionDrag=null;
 const MOBILE_PURE_MODE_KEY='kimichord.mobilePureMode';
+const DEVICE_AUDIO_PROFILE_KEY='kimichord.deviceAudioProfile';
+const DEVICE_AUDIO_PROFILES={
+  desktop:{label:'桌面',chordVol:.62,arpVol:.78,metroVol:.78,mobilePureMode:false,grooveMixPreset:'standard',hint:'完整動態，適合電腦內建喇叭或外接喇叭。'},
+  mobile:{label:'手機',chordVol:.50,arpVol:.62,metroVol:.55,mobilePureMode:true,grooveMixPreset:'standard',hint:'保守輸出、較長起收音與頻寬保護，降低手機揚聲器雜音。'},
+  headphones:{label:'耳機',chordVol:.72,arpVol:.82,metroVol:.72,mobilePureMode:false,grooveMixPreset:'bass',hint:'保留較寬動態與低頻細節，適合耳機或高品質外接音響。'}
+};
 const GROOVE_WAVEFORM_KEY='kimichord.grooveWaveform';
 const GROOVE_MIX_PRESET_KEY='kimichord.grooveMixPreset';
 const GROOVE_CUSTOM_PRESETS_KEY='kimichord.grooveCustomPresets';
@@ -1043,7 +1116,14 @@ const GROOVE_CUSTOM_PRESET_ID_KEY='kimichord.grooveCustomPresetId';
 const GROOVE_HISTORY_VISIBLE_KEY='kimichord.grooveHistoryVisible';
 const EXAM_SETTINGS_KEY='kimichord.examSettings';
 const EXAM_HISTORY_KEY='kimichord.examHistory';
-function readMobilePureModePreference(){try{const value=localStorage.getItem(MOBILE_PURE_MODE_KEY);return value==='1'||value==='mobile';}catch(error){return false;}}
+function readMobilePureModePreference(){try{return localStorage.getItem(MOBILE_PURE_MODE_KEY)==='1';}catch(error){return false;}}
+function detectDeviceAudioProfile(){
+  try{
+    const mobile=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)||window.matchMedia?.('(max-width: 700px)').matches;
+    return mobile?'mobile':'desktop';
+  }catch(error){return 'desktop';}
+}
+function readDeviceAudioProfile(){try{const value=localStorage.getItem(DEVICE_AUDIO_PROFILE_KEY);return DEVICE_AUDIO_PROFILES[value]?value:detectDeviceAudioProfile();}catch(error){return detectDeviceAudioProfile();}}
 function readGroovePreference(key,allowed,fallback){try{const value=localStorage.getItem(key);return allowed.includes(value)?value:fallback;}catch(error){return fallback;}}
 function clampGrooveMixValue(value,min,max,fallback){const numeric=Number(value);return Number.isFinite(numeric)?Math.min(max,Math.max(min,numeric)):fallback;}
 function normaliseGrooveCustomPreset(raw,index=0){
@@ -1055,8 +1135,8 @@ function normaliseGrooveCustomPreset(raw,index=0){
 }
 function readGrooveCustomPresets(){try{const list=JSON.parse(localStorage.getItem(GROOVE_CUSTOM_PRESETS_KEY)||'[]');return Array.isArray(list)?list.map(normaliseGrooveCustomPreset).filter(Boolean).slice(-8):[];}catch(error){return [];}}
 function readGrooveHistoryPreference(){try{return localStorage.getItem(GROOVE_HISTORY_VISIBLE_KEY)==='1';}catch(error){return false;}}
+S.deviceAudioProfile=readDeviceAudioProfile();
 S.mobilePureMode=readMobilePureModePreference();
-S.audioDeviceProfile=(()=>{try{const value=localStorage.getItem(MOBILE_PURE_MODE_KEY);return ['desktop','mobile','headphones'].includes(value)?value:(value==='1'?'mobile':'desktop');}catch(error){return 'desktop';}})();
 S.grooveWaveform=readGroovePreference(GROOVE_WAVEFORM_KEY,['triangle','sine','sawtooth','square'],'triangle');
 S.grooveMixPreset=readGroovePreference(GROOVE_MIX_PRESET_KEY,['standard','bass','night','custom'],'standard');
 function readExamSettings(){try{const raw=JSON.parse(localStorage.getItem(EXAM_SETTINGS_KEY)||'{}');return raw&&typeof raw==='object'?raw:{};}catch(error){return {};}}
@@ -1088,7 +1168,15 @@ let grooveCustomDraft={input:1.72,output:1.10,highpass:42,lowShelfFrequency:118,
 S.grooveCustomPresetId=readGroovePreference(GROOVE_CUSTOM_PRESET_ID_KEY,customGroovePresets.map(item=>item.id),'');
 let grooveHistoryEnabled=readGrooveHistoryPreference(),grooveHistoryPoints=[];
 
+function updateScaleInfoUi(){
+  const info=SCALE_INFO[S.scale]||{label:S.scale,formula:'依目前音階',note:'目前自訂音階。'};
+  const name=document.getElementById('scaleInfoName'),formula=document.getElementById('scaleInfoFormula'),description=document.getElementById('scaleInfoDescription');
+  if(name)name.textContent=info.label;
+  if(formula)formula.textContent=`公式：${info.formula}`;
+  if(description)description.textContent=info.note;
+}
 function updateNoteSelectionUi(){
+  updateScaleInfoUi();
   const chips=[...document.querySelectorAll('.note-chip')];
   const scaleNotes=spellScaleNotes(S.key,S.scale);
   const modeData=getActiveModeData();
@@ -1114,9 +1202,9 @@ function updateNoteSelectionUi(){
   const formulaPattern=document.getElementById('modeFormulaPattern');
   const formulaNotes=document.getElementById('modeFormulaNotes');
   const formulaRow=document.getElementById('modeFormulaRow');
-  if(formulaPattern)formulaPattern.textContent=modeData.pattern||'依目前 SCALE';
+  if(formulaPattern)formulaPattern.textContent=modeData.pattern||'依目前音階';
   if(formulaNotes)formulaNotes.textContent=scaleNotes.join('-')||'—';
-  if(formulaRow)formulaRow.title=`${modeData.key}：${modeData.pattern||'依目前 SCALE'}；${modeData.description||''}`;
+  if(formulaRow)formulaRow.title=`${modeData.key}：${modeData.pattern||'依目前音階'}；${modeData.description||''}`;
 }
 
 function updateNoteModeUi(){
@@ -1148,35 +1236,36 @@ function getChordDegreeDetails(chord){
 
 function getInstrumentReleaseMs(dur,isArpeggio=false){
   const seconds=Number.isFinite(Number(dur))?Number(dur):1.2;
-  // 空靈鼓為敲擊式金屬共鳴音，延音中等偏長、自然漸弱；釋放時間相應較長。
-  if(isArpeggio&&S.inst==='TongueDrum')return(Math.max(.1,seconds*1.1)+.03)*1000;
-  if(S.inst==='TongueDrum')return(seconds*1.7+.1)*1000;
+  if(isArpeggio&&S.inst==='Flute')return(Math.max(.045,seconds*.76)+.016)*1000;
+  if(S.inst==='Flute')return(seconds*1.65+.08)*1000;
   if(isArpeggio&&S.inst==='Harp')return(Math.max(.036,seconds*.66)+.014)*1000;
   if(S.inst==='Harp')return(seconds*1.42+.075)*1000;
   if(isArpeggio&&String(S.inst||'').includes('Piano'))return(Math.max(.06,seconds*.92)+.08)*1000;
   if(String(S.inst||'').includes('Piano'))return(seconds*2.5+0.1)*1000;
-  if(S.inst==='Kalimba')return(seconds*1.6+0.12)*1000;
-  // 鐵琴（顫音琴）為金屬敲擊音，延音較長、尾音綿延；釋放時間相應較長。
-  if(isArpeggio&&S.inst==='Vibraphone')return(Math.max(.12,seconds*1.3)+.04)*1000;
-  if(S.inst==='Vibraphone')return(seconds*1.9+.12)*1000;
+  if(S.inst==='Guitar')return(seconds*1.5+0.1)*1000;
+  if(S.inst==='GlassBowl')return(seconds*2.55+.20)*1000;
+  if(S.inst==='Kalimba')return(seconds*1.28+.20)*1000;
+  if(S.inst==='Handpan')return(seconds*2.10+.20)*1000;
+  if(S.inst==='SteelTongue')return(seconds*1.95+.20)*1000;
   return(seconds*1.3+0.1)*1000;
 }
 
 function getArpeggioNoteDuration(intervalMs){
   const intervalSeconds=Math.max(.035,(Number(intervalMs)||0)/1000);
   // 每拍一音仍必須在下一拍前平滑歸零；手機純淨模式會在播放端再延長包絡，避免非零交叉截斷。
-  if(S.inst==='TongueDrum')return Math.max(.045,intervalSeconds*.86);
+  if(S.inst==='Flute')return Math.max(.032,intervalSeconds*.78);
   if(S.inst==='Harp')return Math.max(.028,intervalSeconds*.68);
   if(String(S.inst||'').includes('Piano'))return Math.max(.032,intervalSeconds*.80);
-  if(S.inst==='Vibraphone')return Math.max(.05,intervalSeconds*.9);
-  if(S.inst==='Kalimba')return Math.max(.042,intervalSeconds*.82);
+  if(S.inst==='GlassBowl')return Math.max(.032,intervalSeconds*.72);
+  if(['Handpan','SteelTongue'].includes(S.inst))return Math.max(.032,intervalSeconds*.76);
+  if(S.inst==='Kalimba')return Math.max(.032,intervalSeconds*.68);
   return Math.max(.024,intervalSeconds*.66);
 }
 function getChordHoldSeconds(){return Math.max(.16,(getChordBeatIntervalMs()*4)/1000);}
 function getProgressionChordIntervalMs(){return getChordBeatIntervalMs()*4;}
 function getChordVoiceDuration(){
   const hold=getChordHoldSeconds();
-  const multiplier=S.inst==='TongueDrum'?1.7:S.inst==='Harp'?1.42:String(S.inst||'').includes('Piano')?2.5:S.inst==='Kalimba'?1.6:S.inst==='Vibraphone'?1.9:1.3;
+  const multiplier=S.inst==='Flute'?1.65:S.inst==='Harp'?1.42:String(S.inst||'').includes('Piano')?2.5:S.inst==='Guitar'?1.5:S.inst==='GlassBowl'?2.55:S.inst==='Handpan'?2.10:S.inst==='SteelTongue'?1.95:S.inst==='Kalimba'?1.28:1.3;
   // 一般和弦的既有音色公式以 duration 的倍數做收尾；預先折算，使整體聲音在四拍視窗結束前完成平滑淡出。
   return Math.max(.11,(hold-.04)/multiplier);
 }
@@ -1235,13 +1324,14 @@ function updateSmartHarmonyStatus(index,total,playing,chord){
   if(details)details.textContent=`音符：${detail.notes}｜級數：${detail.degrees}`;
 }
 let metroBeat=0,grooveStep=0;
+let musicalClockActive=false,musicalClockAnchor=0,musicalClockPeriod=0,musicalClockSource='',metronomeLaunchTimer=0,metroSilentInterval=0,metronomeSpeakerOn=false;
 let selectedMascot='🌳',mascotHasPosition=false,mascotMoveTimer=null,mascotPosition=null,mascotTargetKey=null,mascotTargetEl=null;
 let mascotPlaybackActive=false,mascotPlaybackRun=0,mascotPlaybackTimers=[];
 let recordingDestination=null,recordedBlob=null,recordingUrl='',recordingMime='audio/webm',recordingClearRequested=false;
 let grooveMix=null,chordMix=null,masterMix=null,lastChordTriggerAt=0,grooveMeterRaf=0,grooveMeterActive=false,groovePeakHold=0,grooveClip=false,grooveClipHoldUntil=0,grooveVoiceStops=new Set(),tempoRestartTimer=0,grooveStartTimer=0,grooveRunId=0,playbackMonitorCollapsed=false,beatVisualTimers=[],beatIndicatorActive=false,grooveClipEvents=[],grooveLastClipEventAt=0;
 const PLAYBACK_MONITOR_LOCK_KEY='kimichord.playbackMonitor.lockHeight';
 const PLAYBACK_MONITOR_HEIGHT_KEY='kimichord.playbackMonitor.lockedHeight';
-const AUDIO_PREFERENCE_KEYS=[MOBILE_PURE_MODE_KEY,GROOVE_WAVEFORM_KEY,GROOVE_MIX_PRESET_KEY,GROOVE_CUSTOM_PRESETS_KEY,GROOVE_CUSTOM_PRESET_ID_KEY,GROOVE_HISTORY_VISIBLE_KEY,PLAYBACK_MONITOR_LOCK_KEY,PLAYBACK_MONITOR_HEIGHT_KEY];
+const AUDIO_PREFERENCE_KEYS=[DEVICE_AUDIO_PROFILE_KEY,MOBILE_PURE_MODE_KEY,GROOVE_WAVEFORM_KEY,GROOVE_MIX_PRESET_KEY,GROOVE_CUSTOM_PRESETS_KEY,GROOVE_CUSTOM_PRESET_ID_KEY,GROOVE_HISTORY_VISIBLE_KEY,PLAYBACK_MONITOR_LOCK_KEY,PLAYBACK_MONITOR_HEIGHT_KEY];
 function readPlaybackMonitorPreference(key,fallback){try{const value=localStorage.getItem(key);return value===null?fallback:value;}catch(error){return fallback;}}
 let playbackMonitorHeightLocked=readPlaybackMonitorPreference(PLAYBACK_MONITOR_LOCK_KEY,'0')==='1';
 let playbackMonitorLockedHeight=Math.max(0,Number(readPlaybackMonitorPreference(PLAYBACK_MONITOR_HEIGHT_KEY,'0'))||0);
@@ -1268,17 +1358,24 @@ function setPlaybackMonitorHeightLocked(locked,persist=true){
   if(persist){try{localStorage.setItem(PLAYBACK_MONITOR_LOCK_KEY,playbackMonitorHeightLocked?'1':'0');if(playbackMonitorLockedHeight)localStorage.setItem(PLAYBACK_MONITOR_HEIGHT_KEY,String(playbackMonitorLockedHeight));}catch(error){}}
 }
 
-S.inst=normalizeInstrument(S.inst);
 function ac(){if(!AC)AC=new(window.AudioContext||window.webkitAudioContext)();return AC;}
 function ensureAudioReady(){const ctx=ac();if(ctx.state==='suspended')ctx.resume().catch(()=>{});return ctx;}
 function mtof(m){return 440*Math.pow(2,(m-69)/12);}
 function createSoftLimiterCurve(ctx){
   const curve=new Float32Array(2049);
-  // 較柔和的膝點減少尖銳瞬態進入 waveshaper 時產生的可聽失真。
-  const knee=1.72;
+  // 正常電平保持近乎 1:1，只有接近滿幅的瞬態才進入平滑膝點；
+  // 讓限幅器保護喇叭，但不把所有合成波形染成持續的嗡／啵失真。
+  const kneeStart=.78;
+  const ceiling=.92;
   for(let i=0;i<curve.length;i++){
     const x=(i/(curve.length-1))*2-1;
-    curve[i]=Math.tanh(knee*x)/Math.tanh(knee);
+    const sign=x<0?-1:1,abs=Math.abs(x);
+    if(abs<=kneeStart)curve[i]=x;
+    else{
+      const u=Math.min(1,(abs-kneeStart)/(1-kneeStart));
+      const eased=u*u*(3-2*u);
+      curve[i]=sign*(kneeStart+(ceiling-kneeStart)*eased);
+    }
   }
   return curve;
 }
@@ -1294,13 +1391,12 @@ function ensureMasterMix(){
   // 只有主總線做一次動態處理：避免和弦／Groove 各自削波後再互相調變，造成手機喇叭最容易聽見的破音與啵聲。
   // Groove 的預設 65% 音量經三層 headroom 後，實測常見節奏的連續 RMS 只剩 0.02–0.04，
   // 在一般筆電喇叭上容易被起音掩蓋。提高主總線的乾淨補償，但仍保留壓縮器與輸出餘裕。
-  input.gain.value=1.02;
+  input.gain.value=1.12;
   dcBlock.type='highpass';dcBlock.frequency.value=30;dcBlock.Q.value=.707;
-  airFilter.type='lowpass';airFilter.frequency.value=12500;airFilter.Q.value=.55;
-  compressor.threshold.value=-11;compressor.knee.value=22;compressor.ratio.value=5.5;
-  // 快速抓住多個鼓聲／和弦同拍疊加的瞬態，減少啪聲；保留柔和 knee 與長 release。
-  compressor.attack.value=.003;compressor.release.value=.26;
-  output.gain.value=.98;
+  airFilter.type='lowpass';airFilter.frequency.value=10500;airFilter.Q.value=.55;
+  compressor.threshold.value=-14;compressor.knee.value=24;compressor.ratio.value=6.2;
+  compressor.attack.value=.018;compressor.release.value=.32;
+  output.gain.value=1.10;
   analyser.fftSize=1024;analyser.smoothingTimeConstant=.76;analyser.minDecibels=-82;analyser.maxDecibels=-2;
   const limiter=ctx.createWaveShaper();limiter.curve=createSoftLimiterCurve(ctx);limiter.oversample='4x';
   input.connect(dcBlock);dcBlock.connect(airFilter);airFilter.connect(compressor);compressor.connect(limiter);limiter.connect(output);output.connect(analyser);analyser.connect(ctx.destination);
@@ -1323,14 +1419,13 @@ function ensureGrooveMix(){
   // 再經主總線 headroom 後在桌面喇叭只剩輕微起音啵聲。一般模式提高此層的
   // 可聽動態，手機純淨模式則於 applyMobilePureAudioProfile 保持較保守值。
   // 保留明確的鼓聲動態，但避免多個聲部同拍累積時把主總線推入可聽失真。
-  input.gain.value=1.08;
+  input.gain.value=1.16;
   dcBlock.type='highpass';
   dcBlock.frequency.value=42;
   dcBlock.Q.value=0.707;
   lowShelf.type='lowshelf';lowShelf.frequency.value=118;lowShelf.gain.value=0;
-  // 限制寬頻打擊樂噪音的最終高頻帶寬，降低鈸／沙鈴像底噪一樣持續嘶響。
-  toneFilter.type='lowpass';toneFilter.frequency.value=7200;toneFilter.Q.value=.45;
-  output.gain.value=.92;
+  toneFilter.type='lowpass';toneFilter.frequency.value=7600;toneFilter.Q.value=.42;
+  output.gain.value=1.08;
   analyser.fftSize=512;
   analyser.smoothingTimeConstant=0.72;
   analyser.minDecibels=-80;
@@ -1341,14 +1436,6 @@ function ensureGrooveMix(){
   return grooveMix;
 }
 function connectGrooveOutput(node){node.connect(ensureGrooveMix().input);}
-function disposeGrooveVoice(handle){
-  if(!handle||handle.disposed)return;
-  handle.disposed=true;
-  handle.sources.forEach(source=>{try{source.disconnect();}catch(error){}});
-  handle.sources.length=0;
-  try{handle.master.disconnect();}catch(error){}
-  grooveVoiceStops.delete(handle);
-}
 function ensureChordMix(){
   const ctx=ensureAudioReady();
   if(chordMix&&chordMix.context===ctx)return chordMix;
@@ -1357,11 +1444,11 @@ function ensureChordMix(){
   const output=ctx.createGain();
   const analyser=ctx.createAnalyser();
   // 和弦層以更低增益合併多個振盪器，只做次聲濾除；所有動態控制交由主總線統一處理。
-  input.gain.value=1.08;
+  input.gain.value=1.16;
   dcBlock.type='highpass';
   dcBlock.frequency.value=34;
   dcBlock.Q.value=.707;
-  output.gain.value=1.02;
+  output.gain.value=1.12;
   analyser.fftSize=512;
   analyser.smoothingTimeConstant=.7;
   input.connect(dcBlock);dcBlock.connect(output);output.connect(analyser);analyser.connect(ensureMasterMix().input);
@@ -1375,14 +1462,12 @@ function smoothlySetAudioParam(param,value,ctx,timeConstant=.018){
   try{param.cancelScheduledValues(now);param.setTargetAtTime(value,now,timeConstant);}catch(error){param.value=value;}
 }
 const GROOVE_MIX_PRESETS={
-  standard:{label:'標準',input:1.08,output:.92,highpass:48,lowShelfFrequency:118,lowShelfGain:0,lowpass:9000},
-  bass:{label:'低頻加強',input:1.02,output:.94,highpass:40,lowShelfFrequency:112,lowShelfGain:2.6,lowpass:8400},
+  standard:{label:'標準',input:1.16,output:1.08,highpass:48,lowShelfFrequency:118,lowShelfGain:0,lowpass:9000},
+  bass:{label:'低頻加強',input:1.10,output:1.10,highpass:40,lowShelfFrequency:112,lowShelfGain:2.6,lowpass:8400},
   night:{label:'夜間柔和',input:.82,output:.70,highpass:78,lowShelfFrequency:120,lowShelfGain:.35,lowpass:5000}
 };
 const GROOVE_WAVEFORM_LABELS={triangle:'三角形波',sine:'正弦波',sawtooth:'鋸齒波',square:'方波'};
-// 高諧波波形經 Groove 低通後原本再乘 .68–.78，合成低音／短音在一般音量下被多重增益級壓得過小。
-// 溫和補償鋸齒與方波的電平，仍保留低於三角／正弦的峰值餘裕。
-const GROOVE_WAVEFORM_GAINS={triangle:1,sine:1.04,sawtooth:.9,square:.84};
+const GROOVE_WAVEFORM_GAINS={triangle:1,sine:1.06,sawtooth:.78,square:.68};
 function getSelectedGrooveCustomPreset(){return customGroovePresets.find(item=>item.id===S.grooveCustomPresetId)||null;}
 function getGrooveMixPreset(){return S.grooveMixPreset==='custom'?(getSelectedGrooveCustomPreset()||grooveCustomDraft):GROOVE_MIX_PRESETS[S.grooveMixPreset]||GROOVE_MIX_PRESETS.standard;}
 function getGrooveSynthWaveform(){return GROOVE_WAVEFORM_LABELS[S.grooveWaveform]?S.grooveWaveform:'triangle';}
@@ -1444,12 +1529,12 @@ function applyGrooveMixPreset(){
   const preset=getGrooveMixPreset();
   if(grooveMix){
     const ctx=grooveMix.context,pure=Boolean(S.mobilePureMode);
-    smoothlySetAudioParam(grooveMix.input.gain,pure?Math.min(.70,preset.input*.58):preset.input,ctx,.045);
+    smoothlySetAudioParam(grooveMix.input.gain,pure?Math.min(.78,preset.input*.66):preset.input,ctx,.045);
     smoothlySetAudioParam(grooveMix.dcBlock.frequency,pure?75:preset.highpass,ctx,.045);
     smoothlySetAudioParam(grooveMix.lowShelf.frequency,preset.lowShelfFrequency,ctx,.045);
     smoothlySetAudioParam(grooveMix.lowShelf.gain,pure?Math.min(2,preset.lowShelfGain):preset.lowShelfGain,ctx,.045);
-    smoothlySetAudioParam(grooveMix.toneFilter.frequency,pure?Math.min(6800,preset.lowpass):preset.lowpass,ctx,.060);
-    smoothlySetAudioParam(grooveMix.output.gain,pure?Math.min(.70,preset.output*.78):preset.output,ctx,.050);
+    smoothlySetAudioParam(grooveMix.toneFilter.frequency,pure?Math.min(6200,preset.lowpass):Math.min(7600,preset.lowpass),ctx,.060);
+    smoothlySetAudioParam(grooveMix.output.gain,pure?Math.min(.78,preset.output*.86):preset.output,ctx,.050);
   }
   syncGrooveAudioControls();
 }
@@ -1475,42 +1560,64 @@ function setGrooveMixPreset(value,persist=true){
   if(persist){try{localStorage.setItem(GROOVE_MIX_PRESET_KEY,S.grooveMixPreset);}catch(error){}}
   applyGrooveMixPreset();
 }
+function syncDeviceAudioProfileControl(){
+  const control=document.getElementById('deviceAudioProfile');
+  const hint=document.getElementById('deviceAudioProfileHint');
+  const profile=DEVICE_AUDIO_PROFILES[S.deviceAudioProfile]||DEVICE_AUDIO_PROFILES.desktop;
+  if(control){control.value=S.deviceAudioProfile;control.setAttribute('aria-label',`裝置音量設定：${profile.label}`);}
+  if(hint)hint.textContent=profile.hint;
+}
+function applyDeviceAudioProfile(profileKey,persist=true,notify=true){
+  const key=DEVICE_AUDIO_PROFILES[profileKey]?profileKey:'desktop';
+  const profile=DEVICE_AUDIO_PROFILES[key];
+  const wasPlaying=Boolean(document.getElementById('metronome')?.checked);
+  S.deviceAudioProfile=key;
+  S.chordVol=profile.chordVol;S.arpVol=profile.arpVol;S.metroVol=profile.metroVol;S.grooveMixPreset=profile.grooveMixPreset;
+  if(persist){try{localStorage.setItem(DEVICE_AUDIO_PROFILE_KEY,key);}catch(error){}}
+  setMobilePureMode(profile.mobilePureMode,false);
+  const setValue=(id,value)=>{const el=document.getElementById(id);if(el)el.value=String(value);};
+  const setText=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value;};
+  setValue('chordSlider',Math.round(profile.chordVol*100));setValue('arpSlider',Math.round(profile.arpVol*100));setValue('metroSlider',Math.round(profile.metroVol*100));
+  setText('chordVol',`${Math.round(profile.chordVol*100)}%`);setText('arpVol',`${Math.round(profile.arpVol*100)}%`);setText('metroVol',`${Math.round(profile.metroVol*100)}%`);
+  syncDeviceAudioProfileControl();syncMobilePureModeControl();applyMobilePureAudioProfile();syncGrooveAudioControls();
+  if(wasPlaying)startMetronome();
+  if(notify)showToast(`已套用${profile.label}音量設定：和弦 ${Math.round(profile.chordVol*100)}%・琶音 ${Math.round(profile.arpVol*100)}%・節拍器 ${Math.round(profile.metroVol*100)}%`);
+}
+
 function applyMobilePureAudioProfile(){
-  const profile=S.audioDeviceProfile||'desktop';
-  const pure=profile==='mobile';
-  const headphones=profile==='headphones';
+  const pure=Boolean(S.mobilePureMode);
   if(masterMix){
     const ctx=masterMix.context;
-    smoothlySetAudioParam(masterMix.input.gain,pure?.50:1.02,ctx,.024);
+    smoothlySetAudioParam(masterMix.input.gain,pure?.52:1.12,ctx,.024);
     smoothlySetAudioParam(masterMix.dcBlock.frequency,pure?75:30,ctx,.045);
-    smoothlySetAudioParam(masterMix.airFilter.frequency,pure?7800:12500,ctx,.045);
-    smoothlySetAudioParam(masterMix.compressor.threshold,pure?-25:-11,ctx,.035);
-    smoothlySetAudioParam(masterMix.compressor.knee,pure?28:22,ctx,.035);
-    smoothlySetAudioParam(masterMix.compressor.ratio,pure?9:5.5,ctx,.035);
-    smoothlySetAudioParam(masterMix.compressor.attack,pure?.02:.003,ctx,.035);
-    smoothlySetAudioParam(masterMix.compressor.release,pure?.34:.26,ctx,.035);
-    smoothlySetAudioParam(masterMix.output.gain,pure?.80:headphones?.78:.98,ctx,.028);
+    smoothlySetAudioParam(masterMix.airFilter.frequency,pure?7200:10500,ctx,.045);
+    smoothlySetAudioParam(masterMix.compressor.threshold,pure?-25:-14,ctx,.035);
+    smoothlySetAudioParam(masterMix.compressor.knee,pure?28:24,ctx,.035);
+    smoothlySetAudioParam(masterMix.compressor.ratio,pure?9:6.2,ctx,.035);
+    smoothlySetAudioParam(masterMix.compressor.attack,pure?.02:.018,ctx,.035);
+    smoothlySetAudioParam(masterMix.compressor.release,pure?.34:.32,ctx,.035);
+    smoothlySetAudioParam(masterMix.output.gain,pure?.82:1.10,ctx,.028);
   }
   if(chordMix){
     const ctx=chordMix.context;
-    smoothlySetAudioParam(chordMix.input.gain,pure?.30:.92,ctx,.025);
+    smoothlySetAudioParam(chordMix.input.gain,pure?.32:1.04,ctx,.025);
     smoothlySetAudioParam(chordMix.dcBlock.frequency,pure?62:34,ctx,.045);
-    smoothlySetAudioParam(chordMix.output.gain,pure?.66:headphones?.86:1,ctx,.025);
+    smoothlySetAudioParam(chordMix.output.gain,pure?.70:1.12,ctx,.025);
   }
   if(grooveMix){
     applyGrooveMixPreset();
   }
 }
 function syncMobilePureModeControl(){
-  const control=document.getElementById('audioDeviceProfile');
+  const control=document.getElementById('mobilePureMode');
   if(!control)return;
-  control.value=S.audioDeviceProfile||'desktop';
-  control.setAttribute('aria-label',`裝置音量設定：${control.options[control.selectedIndex]?.text||'桌面'}`);
+  control.checked=Boolean(S.mobilePureMode);
+  control.setAttribute('aria-checked',String(Boolean(S.mobilePureMode)));
+  control.setAttribute('aria-label',S.mobilePureMode?'關閉手機純淨模式':'開啟手機純淨模式');
 }
-function setMobilePureMode(profile,persist=true){
-  S.audioDeviceProfile=typeof profile==='boolean'?(profile?'mobile':'desktop'):(['desktop','mobile','headphones'].includes(profile)?profile:'desktop');
-  S.mobilePureMode=S.audioDeviceProfile==='mobile';
-  if(persist){try{localStorage.setItem(MOBILE_PURE_MODE_KEY,S.audioDeviceProfile);}catch(error){}}
+function setMobilePureMode(enabled,persist=true){
+  S.mobilePureMode=Boolean(enabled);
+  if(persist){try{localStorage.setItem(MOBILE_PURE_MODE_KEY,S.mobilePureMode?'1':'0');}catch(error){}}
   syncMobilePureModeControl();
   applyMobilePureAudioProfile();
 }
@@ -1518,14 +1625,15 @@ function resetAudioPreferences(){
   const metronome=document.getElementById('metronome');
   if(metronome?.checked){metronome.checked=false;metronome.dispatchEvent(new Event('change'));}else stopMetronome();
   AUDIO_PREFERENCE_KEYS.forEach(key=>{try{localStorage.removeItem(key);}catch(error){}});
-  S.mobilePureMode=false;S.audioDeviceProfile='desktop';S.grooveWaveform='triangle';S.grooveMixPreset='standard';S.grooveCustomPresetId='';customGroovePresets=[];grooveCustomDraft={input:1.72,output:1.10,highpass:42,lowShelfFrequency:118,lowShelfGain:0,lowpass:12500,label:'自訂草稿'};grooveHistoryEnabled=false;grooveHistoryPoints=[];grooveClipEvents=[];grooveLastClipEventAt=0;playbackMonitorHeightLocked=false;playbackMonitorLockedHeight=0;playbackMonitorCollapsed=false;S.chordVol=.5;S.arpVol=.7;S.chordEnabled=false;S.arpEnabled=true;S.tempo=72;S.metroVol=.65;S.arpMode='四分音符';S.cycleCount=2;S.metroMode='woodblock';S.grooveCategory='four';S.groove='disco';
+  S.deviceAudioProfile=detectDeviceAudioProfile();S.mobilePureMode=false;S.grooveWaveform='triangle';S.grooveMixPreset='standard';S.grooveCustomPresetId='';customGroovePresets=[];grooveCustomDraft={input:1.72,output:1.10,highpass:42,lowShelfFrequency:118,lowShelfGain:0,lowpass:12500,label:'自訂草稿'};grooveHistoryEnabled=false;grooveHistoryPoints=[];grooveClipEvents=[];grooveLastClipEventAt=0;playbackMonitorHeightLocked=false;playbackMonitorLockedHeight=0;playbackMonitorCollapsed=false;S.chordVol=.5;S.arpVol=.7;S.chordEnabled=false;S.arpEnabled=true;S.tempo=72;S.metroVol=.65;S.arpMode='四分音符';S.cycleCount=2;S.metroMode='woodblock';S.grooveCategory='four';S.groove='disco';
   const setValue=(id,value)=>{const el=document.getElementById(id);if(el)el.value=String(value);};
   setValue('chordSlider',50);setValue('arpSlider',70);setValue('tempoSlider',72);setValue('metroSlider',65);
   const setText=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value;};
   setText('chordVol','50%');setText('arpVol','70%');setText('tempoVal','72');setText('metroVol','65%');
   setSoundLayerEnabled('chord',false);setSoundLayerEnabled('arp',true);setMetronomeMode('woodblock');setPlaybackMonitorHeightLocked(false,false);
   const monitor=document.getElementById('playbackMonitor'),toggle=document.getElementById('playbackMonitorToggle');if(monitor)monitor.classList.remove('collapsed');if(toggle){toggle.textContent='收合';toggle.setAttribute('aria-expanded','true');}
-  applyMobilePureAudioProfile();syncMobilePureModeControl();syncGrooveAudioControls();renderGrooveClipHistory();showToast('所有音訊偏好已重設為安全預設');
+  try{localStorage.setItem(DEVICE_AUDIO_PROFILE_KEY,S.deviceAudioProfile);}catch(error){}
+  applyMobilePureAudioProfile();syncDeviceAudioProfileControl();syncMobilePureModeControl();syncGrooveAudioControls();renderGrooveClipHistory();showToast(`所有音訊偏好已重設為安全預設（${DEVICE_AUDIO_PROFILES[S.deviceAudioProfile].label}）`);
 }
 function fadeGrooveOutput(duration=.13){
   const mix=grooveMix,ctx=mix?.context;
@@ -1544,10 +1652,9 @@ function restoreGrooveOutput(){
   // Groove 啟動時因此拋出 ReferenceError，排程在第一個打擊樂聲部前中斷。採用與目前設定一致的目標值。
   const target=S.mobilePureMode?Math.min(.90,getGrooveMixPreset().output*.78):getGrooveMixPreset().output;
   try{
-    const current=Math.max(.0001,Math.min(target,Number(mix.output.gain.value)||target));
     mix.output.gain.cancelScheduledValues(now);
-    mix.output.gain.setValueAtTime(current,now);
-    mix.output.gain.exponentialRampToValueAtTime(target,now+.025);
+    mix.output.gain.setValueAtTime(.0001,now);
+    mix.output.gain.exponentialRampToValueAtTime(target,now+.075);
   }catch(error){mix.output.gain.value=target;}
 }
 function updatePlaybackMonitorVisibility(){
@@ -1565,15 +1672,15 @@ function updateBeatIndicator(beatIndex=0,active=false,label='四拍待機'){
   if(labelNode)labelNode.textContent=active?`${label}・第 ${beat+1} 拍`:'四拍待機';
   document.querySelectorAll('#beatIndicator .beat-indicator-dot').forEach((dot,index)=>dot.classList.toggle('active',Boolean(active)&&index===beat));
 }
-function startBeatIndicator(label='和弦',startAt){
+function startBeatIndicator(label='和弦'){
+  // 節拍器開啟時，1234 由節拍器（木魚／Groove）主導，避免兩個來源互相覆寫而跳拍。
+  if(document.getElementById('metronome')?.checked&&musicalClockActive)return;
   clearBeatIndicatorTimers();
   beatIndicatorActive=true;
   const beatMs=getChordBeatIntervalMs();
-  const delayMs=Number.isFinite(startAt)&&AC?Math.max(0,(startAt-AC.currentTime)*1000):0;
-  for(let beat=0;beat<4;beat++)beatVisualTimers.push(setTimeout(()=>updateBeatIndicator(beat,true,label),delayMs+beat*beatMs));
-  beatVisualTimers.push(setTimeout(()=>{if(metroInterval!==null||grooveStartTimer)return;beatIndicatorActive=false;updateBeatIndicator(0,false);updatePlaybackMonitorVisibility();},delayMs+beatMs*4+90));
-  if(delayMs===0)updateBeatIndicator(0,true,label);
-  updatePlaybackMonitorVisibility();
+  for(let beat=0;beat<4;beat++)beatVisualTimers.push(setTimeout(()=>updateBeatIndicator(beat,true,label),beat*beatMs));
+  beatVisualTimers.push(setTimeout(()=>{beatIndicatorActive=false;updateBeatIndicator(0,false);updatePlaybackMonitorVisibility();},beatMs*4+90));
+  updateBeatIndicator(0,true,label);updatePlaybackMonitorVisibility();
 }
 function stopBeatIndicator(){clearBeatIndicatorTimers();beatIndicatorActive=false;updateBeatIndicator(0,false);updatePlaybackMonitorVisibility();}
 function syncGrooveHistoryControls(){
@@ -1698,12 +1805,12 @@ function connectAudioOutput(node){
   node.connect(ensureChordMix().input);
 }
 
-// 空靈鼓／豎琴的一般和弦使用共用複音包絡。三個音各自開關 gain 時，即使單音安全，
+// 長笛／豎琴的一般和弦使用共用複音包絡。三個音各自開關 gain 時，即使單音安全，
 // 同步起音或預覽切換仍會把六個振盪器的瞬態疊加；先由同一個零起點總線淡入，
 // 並在停止時一併淡出，避免手機喇叭將該寬頻瞬態聽成「啵」聲。
 function createPolyChordBus(ctx,inst,startAt){
   const gain=ctx.createGain();
-  const attack=inst==='TongueDrum'?.012:.010;
+  const attack=inst==='Flute'?.012:.010;
   gain.gain.setValueAtTime(.00001,startAt);
   gain.gain.linearRampToValueAtTime(1,startAt+attack);
   connectAudioOutput(gain);
@@ -1712,7 +1819,6 @@ function createPolyChordBus(ctx,inst,startAt){
 
 function playNote(midi,dur,vol,inst,options){
   if(dur==null)dur=0.5;if(vol==null)vol=S.chordVol;if(inst==null)inst=S.inst;
-  inst=normalizeInstrument(inst);
   const ctx=ac();
   if(ctx.state==='suspended')ctx.resume();
   const t=Number.isFinite(options?.startAt)?options.startAt:ctx.currentTime+.008,freq=mtof(midi);
@@ -1730,83 +1836,55 @@ function playNote(midi,dur,vol,inst,options){
     o1.connect(g1);o2.connect(g2);g1.connect(filter);g2.connect(filter);
     filter.type='lowpass';filter.frequency.setValueAtTime(3500,t);filter.Q.value=0.5;
     if(isArpeggio){
-      const attack=Math.min(.018,Math.max(.009,dur*.16));
+      const attack=Math.min(.060,Math.max(.042,dur*.22));
       const body=Math.max(attack+.006,dur*.46);
       const fade=Math.max(body+.010,Math.min(dur*.78,Math.max(.018,dur-.006)));
-      // 音量乘數從 0.62 降至 0.48，避免多音疊加時子總線超載。
-      master.gain.setValueAtTime(.0001,t);master.gain.linearRampToValueAtTime(Math.max(.0001,vol*.48),t+attack);
-      master.gain.setValueAtTime(Math.max(.0001,vol*.48),t+body);master.gain.exponentialRampToValueAtTime(.00001,t+fade);
+      master.gain.setValueAtTime(.0001,t);master.gain.linearRampToValueAtTime(Math.max(.0001,vol*.62),t+attack);
+      master.gain.setValueAtTime(Math.max(.0001,vol*.62),t+body);master.gain.exponentialRampToValueAtTime(.00001,t+fade);
       releaseMs=(fade+.010)*1000;
     }else{
       const end=sustainSeconds||dur*2.5;
       const releaseStart=sustainSeconds?Math.max(.07,end-.075):.16;
-      // 音量乘數從 0.82/0.42 降至 0.60/0.32，留出多音疊加餘裕。
-      master.gain.setValueAtTime(.0001,t);master.gain.linearRampToValueAtTime(Math.max(.0001,vol*.60),t+.022);
-      master.gain.exponentialRampToValueAtTime(Math.max(.0001,vol*.32),t+releaseStart);master.gain.exponentialRampToValueAtTime(.0001,t+end);
+      master.gain.setValueAtTime(.0001,t);master.gain.linearRampToValueAtTime(Math.max(.0001,vol*.82),t+.052);
+      master.gain.exponentialRampToValueAtTime(Math.max(.0001,vol*.42),t+releaseStart);master.gain.exponentialRampToValueAtTime(.0001,t+end);
       releaseMs=(end+.1)*1000;
     }
     g1.gain.setValueAtTime(0.7,t);g2.gain.setValueAtTime(0.25,t);
     const stopAt=t+releaseMs/1000;sources.push(o1,o2);o1.start(t);o1.stop(stopAt);o2.start(t);o2.stop(stopAt);
-  }else if(inst==='TongueDrum'){
-    // 空靈鼓（Steel Tongue Drum / Hank Drum）：敲擊式金屬共鳴，溫暖圓潤、禪意放鬆。
-    // 以基頻 + 八度 + 微量高泛音堆疊出金屬「咚／叮」質感；敲擊式起音（約 4ms），
-    // 延音自然指數漸弱，泛音比基頻更快消失，尾音溫潤不刺耳；低通保留溫暖、濾掉毛刺。
-    const o1=ctx.createOscillator(),o2=ctx.createOscillator(),o3=ctx.createOscillator();
-    const g1=ctx.createGain(),g2=ctx.createGain(),g3=ctx.createGain();
-    o1.type='sine';o2.type='sine';o3.type='sine';
-    // 空靈鼓的突出泛音接近八度，再加一個微弱的高泛音增添金屬光澤。
-    o1.frequency.value=freq;o2.frequency.value=freq*2.02;o3.frequency.value=freq*3.01;
-    o1.connect(g1);o2.connect(g2);o3.connect(g3);g1.connect(filter);g2.connect(filter);g3.connect(filter);
-    filter.type='lowpass';filter.frequency.setValueAtTime(3600,t);filter.Q.value=.4;
+  }else if(inst==='Flute'){
+    const o1=ctx.createOscillator(),o2=ctx.createOscillator(),g1=ctx.createGain(),g2=ctx.createGain();
+    o1.type='sine';o2.type='sine';o1.frequency.value=freq;o2.frequency.value=freq*2;
+    o1.connect(g1);o2.connect(g2);g1.connect(filter);g2.connect(filter);
+    filter.type='lowpass';filter.frequency.setValueAtTime(3100,t);filter.Q.value=.28;
     if(isArpeggio){
-      const attack=.004;
-      const decay=Math.max(.12,Math.min(dur*1.1,dur-.005));
-      master.gain.setValueAtTime(.0001,t);master.gain.linearRampToValueAtTime(Math.max(.0001,vol*.46),t+attack);
-      master.gain.exponentialRampToValueAtTime(.00001,t+decay);
-      releaseMs=(decay+.02)*1000;
+      const attack=Math.min(.068,Math.max(.048,dur*.24));
+      const body=Math.max(attack+.006,dur*.38);
+      const fade=Math.max(body+.010,Math.min(dur*.72,Math.max(.030,dur-.007)));
+      master.gain.setValueAtTime(.0001,t);master.gain.linearRampToValueAtTime(Math.max(.0001,vol*.42),t+attack);
+      master.gain.setValueAtTime(Math.max(.0001,vol*.42),t+body);master.gain.exponentialRampToValueAtTime(.00001,t+fade);
+      releaseMs=(fade+.012)*1000;
     }else{
-      const decay=sustainSeconds?Math.min(sustainSeconds,Math.max(.5,dur*1.7)):Math.max(.5,dur*1.7);
-      master.gain.setValueAtTime(.0001,t);master.gain.linearRampToValueAtTime(Math.max(.0001,vol*.46),t+.004);
-      master.gain.exponentialRampToValueAtTime(.00001,t+decay);
-      releaseMs=(decay+.03)*1000;
+      const end=sustainSeconds||dur*1.65;
+      const releaseStart=sustainSeconds?Math.max(.05,end-.070):dur*.68;
+      master.gain.setValueAtTime(.0001,t);master.gain.linearRampToValueAtTime(Math.max(.0001,vol*.52),t+.064);
+      master.gain.setValueAtTime(Math.max(.0001,vol*.52),t+releaseStart);master.gain.exponentialRampToValueAtTime(.00001,t+end);
+      releaseMs=(end+.012)*1000;
     }
-    // 泛音比基頻更快衰減，讓音頭明亮、尾音回到柔和的基頻金屬共鳴。
-    g1.gain.setValueAtTime(.85,t);g1.gain.exponentialRampToValueAtTime(.0001,t+Math.max(.45,dur*1.7));
-    g2.gain.setValueAtTime(.34,t);g2.gain.exponentialRampToValueAtTime(.0001,t+Math.max(.28,dur*1.0));
-    g3.gain.setValueAtTime(.12,t);g3.gain.exponentialRampToValueAtTime(.0001,t+Math.max(.14,dur*.5));
-    const stopAt=t+releaseMs/1000;sources.push(o1,o2,o3);o1.start(t);o1.stop(stopAt);o2.start(t);o2.stop(stopAt);o3.start(t);o3.stop(stopAt);
-  }else if(inst==='Kalimba'){
-    // 拇指琴（Kalimba／卡林巴）：金屬簧片撥奏音，圓潤明亮、尾音乾淨。
-    // 以基頻 + 高八度 + 微量高泛音堆疊出簧片「叮」質感；撥奏式起音（約 6ms），
-    // 延音自然指數漸弱，高泛音更快消失，尾音圓潤不刺耳；低通保留明亮、濾掉毛刺。
-    const o1=ctx.createOscillator(),o2=ctx.createOscillator(),o3=ctx.createOscillator();
-    const g1=ctx.createGain(),g2=ctx.createGain(),g3=ctx.createGain();
-    o1.type='sine';o2.type='sine';o3.type='sine';
-    o1.frequency.value=freq;o2.frequency.value=freq*2;o3.frequency.value=freq*3.96;
-    o1.connect(g1);o2.connect(g2);o3.connect(g3);g1.connect(filter);g2.connect(filter);g3.connect(filter);
-    filter.type='lowpass';filter.frequency.setValueAtTime(4200,t);filter.Q.value=.4;
-    if(isArpeggio){
-      const attack=.006;
-      const decay=Math.max(.16,Math.min(dur*1.25,dur-.005));
-      master.gain.setValueAtTime(.0001,t);master.gain.linearRampToValueAtTime(Math.max(.0001,vol*.46),t+attack);
-      master.gain.exponentialRampToValueAtTime(.00001,t+decay);
-      releaseMs=(decay+.025)*1000;
-    }else{
-      const end=sustainSeconds||dur*1.6;const releaseStart=sustainSeconds?Math.max(.06,end-.07):.12;
-      master.gain.setValueAtTime(.0001,t);master.gain.linearRampToValueAtTime(Math.max(.0001,vol*.44),t+.006);
-      master.gain.setValueAtTime(Math.max(.0001,vol*.34),t+releaseStart);master.gain.exponentialRampToValueAtTime(.0001,t+end);releaseMs=(end+.12)*1000;
-    }
-    g1.gain.setValueAtTime(.9,t);g1.gain.exponentialRampToValueAtTime(.0001,t+Math.max(.5,dur*1.6));
-    g2.gain.setValueAtTime(.28,t);g2.gain.exponentialRampToValueAtTime(.0001,t+Math.max(.3,dur*1.0));
-    g3.gain.setValueAtTime(.1,t);g3.gain.exponentialRampToValueAtTime(.0001,t+Math.max(.16,dur*.55));
-    const stopAt=t+releaseMs/1000;sources.push(o1,o2,o3);o1.start(t);o1.stop(stopAt);o2.start(t);o2.stop(stopAt);o3.start(t);o3.stop(stopAt);
+    g1.gain.setValueAtTime(.78,t);g2.gain.setValueAtTime(.10,t);
+    const stopAt=t+releaseMs/1000;sources.push(o1,o2);o1.start(t);o1.stop(stopAt);o2.start(t);o2.stop(stopAt);
+  }else if(inst==='Guitar'){
+    const o=ctx.createOscillator();o.type='sawtooth';o.frequency.value=freq;o.connect(filter);
+    filter.type='lowpass';filter.frequency.setValueAtTime(2200,t);filter.frequency.exponentialRampToValueAtTime(900,t+0.4);
+    const end=sustainSeconds||dur*1.5;const releaseStart=sustainSeconds?Math.max(.06,end-.065):.11;
+    master.gain.setValueAtTime(.0001,t);master.gain.linearRampToValueAtTime(Math.max(.0001,vol*.46),t+.058);
+    master.gain.setValueAtTime(Math.max(.0001,vol*.37),t+releaseStart);master.gain.exponentialRampToValueAtTime(.0001,t+end);releaseMs=(end+.13)*1000;sources.push(o);o.start(t);o.stop(t+releaseMs/1000);
   }else if(inst==='Harp'){
     const o1=ctx.createOscillator(),o2=ctx.createOscillator();
     const g1=ctx.createGain(),g2=ctx.createGain();
     o1.type='triangle';o2.type='sine';o1.frequency.value=freq;o2.frequency.value=freq*2;
     o1.connect(g1);o2.connect(g2);g1.connect(filter);g2.connect(filter);filter.type='lowpass';filter.frequency.setValueAtTime(4200,t);filter.Q.value=.34;
     if(isArpeggio){
-      const attack=Math.min(.016,Math.max(.008,dur*.16));
+      const attack=Math.min(.058,Math.max(.042,dur*.22));
       const body=Math.max(attack+.005,dur*.30);
       const fade=Math.max(body+.009,Math.min(dur*.62,Math.max(.024,dur-.006)));
       master.gain.setValueAtTime(.0001,t);master.gain.linearRampToValueAtTime(Math.max(.0001,vol*.36),t+attack);
@@ -1815,51 +1893,47 @@ function playNote(midi,dur,vol,inst,options){
     }else{
       const end=sustainSeconds||dur*1.42;
       const releaseStart=sustainSeconds?Math.max(.05,end-.065):Math.max(.06,dur*.34);
-      master.gain.setValueAtTime(.0001,t);master.gain.linearRampToValueAtTime(Math.max(.0001,vol*.48),t+.024);
+      master.gain.setValueAtTime(.0001,t);master.gain.linearRampToValueAtTime(Math.max(.0001,vol*.48),t+.052);
       master.gain.setValueAtTime(Math.max(.0001,vol*.38),t+releaseStart);master.gain.exponentialRampToValueAtTime(.00001,t+end);
       releaseMs=(end+.012)*1000;
     }
     g1.gain.setValueAtTime(.72,t);g2.gain.setValueAtTime(.16,t);
     const stopAt=t+releaseMs/1000;sources.push(o1,o2);o1.start(t);o1.stop(stopAt);o2.start(t);o2.stop(stopAt);
-  }else if(inst==='Vibraphone'){
-    // 鐵琴（顫音琴 Vibraphone）：金屬條敲擊音。以近正弦泛音堆疊出金屬質感，
-    // 主要特徵為基頻 + 高八度 + 4 倍頻金屬模態；起音柔和（約 8ms），
-    // 延音長、尾音綿延，並加入約 5Hz 顫音（vibrato）LFO 輕微調變音量，模擬顫音琴招牌音色。
-    const o1=ctx.createOscillator(),o2=ctx.createOscillator(),o3=ctx.createOscillator();
-    const g1=ctx.createGain(),g2=ctx.createGain(),g3=ctx.createGain();
-    o1.type='sine';o2.type='sine';o3.type='sine';
-    // 顫音琴金屬條的突出泛音落在高八度與約 4 倍頻，產生明亮但圓潤的金屬感。
-    o1.frequency.value=freq;o2.frequency.value=freq*2;o3.frequency.value=freq*3.98;
-    o1.connect(g1);o2.connect(g2);o3.connect(g3);g1.connect(filter);g2.connect(filter);g3.connect(filter);
-    // 低通保留金屬光澤但濾掉最刺耳的超高頻，避免多音疊加時尖銳。
-    filter.type='lowpass';filter.frequency.setValueAtTime(6200,t);filter.Q.value=.4;
-    // 高泛音比基頻衰減稍快，讓音頭明亮、尾音回到柔和的基頻金屬共鳴。
-    g1.gain.setValueAtTime(.88,t);g1.gain.exponentialRampToValueAtTime(.0001,t+Math.max(.5,dur*1.9));
-    g2.gain.setValueAtTime(.26,t);g2.gain.exponentialRampToValueAtTime(.0001,t+Math.max(.32,dur*1.2));
-    g3.gain.setValueAtTime(.12,t);g3.gain.exponentialRampToValueAtTime(.0001,t+Math.max(.2,dur*.7));
-    // 顫音（vibrato）：約 5Hz 的 LFO 對主總線音量做 ±8% 的輕微調變，營造綿延的金屬顫音尾韻。
-    const lfo=ctx.createOscillator(),lfoGain=ctx.createGain();
-    lfo.type='sine';lfo.frequency.value=5;lfoGain.gain.value=.08;lfo.connect(lfoGain);lfoGain.connect(master.gain);
-    if(isArpeggio){
-      const attack=.006;
-      const decay=Math.max(.14,Math.min(dur*1.3,dur-.004));
-      master.gain.setValueAtTime(.0001,t);master.gain.linearRampToValueAtTime(Math.max(.0001,vol*.5),t+attack);
-      master.gain.exponentialRampToValueAtTime(.00001,t+decay);
-      releaseMs=(decay+.03)*1000;
-    }else{
-      const decay=sustainSeconds?Math.min(sustainSeconds,Math.max(.6,dur*1.9)):Math.max(.6,dur*1.9);
-      master.gain.setValueAtTime(.0001,t);master.gain.linearRampToValueAtTime(Math.max(.0001,vol*.5),t+.008);
-      master.gain.exponentialRampToValueAtTime(.00001,t+decay);
-      releaseMs=(decay+.04)*1000;
-    }
-    const stopAt=t+releaseMs/1000;sources.push(o1,o2,o3,lfo);o1.start(t);o1.stop(stopAt);o2.start(t);o2.stop(stopAt);o3.start(t);o3.stop(stopAt);lfo.start(t);lfo.stop(stopAt);
+  }else if(['GlassBowl','Handpan','SteelTongue','Kalimba'].includes(inst)){
+    // 四種聲學樂器採用不同的模態、起音與衰減，不以同一組泛音改名冒充：
+    // 碗琴是偏高頻玻璃模態；Handpan 是低中頻圓潤共鳴；鋼舌鼓是舌片金屬模態；
+    // 卡林巴是短促簧片加木箱共鳴。每個模態獨立衰減，和弦時不會變成同一個合成器。
+    const profile={
+      GlassBowl:{partials:[1,2.71,4.93,7.18,9.64],levels:[.58,.18,.085,.040,.018],types:['sine','sine','sine','triangle','sine'],filter:'bandpass',cutoff:Math.min(6200,Math.max(2600,freq*4.2)),q:.72,end:3.10,peak:.30,attack:.075,decays:[.96,.72,.50,.34,.24]},
+      Handpan:{partials:[1],levels:[.52],types:['sine'],filter:'lowpass',cutoff:2350,q:.46,end:2.55,peak:.43,attack:.060,decays:[1.00]},
+      SteelTongue:{partials:[1],levels:[.54],types:['sine'],filter:'lowpass',cutoff:3100,q:.42,end:2.28,peak:.41,attack:.055,decays:[.94]},
+      Kalimba:{partials:[1,2.02,3.96,6.05,8.12],levels:[.48,.27,.12,.055,.022],types:['triangle','sine','triangle','sine','sine'],filter:'lowpass',cutoff:4100,q:.30,end:1.48,peak:.43,attack:.032,decays:[.42,.30,.22,.16,.11]}
+    }[inst];
+    const end=sustainSeconds||dur*profile.end;
+    profile.partials.forEach((partial,index)=>{
+      const osc=ctx.createOscillator(),gain=ctx.createGain();
+      osc.type=profile.types[index];
+      const detune=(inst==='GlassBowl'?(index%2?-2.4:1.7):inst==='Handpan'?(index%2?.8:-.6):inst==='Kalimba'?(index%2?1.2:-.8):0);
+      osc.frequency.setValueAtTime(freq*partial*(inst==='Handpan'&&index===0?1.012:1),t);
+      osc.detune.setValueAtTime(detune,t);
+      if(inst==='Handpan'&&index===0)osc.frequency.exponentialRampToValueAtTime(freq,t+.16);
+      const decay=Math.min(end*.92,Math.max(.10,end*profile.decays[index]));
+      gain.gain.setValueAtTime(.0001,t);
+      gain.gain.exponentialRampToValueAtTime(Math.max(.0001,profile.levels[index]),t+Math.min(.018+index*.006,profile.attack+.015));
+      gain.gain.exponentialRampToValueAtTime(Math.max(.0001,profile.levels[index]*.035),t+decay);
+      osc.connect(gain);gain.connect(filter);sources.push(osc);osc.start(t);osc.stop(t+end+.24);
+    });
+    filter.type=profile.filter;filter.frequency.setValueAtTime(profile.cutoff,t);filter.Q.value=profile.q;
+    const releaseStart=sustainSeconds?Math.max(.12,end-.18):Math.max(.16,end*(inst==='Kalimba'?.48:.78));
+    master.gain.setValueAtTime(.0001,t);master.gain.linearRampToValueAtTime(Math.max(.0001,vol*profile.peak),t+(isArpeggio?Math.max(.040,profile.attack*.82):profile.attack));
+    master.gain.setValueAtTime(Math.max(.0001,vol*profile.peak*.80),t+releaseStart);master.gain.exponentialRampToValueAtTime(.00001,t+end);
+    releaseMs=(end+.24)*1000;
   }else{
-    // square 波最容易產生逼哩聲，改用 triangle 降低諧波量，並加低通濾波。
-    const o=ctx.createOscillator();o.type='triangle';o.frequency.value=freq;o.connect(filter);
-    filter.type='lowpass';filter.frequency.setValueAtTime(800,t);filter.frequency.linearRampToValueAtTime(1100,t+0.08);filter.Q.value=0.3;
+    const o=ctx.createOscillator();o.type='square';o.frequency.value=freq;o.connect(filter);
+    filter.type='lowpass';filter.frequency.setValueAtTime(900,t);filter.frequency.linearRampToValueAtTime(1400,t+0.08);
     const end=sustainSeconds||dur*1.3;const releaseStart=sustainSeconds?Math.max(.07,end-.070):.12;
-    master.gain.setValueAtTime(.0001,t);master.gain.linearRampToValueAtTime(Math.max(.0001,vol*.26),t+.045);
-    master.gain.setValueAtTime(Math.max(.0001,vol*.20),t+releaseStart);master.gain.exponentialRampToValueAtTime(.0001,t+end);releaseMs=(end+.13)*1000;sources.push(o);o.start(t);o.stop(t+releaseMs/1000);
+    master.gain.setValueAtTime(.0001,t);master.gain.linearRampToValueAtTime(Math.max(.0001,vol*.32),t+.075);
+    master.gain.setValueAtTime(Math.max(.0001,vol*.25),t+releaseStart);master.gain.exponentialRampToValueAtTime(.0001,t+end);releaseMs=(end+.13)*1000;sources.push(o);o.start(t);o.stop(t+releaseMs/1000);
   }
   return{sources,gain:master,isArpeggio,releaseMs};
 }
@@ -1871,7 +1945,7 @@ function stopPreviewVoice(voice){
   const now=ctx.currentTime;
   // setTargetAtTime 在 25ms 後尚未收斂到靜音就 stop，會造成硬截斷。改為明確
   // 線性淡出；複音和弦共用一個 gain，所有聲部會在 28ms 內同時平順收尾。
-  const release=voice.isArpeggio?.045:(voice.isChordBus?.028:.028);
+  const release=voice.isArpeggio?.085:(voice.isChordBus?.075:.075);
   try{
     const gain=voice.gain.gain;
     if(typeof gain.cancelAndHoldAtTime==='function')gain.cancelAndHoldAtTime(now);
@@ -1890,82 +1964,6 @@ function getArpIntervalMs(){
 }
 function getTempoBpm(){return Math.min(300,Math.max(30,Number(S.tempo)||72));}
 function getChordBeatIntervalMs(){return 60000/getTempoBpm();}
-function getBeatMs(){return 60000/getTempoBpm();}
-function isBeatTimelineRunning(){return beatTimeline.isRunning&&AC;}
-// 目前 audio clock 距離最近一個「已過去」的節拍原點有幾拍（可為負，代表還沒到下一拍）。
-function getBeatsSinceTimelineOrigin(){return (AC.currentTime-beatTimeline.originTime)*1000/beatTimeline.beatMs;}
-// 下一個小節第一拍（下拍）在 audio clock 上的絕對時間。
-// 注意：不可用 Math.ceil(beats) 對齊「任意拍界」——那樣只保證落在拍上，
-// 不保證是第一拍，根音會落在第 2／3／4 拍而形成錯拍。
-function getNextDownbeatBoundary(){
-  if(!AC)return null;
-  if(!isBeatTimelineRunning())return AC.currentTime+0.15;
-  const beats=getBeatsSinceTimelineOrigin();
-  let nextDownbeat=Math.ceil(beats/BEATS_PER_MEASURE-1e-6)*BEATS_PER_MEASURE;
-  let boundary=beatTimeline.originTime+nextDownbeat*beatTimeline.beatMs/1000;
-  // 排程提前量只用來預排音源，不能拿來跨過即將到來的第一拍；否則新時脈在 +150ms 起拍時會被整整延後一小節。
-  while(boundary<AC.currentTime+0.005){nextDownbeat+=BEATS_PER_MEASURE;boundary=beatTimeline.originTime+nextDownbeat*beatTimeline.beatMs/1000;}
-  return boundary;
-}
-// 未編入進行的單次和弦預聽，落在共用時鐘的下一拍；和弦進行仍使用小節第一拍對齊。
-function getNextBeatBoundary(){
-  if(!AC)return null;
-  if(!isBeatTimelineRunning())return AC.currentTime+0.15;
-  let nextBeat=Math.ceil(getBeatsSinceTimelineOrigin()-1e-6);
-  let boundary=beatTimeline.originTime+nextBeat*beatTimeline.beatMs/1000;
-  while(boundary<AC.currentTime+0.005){nextBeat++;boundary=beatTimeline.originTime+nextBeat*beatTimeline.beatMs/1000;}
-  return boundary;
-}
-// 確保共用時脈存在。和弦／智慧和聲／自訂進行可能在尚未開啟節拍器時就起拍；
-// 此時由進行先建立原點，之後開啟的節拍器沿用同一原點，
-// 兩者才不會各自為政而固定差半拍。
-// 優先沿用「執行中」的原點；否則沿用上一次保留的拍點（stopBeatTimeline 會保留，
-// 因為 startMetronome 會先呼叫 stopMetronome 內部拆除時脈）；
-// 速度已變更（beatMs 不同）時才以現在為原點重新建立。
-function ensureBeatTimeline(){
-  if(isBeatTimelineRunning()&&beatTimeline.beatMs===getBeatMs())return beatTimeline.runId;
-  if(beatTimelinePreserved&&beatTimelinePreserved.beatMs===getBeatMs())return adoptBeatTimeline(beatTimelinePreserved);
-  return startBeatTimeline();
-}
-// 節拍器／Groove 啟動時必須沿用進行已建立的拍點；stopMetronome 會先拆除時脈，
-// 因此不可一律以「當下」為新原點，否則兩個子系統各持無關原點而形成 0–1 拍的固定相位差。
-function acquireBeatTimelineForPlayback(){return ensureBeatTimeline();}
-// 沿用呼叫方保存的原點（速度未變時），讓後啟動的子系統接上既有拍點。
-function adoptBeatTimeline(preserved){
-  beatTimeline.runId++;
-  beatTimeline.originTime=preserved.originTime;
-  beatTimeline.beatMs=preserved.beatMs;
-  beatTimeline.isRunning=true;
-  return beatTimeline.runId;
-}
-// 從現在起，等待下一個小節第一拍所需的毫秒數；時脈尚未建立時先建立（原點即為下拍）。
-function getMsUntilNextDownbeat(){
-  ensureBeatTimeline();
-  ensureMetronomeForMusicalPlayback();
-  const boundary=getNextDownbeatBoundary();
-  if(boundary==null)return 0;
-  return Math.max(0,(boundary-AC.currentTime)*1000);
-}
-function ensureMetronomeForMusicalPlayback(){
-  const input=document.getElementById('metronome');
-  if(!input)return;
-  if(!input.checked){input.checked=true;input.dispatchEvent(new Event('change'));return;}
-  if(metroInterval===null&&!grooveStartTimer)startMetronome();
-}
-function startBeatTimeline(){
-  ensureAudioReady();
-  beatTimeline.runId++;
-  beatTimeline.originTime=AC.currentTime+0.15;
-  beatTimeline.beatMs=getBeatMs();
-  beatTimeline.isRunning=true;
-  return beatTimeline.runId;
-}
-function stopBeatTimeline(){
-  // 保留原點：startMetronome 會先呼叫 stopMetronome 拆除時脈，若不保留，
-  // 後啟動的節拍器就會以「當下」為新原點，與進行已排定的拍點形成固定相位差。
-  if(beatTimeline.isRunning)beatTimelinePreserved={originTime:beatTimeline.originTime,beatMs:beatTimeline.beatMs};
-  beatTimeline.isRunning=false;beatTimeline.runId++;
-}
 function clearArpeggioTimers(){
   arpTimers.forEach(clearTimeout);
   arpTimers=[];
@@ -1979,9 +1977,9 @@ function updateScalePreviewUi(index,total,note,playing){
   const safeIndex=Math.max(0,Math.min(Number(index)||0,safeTotal-1));
   if(button){
     button.classList.toggle('scale-preview-playing',Boolean(playing));
-    button.textContent=playing?'■ 停止預覽':'♩ 音階預覽';
+    button.textContent=playing?'■ 停止聆聽':'♩ 聆聽音階';
     button.setAttribute('aria-pressed',String(Boolean(playing)));
-    button.setAttribute('aria-label',playing?'停止目前音階預覽':'依目前 KEY、MODE 與 BPM 逐音播放音階');
+    button.setAttribute('aria-label',playing?'停止目前音階聆聽':'依目前根音、音階與速度逐音播放');
   }
   if(status)status.hidden=!playing;
   if(noteLabel)noteLabel.textContent=note||'準備中';
@@ -2049,11 +2047,20 @@ function setSoundLayerEnabled(layer,enabled){
   }
   if(layer==='arp'&&!S.arpEnabled)clearArpeggioTimers();
 }
-function playChord(midis,dur,vol,capture,startAt){
+function playChord(midis,dur,vol,capture,skipSync=false){
   if(!Array.isArray(midis)||midis.length===0)return;
-  if(!Number.isFinite(startAt)){
-    ensureMetronomeForMusicalPlayback();
-    startAt=getNextBeatBoundary();
+  const ctxForSync=ac();
+  const nowForSync=ctxForSync.currentTime;
+  const metronomeEnabled=Boolean(document.getElementById('metronome')?.checked);
+  const shouldSyncToMetronome=metronomeEnabled&&musicalClockActive&&musicalClockSource==='metronome'&&musicalClockPeriod>0;
+  const nextBeatForSync=shouldSyncToMetronome
+    ? musicalClockAnchor+Math.ceil(Math.max(0,nowForSync-musicalClockAnchor)/musicalClockPeriod)*musicalClockPeriod
+    : nowForSync;
+  const syncDelay=shouldSyncToMetronome?Math.max(0,nextBeatForSync-nowForSync):0;
+  if(!skipSync&&syncDelay>.018){
+    const copy=midis.slice();
+    setTimeout(()=>playChord(copy,dur,vol,capture,true),Math.round(syncDelay*1000));
+    return;
   }
   const triggerAt=performance.now();
   // 行動瀏覽器可能在單次觸控附近送出重複事件；36ms 內的同一瞬態不再建立第二批振盪器。
@@ -2061,17 +2068,17 @@ function playChord(midis,dur,vol,capture,startAt){
   if(triggerAt-lastChordTriggerAt<36)return;
   lastChordTriggerAt=triggerAt;
   clearArpeggioTimers();
-  startBeatIndicator('和弦',startAt);
+  startBeatIndicator('和弦');
   const interval=getArpIntervalMs();
   const sustainSeconds=S.chordEnabled&&!S.arpEnabled?Math.max(.16,getChordHoldSeconds()-.028):0;
   const captureVoice=voice=>{if(capture&&voice)capture.add(voice);return voice;};
   const startPolyChord=(notes,duration,volume,noteOptions={})=>{
-    const useSharedEnvelope=(S.inst==='TongueDrum'||S.inst==='Harp');
+    const useSharedEnvelope=(S.inst==='Flute'||S.inst==='Harp');
     if(!useSharedEnvelope){notes.forEach(m=>captureVoice(playNote(m,duration,volume,S.inst,noteOptions)));return;}
-    const ctx=ac(),voiceStartAt=Number.isFinite(noteOptions.startAt)?noteOptions.startAt:ctx.currentTime+.012;
-    const chordBus=createPolyChordBus(ctx,S.inst,voiceStartAt);
+    const ctx=ac(),startAt=ctx.currentTime+.012;
+    const chordBus=createPolyChordBus(ctx,S.inst,startAt);
     notes.forEach(m=>{
-      const voice=playNote(m,duration,volume,S.inst,{...noteOptions,output:chordBus.gain,startAt:voiceStartAt});
+      const voice=playNote(m,duration,volume,S.inst,{...noteOptions,output:chordBus.gain,startAt});
       chordBus.sources.push(...(voice?.sources||[]));
       chordBus.releaseMs=Math.max(chordBus.releaseMs,Number(voice?.releaseMs)||0);
     });
@@ -2079,34 +2086,28 @@ function playChord(midis,dur,vol,capture,startAt){
   };
   if(interval>0){
     // 每個和弦固定佔四拍；和弦與逐拍琶音仍可由左側開關獨立控制。
-    if(S.chordEnabled&&S.chordVol>0)startPolyChord(midis,dur==null?getChordVoiceDuration():dur,S.chordVol,{sustainSeconds,...(Number.isFinite(startAt)?{startAt}: {})});
+    if(S.chordEnabled&&S.chordVol>0)startPolyChord(midis,dur==null?getChordVoiceDuration():dur,S.chordVol,{sustainSeconds});
     // 琶音音量為 0% 或被關閉時完全靜音；每個音的尾韻短於一拍，避免音重疊。
     if(!S.arpEnabled||S.arpVol<=0)return;
     const noteDur=getArpeggioNoteDuration(interval);
     getArpeggioMidiSequence(midis).forEach((m,i)=>{
-      if(S.arpEnabled&&S.arpVol>0){
-        const noteStartAt=(Number.isFinite(startAt)?startAt:ac().currentTime+.012)+i*interval/1000;
-        captureVoice(playNote(m,noteDur,S.arpVol,S.inst,{arpeggio:true,startAt:noteStartAt}));
-      }
+      arpTimers.push(setTimeout(()=>{
+        if(S.arpEnabled&&S.arpVol>0)captureVoice(playNote(m,noteDur,S.arpVol,S.inst,{arpeggio:true}));
+      },i*interval));
     });
     return;
   }
   if(!S.chordEnabled||S.chordVol<=0)return;
-  startPolyChord(midis,dur==null?getChordVoiceDuration():dur,vol==null?S.chordVol:vol,{sustainSeconds,...(Number.isFinite(startAt)?{startAt}: {})});
+  startPolyChord(midis,dur==null?getChordVoiceDuration():dur,vol==null?S.chordVol:vol,{sustainSeconds});
 }
 function playArpeggio(midis){playChord(midis);}
-function scheduleChordAudio(midis,startAt,guard=()=>true){
-  const ctx=ensureAudioReady();
-  const leadSeconds=BEAT_SCHEDULE_AHEAD_SECONDS;
-  const delay=Math.max(0,(startAt-ctx.currentTime-leadSeconds)*1000);
-  return setTimeout(()=>{if(guard())playChord(midis,undefined,undefined,undefined,startAt);},delay);
-}
 
-function playMetronomeBeat(accent=false,when){
+function playMetronomeBeat(accent=false){
   const volume=Math.min(1,Math.max(0,Number(S.metroVol)||0));
   if(volume<=0)return;
+  if(S.metroMute)return;
   const ctx=ensureAudioReady();
-  const t=Number.isFinite(when)?when:ctx.currentTime;
+  const t=ctx.currentTime;
   // 木魚：短促敲擊瞬態 + 三角形木質共鳴 + 高次泛音；第一拍使用較高音域，後三拍使用較低音域。
   const master=ctx.createGain();
   const bodyFilter=ctx.createBiquadFilter();
@@ -2120,36 +2121,29 @@ function playMetronomeBeat(accent=false,when){
   const bodyEnd=accent?540:300;
   // 木魚不再經過和弦子總線，避免桌面上額外 headroom 使 65% 預設音量低到近乎不可聞。
   // 保留主總線壓縮、頻寬保護與 limiter；峰值仍明顯低於 Groove 的同拍累積餘裕。
-  const peak=(accent?0.38:0.22)*volume;
+  const peak=(accent?0.44:0.27)*volume;
   body.type='triangle';body.frequency.setValueAtTime(freq,t);body.frequency.exponentialRampToValueAtTime(bodyEnd,t+duration*.7);
   overtone.type='sine';overtone.frequency.setValueAtTime(freq*2.08,t);overtone.frequency.exponentialRampToValueAtTime(bodyEnd*2.08,t+duration*.68);
   bodyGain.gain.setValueAtTime(1,t);overtoneGain.gain.setValueAtTime(accent?0.22:0.15,t);
-  bodyFilter.type='bandpass';bodyFilter.frequency.setValueAtTime(accent?1120:680,t);bodyFilter.Q.value=1.25;
-  overtoneFilter.type='bandpass';overtoneFilter.frequency.setValueAtTime(accent?2480:1480,t);overtoneFilter.Q.value=2.1;
-  master.gain.setValueAtTime(0.0001,t);master.gain.exponentialRampToValueAtTime(Math.max(0.002,peak),t+0.004);master.gain.exponentialRampToValueAtTime(0.0001,t+duration);
+  bodyFilter.type='bandpass';bodyFilter.frequency.setValueAtTime(accent?1120:680,t);bodyFilter.Q.value=.72;
+  overtoneFilter.type='bandpass';overtoneFilter.frequency.setValueAtTime(accent?2480:1480,t);overtoneFilter.Q.value=.95;
+  master.gain.setValueAtTime(0.0001,t);master.gain.exponentialRampToValueAtTime(Math.max(0.002,peak),t+0.028);master.gain.exponentialRampToValueAtTime(0.0001,t+duration+.090);
   body.connect(bodyGain);bodyGain.connect(bodyFilter);bodyFilter.connect(master);
   overtone.connect(overtoneGain);overtoneGain.connect(overtoneFilter);overtoneFilter.connect(master);
   master.connect(ensureMasterMix().input);
-  body.start(t);overtone.start(t);body.stop(t+duration+0.035);overtone.stop(t+duration+0.035);
+  body.start(t);overtone.start(t);body.stop(t+duration+.190);overtone.stop(t+duration+.190);
 }
 function playDrumVoice(kind,when,accent=false){
   const volume=Math.min(1,Math.max(0,Number(S.metroVol)||0));
   if(volume<=0)return;
+  if(S.metroMute)return;
   const ctx=ensureAudioReady();
   const now=when||ctx.currentTime;
   const master=ctx.createGain();
   connectGrooveOutput(master);
-  const voiceHandle={master,sources:[],stopped:false,disposed:false};
+  const voiceHandle={master,sources:[],stopped:false};
   grooveVoiceStops.add(voiceHandle);
-  const trackSource=source=>{
-    voiceHandle.sources.push(source);
-    source.addEventListener('ended',()=>{
-      try{source.disconnect();}catch(error){}
-      voiceHandle.sources=voiceHandle.sources.filter(activeSource=>activeSource!==source);
-      if(voiceHandle.sources.length===0)disposeGrooveVoice(voiceHandle);
-    },{once:true});
-    return source;
-  };
+  const trackSource=source=>{voiceHandle.sources.push(source);return source;};
   const voiceGain={
     kick:0.96,edmKick:0.94,subKick:0.84,snare:0.9,clap:0.82,
     brush:1.32,brushAccent:1.46,closedHat:0.62,hat:0.64,openHat:0.72,
@@ -2163,44 +2157,43 @@ function playDrumVoice(kind,when,accent=false){
   // 桌面輸出先前將每一聲部限制到約 0.02 的最終可聽峰值，節奏本體被起音瞬態掩蓋。
   // 一般模式保留足夠的鼓組動態，手機純淨模式仍採較低上限；總線壓縮與 4× limiter
   // 繼續處理同一細分拍的多聲部累積。
-  const peak=Math.min(S.mobilePureMode?0.14:0.22,(accent?0.22:0.16)*volume*voiceGain);
+  const peak=Math.min(S.mobilePureMode?0.16:0.34,(accent?0.26:0.19)*volume*voiceGain);
   const envelope=(duration,level=peak)=>{
-    // 音源 gain 只設定音色比例；起音與收尾由這條聲部總包絡統一控制，避免雙重曲線疊乘產生瞬態。
-    const normalizedLevel=S.mobilePureMode ? .72 : .82;
-    // 原本至少 16ms 的起音對鼓組與合成短音太慢，會把節奏瞬態壓成小聲的「啵」；
-    // 6ms 仍可避免零點跳變，同時恢復清楚起音。
-    const attack=Math.min(.010,Math.max(.006,duration*.06));
-    const releaseStart=Math.max(now+attack,now+Math.max(.055,duration*.68));
-    const releaseEnd=now+Math.max(duration,.075)+.090;
-    master.gain.setValueAtTime(0,now);
-    master.gain.linearRampToValueAtTime(normalizedLevel,now+attack);
+    // source 自身的 tone／noise gain 已承載 level。若此處再依 level 比例壓低 master，
+    // 會形成二次增益衰減，尤其 Hi-hat、刷鈸與拉丁細節在桌面端幾乎只剩 click。
+    // master 僅負責所有同一步進聲部共用的平滑起收音，實際音色比例維持在來源 gain。
+    const normalizedLevel=S.mobilePureMode ? .72 : .94;
+    master.gain.setValueAtTime(0.0001,now);
+    // 所有聲部再使用同一條較緩母線淡入與較長收尾；先前過短起音會讓低鼓、
+    // 噪聲與方波樂器的首個非零樣本在筆電／手機揚聲器上反覆聽成啵聲。
+    const attack=Math.min(.060,Math.max(.042,duration*.28));
+    const releaseStart=Math.max(now+attack,now+Math.max(.066,duration*.66));
+    master.gain.exponentialRampToValueAtTime(normalizedLevel,now+attack);
     master.gain.setValueAtTime(normalizedLevel,releaseStart);
-    master.gain.linearRampToValueAtTime(0,releaseEnd);
+    master.gain.exponentialRampToValueAtTime(0.0001,now+Math.max(duration,.075)+.190);
   };
+  // 所有預設都使用保守頻寬；夜間柔和再額外降低頻率與 Q。
+  const cleanSafe=true;
   const nightSafe=S.grooveMixPreset==='night';
   const noiseBurst=(duration,filterType,frequency,q=0.7,level=peak,decay=1.4)=>{
-    const nightNoiseFilter=nightSafe&&filterType==='highpass'?'bandpass':filterType;
-    const safeFrequency=nightSafe?(filterType==='highpass'?Math.min(frequency,1750):Math.min(frequency,2600)):frequency;
-    const safeQ=nightSafe?Math.min(q,.48):q;
-    const filter=ctx.createBiquadFilter();filter.type=nightNoiseFilter;filter.frequency.setValueAtTime(safeFrequency,now);filter.Q.value=safeQ;filter.connect(master);
+    const safeNoiseFilter=(cleanSafe||nightSafe)&&filterType==='highpass'?'bandpass':filterType;
+    const safeFrequency=nightSafe?(filterType==='highpass'?Math.min(frequency,1750):Math.min(frequency,2600)):(cleanSafe?Math.min(frequency,3400):frequency);
+    const safeQ=nightSafe?Math.min(q,.48):(cleanSafe?Math.min(q,.72):q);
+    const filter=ctx.createBiquadFilter();filter.type=safeNoiseFilter;filter.frequency.setValueAtTime(safeFrequency,now);filter.Q.value=safeQ;filter.connect(master);
     const buffer=ctx.createBuffer(1,Math.ceil(ctx.sampleRate*duration),ctx.sampleRate);const data=buffer.getChannelData(0);
-    const edgeFade=Math.min(Math.floor(data.length*.012),Math.max(8,Math.floor(ctx.sampleRate*.003)));
-    for(let i=0;i<data.length;i++){
-      const fadeIn=Math.min(1,i/edgeFade);
-      const fadeOut=Math.min(1,(data.length-1-i)/edgeFade);
-      data[i]=(Math.random()*2-1)*Math.pow(1-i/data.length,decay)*Math.min(fadeIn,fadeOut);
-    }
-    const noise=trackSource(ctx.createBufferSource());noise.buffer=buffer;const gain=ctx.createGain();
-    gain.gain.setValueAtTime(Math.max(.0001,level),now);noise.connect(gain);gain.connect(filter);noise.start(now);noise.stop(now+duration+.105);
+    for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1)*Math.pow(1-i/data.length,decay);
+    const noise=trackSource(ctx.createBufferSource());noise.buffer=buffer;const gain=ctx.createGain();const attack=Math.min(.058,Math.max(.040,duration*.25));
+    gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(Math.max(.0001,level),now+attack);gain.gain.exponentialRampToValueAtTime(.0001,now+duration+.150);noise.connect(gain);gain.connect(filter);noise.start(now);noise.stop(now+duration+.245);
   };
   const tone=(type,freq,startFreq=freq,duration=0.2,level=peak,filterType='lowpass',filterFreq=3200)=>{
-    const safeFilterFreq=nightSafe?Math.min(filterFreq,1500):filterFreq;
+    const safeFilterFreq=nightSafe?Math.min(filterFreq,1500):(cleanSafe?Math.min(filterFreq,5200):filterFreq);
     const osc=trackSource(ctx.createOscillator());const gain=ctx.createGain();const filter=ctx.createBiquadFilter();
     osc.type=type;osc.frequency.setValueAtTime(startFreq,now);
     // 低頻鼓需具可辨識的下滑音高與足夠的中低頻延續；若只固定在單一高頻率，
     // 桌面小喇叭往往只留下像啵聲的起音瞬態。
     if(Math.abs(startFreq-freq)>.5)osc.frequency.exponentialRampToValueAtTime(Math.max(1,freq),now+Math.min(.095,Math.max(.025,duration*.62)));
-    filter.type=filterType;filter.frequency.setValueAtTime(safeFilterFreq,now);filter.Q.value=nightSafe?0.52:0.65;gain.gain.setValueAtTime(Math.max(.0001,level),now);osc.connect(gain);gain.connect(filter);filter.connect(master);osc.start(now);osc.stop(now+duration+.105);
+    const attack=Math.min(.058,Math.max(.040,duration*.25));
+    filter.type=filterType;filter.frequency.setValueAtTime(safeFilterFreq,now);filter.Q.value=nightSafe?0.42:(cleanSafe?0.38:0.50);gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(Math.max(.0001,level),now+attack);gain.gain.exponentialRampToValueAtTime(.0001,now+duration+.150);osc.connect(gain);gain.connect(filter);filter.connect(master);osc.start(now);osc.stop(now+duration+.245);
   };
   switch(kind){
     case 'kick':
@@ -2250,9 +2243,9 @@ function playDrumVoice(kind,when,accent=false){
       envelope(0.2,peak*0.4);tone('sine',860,860,0.2,peak*0.3,'bandpass',1800);break;
     case 'electricBass':
     case 'synthBass':
-      envelope(kind==='synthBass'?0.44:0.52,peak*0.62);tone(getGrooveSynthWaveform(),kind==='synthBass'?67:76,kind==='synthBass'?112:126,kind==='synthBass'?0.44:0.52,peak*0.82*getGrooveWaveformGain(),'lowpass',kind==='synthBass'?((S.grooveWaveform==='sawtooth'||S.grooveWaveform==='square')?520:720):((S.grooveWaveform==='sawtooth'||S.grooveWaveform==='square')?680:920));break;
+      envelope(kind==='synthBass'?0.44:0.52,peak*0.62);tone(getGrooveSynthWaveform(),kind==='synthBass'?67:76,kind==='synthBass'?112:126,kind==='synthBass'?0.44:0.52,peak*0.60*getGrooveWaveformGain(),'lowpass',kind==='synthBass'?720:920);break;
     case 'synthPluck':
-      envelope(0.16,peak*0.54);tone(getGrooveSynthWaveform(),accent?440:330,accent?440:330,0.16,peak*0.68*getGrooveWaveformGain(),'lowpass',(S.grooveWaveform==='sawtooth'||S.grooveWaveform==='square')?1050:1800);break;
+      envelope(0.16,peak*0.54);tone(getGrooveSynthWaveform(),accent?440:330,accent?440:330,0.16,peak*0.46*getGrooveWaveformGain(),'lowpass',1800);break;
     case 'logDrum':
       // Amapiano 標誌性的低木鼓：快速下滑的中低頻，但保留圓潤尾音以在桌面喇叭可辨識。
       envelope(0.34,peak*0.74);tone('sine',68,178,0.34,peak*0.68,'bandpass',780);tone('triangle',138,186,0.21,peak*0.21,'lowpass',1150);break;
@@ -2264,14 +2257,15 @@ function playDrumVoice(kind,when,accent=false){
     default:
       envelope(0.12,peak*0.4);noiseBurst(0.1,'bandpass',1800,1,peak*0.25,1.5);
   }
+  setTimeout(()=>grooveVoiceStops.delete(voiceHandle),1500);
 }
-function playGrooveStep(step,when){
+function playGrooveStep(step){
   const pattern=GROOVE_PATTERNS[S.groove]||GROOVE_PATTERNS.disco;
-  const startAt=Number.isFinite(when)?when:ac().currentTime+0.008;
+  const when=ac().currentTime+0.008;
   Object.keys(pattern).forEach(instrument=>{
     if(!Array.isArray(pattern[instrument])||!pattern[instrument].includes(step))return;
     const kind=instrument==='hat'?'closedHat':instrument;
-    playDrumVoice(kind,startAt,step===0&&instrument==='kick');
+    playDrumVoice(kind,when,step===0&&instrument==='kick');
   });
 }
 function nn(s){return NOTES[s%12];}
@@ -3334,24 +3328,19 @@ function playCustomProgression(){
   stopIntermediatePreview(false);stopScalePreview();clearSmartHarmonyTimers();stopMascotPlayback();
   const run=++customProgressionRun,cycles=Math.max(1,Number(S.cycleCount)||1),chordMs=getProgressionChordIntervalMs();
   customProgressionActive=true;customProgressionCurrentSlot=0;customProgressionTimers=[];updateCustomProgressionPlaybackUi();
-  // 自訂進行先前完全沒有對齊時脈（一律從 0ms 起算），根音必然落在任意位置。
-  // 現與其他兩條進行一致，從下一個小節第一拍起拍。
-  const beatAlignMs=getMsUntilNextDownbeat();
-  const beatStartAt=getNextDownbeatBoundary();
   for(let cycle=0;cycle<cycles;cycle++)sequence.forEach((chord,index)=>{
     const absoluteIndex=cycle*sequence.length+index;
-    const midis=validCustomChord(chord)?spellChord(chord.note,chord.q).map(note=>note.midi):null;
-    if(midis)customProgressionTimers.push(scheduleChordAudio(midis,beatStartAt+absoluteIndex*chordMs/1000,()=>run===customProgressionRun&&customProgressionActive));
     customProgressionTimers.push(setTimeout(()=>{
       if(run!==customProgressionRun)return;
       customProgressionCurrentSlot=index;updateCustomProgressionPlaybackUi();
-      if(!midis)return;
-      updateVisualizationHighlight(midis,chord.note,chord.q,chord.note,true);
+      if(!validCustomChord(chord))return;
+      const midis=spellChord(chord.note,chord.q).map(note=>note.midi);
+      updateVisualizationHighlight(midis,chord.note,chord.q,chord.note,true);playChord(midis);
       if(absoluteIndex===cycles*sequence.length-1){
         const tail=Math.max(160,getChordPlaybackDurationMs(midis));
         customProgressionFinishTimer=setTimeout(()=>{if(run===customProgressionRun)stopCustomProgression();},tail);
       }
-    },beatAlignMs+absoluteIndex*chordMs));
+    },absoluteIndex*chordMs));
   });
   showToast(`開始播放自訂和弦進行：${cycles} 輪`);
 }
@@ -3765,7 +3754,7 @@ function examReportMarkup(){
   return `<div class="exam-report-modal show" id="examReportModal" role="dialog" aria-modal="true" aria-labelledby="examReportTitle"><div class="exam-report-dialog"><div class="exam-report-head"><div><h2 id="examReportTitle">本場成績統計</h2><p>隨堂考試已完成，以下是本場作答摘要。</p></div><button class="exam-report-close" id="examReportClose" type="button" aria-label="關閉成績統計">×</button></div><div class="exam-report-grid"><div class="exam-report-kpi"><span>答題正確率</span><strong>${accuracy}%</strong><small>${correct}／${total} 題</small></div><div class="exam-report-kpi"><span>錯誤題數</span><strong>${S.examWrongCount||0}</strong><small>含逾時與錯誤輸入</small></div><div class="exam-report-kpi"><span>平均反應</span><strong>${correct?Math.round(S.examReactionTotal/correct):'—'}${correct?' ms':''}</strong><small>僅計入答對題</small></div></div><section class="exam-report-section"><h3>常錯音符</h3><div class="exam-report-notes">${examMistakeRows()}</div></section><div class="exam-report-actions"><button class="sb-btn" id="examReportContinueBtn" type="button">查看完成頁</button><button class="sb-btn" id="examReportJsonBtn" type="button">下載 JSON</button><button class="sb-btn" id="examReportCsvBtn" type="button">下載 CSV</button><button class="sb-btn green" id="examTargetedPracticeBtn" type="button">針對性練習</button><button class="sb-btn green" id="examReportRetryBtn" type="button">依弱點再考一次</button></div></div></div>`;
 }
 function playExamFeedbackSound(kind){
-  try{ensureAudio();if(!AC||Number(S.examFeedbackVolume||0)<=0)return;const ctx=AC,now=ctx.currentTime,level=Math.min(1,Math.max(0,Number(S.examFeedbackVolume)/100));const osc=ctx.createOscillator(),gain=ctx.createGain();osc.type='sine';osc.frequency.setValueAtTime(kind==='correct'?740:180,now);osc.frequency.exponentialRampToValueAtTime(kind==='correct'?1040:110,now+0.09);gain.gain.setValueAtTime(0.0001,now);gain.gain.exponentialRampToValueAtTime(0.075*level,now+0.012);gain.gain.exponentialRampToValueAtTime(0.0001,now+0.16);osc.connect(gain);gain.connect(ctx.destination);osc.start(now);osc.stop(now+0.18);}catch(error){}
+  try{ensureAudio();if(!AC||Number(S.examFeedbackVolume||0)<=0)return;const ctx=AC,now=ctx.currentTime,level=Math.min(1,Math.max(0,Number(S.examFeedbackVolume)/100));const osc=ctx.createOscillator(),gain=ctx.createGain();osc.type='sine';osc.frequency.setValueAtTime(kind==='correct'?740:180,now);osc.frequency.exponentialRampToValueAtTime(kind==='correct'?1040:110,now+0.09);gain.gain.setValueAtTime(0.0001,now);gain.gain.exponentialRampToValueAtTime(0.075*level,now+0.045);gain.gain.exponentialRampToValueAtTime(0.0001,now+0.28);osc.connect(gain);gain.connect(ensureMasterMix().input);osc.start(now);osc.stop(now+0.36);}catch(error){}
 }
 function spawnExamFeedbackParticles(midiValue,kind){
   const piano=document.querySelector(`.exam-piano-stage .piano-mini [data-midi="${Number(midiValue)}"]`);if(!piano)return;
@@ -3809,69 +3798,6 @@ function renderExam(){
   const pauseOverlayResumeBtn=document.getElementById('examPauseOverlayResumeBtn');if(pauseOverlayResumeBtn)pauseOverlayResumeBtn.onclick=resumeExam;
   const fullscreenBtn=document.getElementById('examFullscreenBtn');if(fullscreenBtn)fullscreenBtn.onclick=toggleExamFullscreen;
   updateExamStats();
-}
-function scaleDegreeNote(key,degree){return spellNote(key,MAJOR_SCALE_INTERVALS[degree],degree).name;}
-function normalizeQuizNote(value){
-  const match=/^([A-G])([#b]{0,2})$/i.exec(String(value||'').trim().replace(/♯/g,'#').replace(/♭/g,'b'));
-  if(!match)return null;
-  const name=match[1].toUpperCase()+match[2];
-  return{name,pitch:notePitchClass(name)};
-}
-function createScaleDegreeQuizQuestion(){
-  let key,sourceDegree,sourceNote;
-  for(let attempt=0;attempt<48;attempt++){
-    key=SCALE_DEGREE_KEYS[Math.floor(Math.random()*SCALE_DEGREE_KEYS.length)];
-    const candidates=MAJOR_SCALE_INTERVALS.map((_,degree)=>({degree,note:scaleDegreeNote(key,degree)})).filter(item=>/^[A-G]$/.test(item.note));
-    if(candidates.length){const picked=candidates[Math.floor(Math.random()*candidates.length)];sourceDegree=picked.degree;sourceNote=picked.note;break;}
-  }
-  if(!sourceNote){key='C';sourceDegree=0;sourceNote='C';}
-  let targetDegree=Math.floor(Math.random()*6);
-  if(targetDegree>=sourceDegree)targetDegree++;
-  const answer=scaleDegreeNote(key,targetDegree);
-  return{key,sourceDegree,sourceNote,targetDegree,answer,attempts:0,status:'pending',firstTryCorrect:false,value:''};
-}
-function startScaleDegreeQuiz(count){
-  const parsed=Math.floor(Number(count));
-  if(!Number.isFinite(parsed)||parsed<1){showToast('請輸入至少 1 題');return;}
-  scaleDegreeQuiz={count:Math.min(200,parsed),questions:Array.from({length:Math.min(200,parsed)},createScaleDegreeQuizQuestion),checked:false};
-  renderScaleDegreeQuiz();
-}
-function checkScaleDegreeQuiz(){
-  if(!scaleDegreeQuiz.questions.length)return;
-  scaleDegreeQuiz.questions.forEach(question=>{
-    if(question.status==='correct'||question.status==='revealed')return;
-    const entered=normalizeQuizNote(question.value);
-    if(entered&&entered.pitch===notePitchClass(question.answer)){
-      question.status='correct';question.firstTryCorrect=question.attempts===0;
-    }else{
-      question.attempts++;
-      question.status=question.attempts>=3?'revealed':'wrong';
-    }
-  });
-  scaleDegreeQuiz.checked=true;
-  renderScaleDegreeQuiz();
-}
-function renderScaleDegreeQuiz(){
-  const area=document.getElementById('contentArea');if(!area)return;
-  const questions=scaleDegreeQuiz.questions;
-  const correct=questions.filter(question=>question.firstTryCorrect).length;
-  const resolved=questions.length>0&&questions.every(question=>question.status==='correct'||question.status==='revealed');
-  const score=scaleDegreeQuiz.checked?`<div class="degree-quiz-score" role="status">首次答對 ${correct}／${questions.length} 題・得分 ${Math.round(correct/Math.max(1,questions.length)*100)}%${resolved?'・本回合完成，錯題答案已訂正或顯示':''}</div>`:'';
-  const list=questions.length?`<div class="degree-quiz-list">${questions.map((question,index)=>{
-    const rowClass=question.status==='wrong'?' is-wrong':question.status==='correct'?' is-correct':'';
-    let feedback='請輸入音名，例如 C、F# 或 Bb。';
-    if(question.status==='wrong')feedback=`答案不正確，請重新輸入（已錯 ${question.attempts} 次，最多 3 次）。`;
-    if(question.status==='correct')feedback=`答對：${question.answer}。`;
-    if(question.status==='revealed')feedback=`已連續答錯 3 次，正確答案是 ${question.answer}。`;
-    const disabled=question.status==='correct'||question.status==='revealed'?' disabled':'';
-    return `<article class="degree-quiz-question${rowClass}" data-question-index="${index}"><div class="degree-quiz-prompt"><strong>${index+1}.</strong> 已知 ${question.key} 大調的「${SCALE_DEGREE_NAMES[question.sourceDegree]}」音為 ${question.sourceNote}，請寫出同一調的「${SCALE_DEGREE_NAMES[question.targetDegree]}」音。</div><input class="degree-quiz-answer" data-quiz-answer="${index}" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" maxlength="3" placeholder="音名" aria-label="第 ${index+1} 題答案" value="${question.value}"${disabled}><div class="degree-quiz-feedback" aria-live="polite">${feedback}</div></article>`;
-  }).join('')}</div>`:'';
-  area.innerHTML=`<section class="degree-quiz-page"><div class="degree-quiz-card"><header class="degree-quiz-head"><div><h2>亂數樂理產生器・音階音級換算</h2><p>依大調七個音級練習音名。答案請輸入音名；同音異名（例如 C#／Db）視為正確。</p></div></header><div class="degree-quiz-setup"><div class="degree-quiz-field"><label for="degreeQuizCount">本回合題數（1–200）</label><input id="degreeQuizCount" type="number" min="1" max="200" step="1" value="${scaleDegreeQuiz.count}" inputmode="numeric"></div><button class="degree-quiz-btn primary" id="degreeQuizGenerateBtn" type="button">${questions.length?'產生新題':'開始出題'}</button><button class="degree-quiz-btn" id="degreeQuizExitBtn" type="button">返回練習</button></div>${score}${list}${questions.length?`<div class="degree-quiz-actions"><button class="degree-quiz-btn primary" id="degreeQuizSubmitBtn" type="button"${resolved?' disabled':''}>${scaleDegreeQuiz.checked?'交卷／檢查訂正':'交卷／檢查答案'}</button><button class="degree-quiz-btn" id="degreeQuizNewBtn" type="button">重新產生題目</button></div>`:''}</div></section>`;
-  area.querySelectorAll('[data-quiz-answer]').forEach(input=>input.addEventListener('input',event=>{const index=Number(event.currentTarget.dataset.quizAnswer);if(scaleDegreeQuiz.questions[index])scaleDegreeQuiz.questions[index].value=event.currentTarget.value;}));
-  document.getElementById('degreeQuizGenerateBtn')?.addEventListener('click',()=>startScaleDegreeQuiz(document.getElementById('degreeQuizCount')?.value));
-  document.getElementById('degreeQuizNewBtn')?.addEventListener('click',()=>startScaleDegreeQuiz(document.getElementById('degreeQuizCount')?.value));
-  document.getElementById('degreeQuizSubmitBtn')?.addEventListener('click',checkScaleDegreeQuiz);
-  document.getElementById('degreeQuizExitBtn')?.addEventListener('click',()=>{S.level='Beginner';document.body.classList.remove('scale-degree-quiz-mode');const select=document.getElementById('levelSelect');if(select)select.value=S.level;render();});
 }
 function applyExamFullscreenState(){
   document.body.classList.toggle('exam-focus-active',Boolean(S.examFullscreen));
@@ -4022,11 +3948,12 @@ function restoreStandardContentShell(){
 }
 function render(){
   const sidebar=document.getElementById('sidebar');
-  document.body.classList.toggle('scale-degree-quiz-mode',S.level==='ScaleDegreeQuiz');
   if(sidebar)sidebar.classList.toggle('exam-mode-active',S.level==='Exam');
   const diatonicControls=document.getElementById('diatonicControls');
   const examControls=document.getElementById('examControls');
-  if(diatonicControls)diatonicControls.hidden=S.level!=='Diatonic';
+  // 音階是初學者、調內與和弦種類圖的共同學習基礎；隨堂考試使用自己的題庫，
+  // 因此只在 Exam 隱藏，避免切換難度後新增音階控制消失。
+  if(diatonicControls)diatonicControls.hidden=S.level==='Exam';
   if(examControls)examControls.hidden=S.level!=='Exam';
   const examBody=document.getElementById('examSettingsBody');if(examBody)examBody.hidden=S.examSettingsCollapsed&&S.examActive;
   updateNoteSelectionUi();
@@ -4042,7 +3969,6 @@ const particleCountInput=document.getElementById('examParticleCount');if(particl
   if(S.level==='Beginner')renderBeginner();
   else if(S.level==='Intermediate')renderIntermediate();
   else if(S.level==='Exam')renderExam();
-  else if(S.level==='ScaleDegreeQuiz')renderScaleDegreeQuiz();
   else renderDiatonic();
   requestAnimationFrame(syncMascotTraveler);
 }
@@ -4276,11 +4202,6 @@ document.getElementById('levelSelect').onchange=function(){
     const metronome=document.getElementById('metronome');
     if(metronome?.checked){metronome.checked=false;metronome.dispatchEvent(new Event('change'));}
   }
-  if(nextLevel==='ScaleDegreeQuiz'){
-    stopMascotPlayback();clearSmartHarmonyTimers();stopCustomProgression();
-    if(loopInterval){clearInterval(loopInterval);loopInterval=null;}S.loop=false;const loopButton=document.getElementById('loopBtn');if(loopButton){loopButton.classList.remove('on');loopButton.textContent='🔁';}
-    const metronome=document.getElementById('metronome');if(metronome?.checked){metronome.checked=false;metronome.dispatchEvent(new Event('change'));}
-  }
   if(S.beginnerInputTimer)clearTimeout(S.beginnerInputTimer);
   S.beginnerInputTimer=null;S.beginnerInputWindow=[];S.beginnerRecentInput=[];S.beginnerRecommendations=[];S.beginnerPinned=false;
   S.level=nextLevel;
@@ -4313,11 +4234,10 @@ document.getElementById('scaleSelect').onchange=function(){
   render();
 };
 document.getElementById('modeSelect').onchange=function(){stopIntermediatePreview(false);stopScalePreview();S.mode=this.value;S.modeScaleEnabled=true;render();};
-document.getElementById('instSelect').onchange=function(){S.inst=normalizeInstrument(this.value);};
+document.getElementById('instSelect').onchange=function(){S.inst=this.value;};
 document.getElementById('harmonyStyleSelect').onchange=function(){S.harmonyStyle=this.value;populateCommonProgressions();showToast(`智慧和聲風格：${HARMONY_STYLE_LABELS[S.harmonyStyle]||'流行'}`);};
 const examHintToggle=document.getElementById('examKeyboardHintToggle');function updateExamHintToggle(){if(!examHintToggle)return;examHintToggle.setAttribute('aria-pressed',String(Boolean(S.examKeyboardHint)));examHintToggle.textContent=S.examKeyboardHint?'隱藏藍色鍵盤提示':'顯示藍色鍵盤提示';}if(examHintToggle){updateExamHintToggle();examHintToggle.onclick=function(){S.examKeyboardHint=!S.examKeyboardHint;saveExamSettings();updateExamHintToggle();if(S.level==='Exam')renderExam();};}
 const examAnswerReferenceToggle=document.getElementById('examAnswerReferenceToggle');function updateExamAnswerReferenceToggle(){if(!examAnswerReferenceToggle)return;examAnswerReferenceToggle.setAttribute('aria-pressed',String(Boolean(S.examAnswerReference)));examAnswerReferenceToggle.textContent=S.examAnswerReference?'隱藏答案參考':'顯示答案參考';}if(examAnswerReferenceToggle){updateExamAnswerReferenceToggle();examAnswerReferenceToggle.onclick=function(){S.examAnswerReference=!S.examAnswerReference;saveExamSettings();updateExamAnswerReferenceToggle();if(S.level==='Exam')renderExam();};}
-const deviceProfileSelect=document.getElementById('audioDeviceProfile');if(deviceProfileSelect)deviceProfileSelect.onchange=function(){setMobilePureMode(this.value,true);showToast(this.value==='mobile'?'手機音量配置已套用':this.value==='headphones'?'耳機音量配置已套用':'桌面音量配置已套用');};
 const resetAudioPreferencesBtn=document.getElementById('resetAudioPreferencesBtn');if(resetAudioPreferencesBtn)resetAudioPreferencesBtn.onclick=resetAudioPreferences;
 const examToggle=document.getElementById('examSettingsToggle');if(examToggle)examToggle.onclick=function(){S.examSettingsCollapsed=!S.examSettingsCollapsed;const body=document.getElementById('examSettingsBody');if(body)body.hidden=S.examSettingsCollapsed;this.setAttribute('aria-expanded',String(!S.examSettingsCollapsed));};
 const progressionSearch=document.getElementById('progressionSearch');if(progressionSearch)progressionSearch.oninput=function(){S.progressionSearch=this.value;populateCommonProgressions();};
@@ -4350,7 +4270,11 @@ document.getElementById('arpToggle').onclick=function(){
   setSoundLayerEnabled('arp',!S.arpEnabled);
   showToast(S.arpEnabled?'琶音音已開啟':'琶音音已關閉');
 };
-
+document.getElementById('mobilePureMode').onchange=function(){
+  setMobilePureMode(this.checked,true);
+  showToast(S.mobilePureMode?'手機純淨模式已開啟：採保守增益、頻寬與起收音保護':'手機純淨模式已關閉：恢復完整動態預設');
+};
+document.getElementById('deviceAudioProfile').onchange=function(){applyDeviceAudioProfile(this.value,true,true);};
 document.getElementById('tempoSlider').oninput=function(){
   const restartScale=scalePreviewActive;
   const restartDiatonic=mascotPlaybackActive;
@@ -4400,7 +4324,6 @@ function stopMascotPlayback(){
 async function playDiatonicSequence(){
   clearSmartHarmonyTimers();
   stopMascotPlayback();
-  ensureMetronomeForMusicalPlayback();
   const run=++mascotPlaybackRun;
   // 播放前強制刷新目前調性／音階／調式所對應的和弦樹，
   // 並等待瀏覽器完成 DOM layout，吉祥物才有可追蹤的節點座標。
@@ -4414,19 +4337,15 @@ async function playDiatonicSequence(){
   const repeats=[1,2,4].includes(Number(S.cycleCount))?Number(S.cycleCount):2;
   const sequence=Array.from({length:repeats},()=>diatonic).flat();
   updateDiatonicPlaybackStatus(1,repeats,0,sequence.length,true);
-  // 將整個進行對齊到下一個小節的「第一拍」，讓理音與根音落在下拍，
-  // 與節拍器／木魚／Groove 的 beat%4===0 定義一致。
-  const beatAlignMs=getMsUntilNextDownbeat();
-  const beatStartAt=getNextDownbeatBoundary();
   sequence.forEach((c,i)=>{
-    mascotPlaybackTimers.push(scheduleChordAudio(c.midi,beatStartAt+i*chordMs/1000,()=>mascotPlaybackActive&&run===mascotPlaybackRun));
     const timer=setTimeout(()=>{
       if(!mascotPlaybackActive||run!==mascotPlaybackRun)return;
       const round=Math.floor(i/Math.max(1,diatonic.length))+1;
       updateDiatonicPlaybackStatus(round,repeats,i,sequence.length,true);
       updateVisualizationHighlight(c.midi,c.note,c.q,c.note,true);
+      playChord(c.midi);
       moveMascotTo(c.note,c.q);
-    },beatAlignMs+i*chordMs);
+    },i*chordMs);
     mascotPlaybackTimers.push(timer);
   });
   const lastChord=sequence[sequence.length-1];
@@ -4441,11 +4360,12 @@ async function playDiatonicSequence(){
 }
 
 document.getElementById('playAllBtn').onclick=function(){
+  ensureAudioReady();
   stopScalePreview();
   playDiatonicSequence();
 };
 
-document.getElementById('scalePreviewBtn').onclick=function(){playScalePreview();};
+document.getElementById('scalePreviewBtn').onclick=function(){ensureAudioReady();playScalePreview();};
 
 function restartDiatonicLoop(){
   if(loopInterval){clearInterval(loopInterval);loopInterval=null;}
@@ -4473,18 +4393,14 @@ document.getElementById('loopBtn').onclick=function(){
 document.getElementById('randomChordsBtn').onclick=function(){
   stopScalePreview();
   clearSmartHarmonyTimers();
-  ensureMetronomeForMusicalPlayback();
-  const run=smartHarmonyRun;
   const roots=['C','D','E','F','G','A','B'];
   const qs=['Major','Minor','Major 7','Minor 7','Dominant 7'];
-  const beatStartAt=getNextDownbeatBoundary();
   S.progression=[];
   for(let i=0;i<4;i++){
     const r=roots[Math.floor(Math.random()*roots.length)];
     const q=qs[Math.floor(Math.random()*qs.length)];
     S.progression.push({name:r+CHORDS[q].rom,note:r,q});
-    const midis=midi(r,CHORDS[q].f),startAt=beatStartAt+i*getProgressionChordIntervalMs()/1000;
-    smartHarmonyTimers.push(scheduleChordAudio(midis,startAt,()=>run===smartHarmonyRun));
+    setTimeout(()=>playChord(midi(r,CHORDS[q].f)),i*getProgressionChordIntervalMs());
   }
   renderProgression();
   render();
@@ -4504,17 +4420,30 @@ function playSmartHarmony(progression){
   stopMascotPlayback();
   lastSmartHarmonyProgression=progression.map(chord=>({...chord}));
   const chordMs=getProgressionChordIntervalMs();
-  // 同樣對齊到下一個小節第一拍，確保智慧和聲的根音落在下拍。
-  const beatAlignMs=getMsUntilNextDownbeat();
-  const beatStartAt=getNextDownbeatBoundary();
   updateSmartHarmonyStatus(0,progression.length,true,progression[0]);
+  ensureAudioReady();
+  const ctx=ac();
+  const beatSec=60/Math.max(30,Number(S.tempo)||72);
+  const barSec=beatSec*4;
+  // 共用時鐘：若尚無有效時鐘，錨點設為下一個第一拍（小節線），period 為一小節（秒）；
+  // 讓和弦／琶音與節拍器都對齊第一拍，離第一拍差 1～3 拍時自動等到下一個第一拍。
+  if(!(musicalClockActive&&musicalClockPeriod>0)){
+    musicalClockAnchor=Math.ceil(ctx.currentTime/barSec)*barSec;
+    musicalClockPeriod=barSec;
+    if(!musicalClockSource)musicalClockSource='metronome';
+    musicalClockActive=true;
+  }else if(Math.abs(musicalClockPeriod-barSec)>1e-6){
+    musicalClockPeriod=barSec;
+  }
   progression.forEach((chord,index)=>{
-    const midis=midi(chord.note,CHORDS[chord.q].f),startAt=beatStartAt+index*chordMs/1000;
-    smartHarmonyTimers.push(scheduleChordAudio(midis,startAt,()=>run===smartHarmonyRun));
+    const atSec=musicalClockAnchor+index*(chordMs/1000);
+    const delayMs=Math.max(0,atSec-ctx.currentTime)*1000;
     smartHarmonyTimers.push(setTimeout(()=>{
       if(run!==smartHarmonyRun)return;
+      const midis=midi(chord.note,CHORDS[chord.q].f);
       updateSmartHarmonyStatus(index,progression.length,true,chord);
       updateVisualizationHighlight(midis,chord.note,chord.q,chord.note,true);
+      playChord(midis,undefined,undefined,undefined,true);
       moveMascotTo(chord.note,chord.q);
       if(index===progression.length-1){
         smartHarmonyTimers=[];
@@ -4525,7 +4454,7 @@ function playSmartHarmony(progression){
           if(finishRun===smartHarmonyRun)updateSmartHarmonyStatus(-1,0,false);
         },Math.max(120,playbackTailMs));
       }
-    },beatAlignMs+index*chordMs));
+    },delayMs));
   });
 }
 document.getElementById('smartHarmonizeBtn').onclick=function(){
@@ -4701,17 +4630,22 @@ window.addEventListener('resize',syncMascotTraveler);
 // Metronome
 function setMetronomeMode(mode){
   S.metroMode=mode==='groove'?'groove':'woodblock';
+  // Groove／木魚互斥：先完整停止目前節拍器排程（含淡出），
+  // 避免兩種音色同時出聲、切換時舊音色延遲靜音，或出現重複木魚。
+  stopMetronome();
   const wood=document.getElementById('woodblockModeBtn');
   const groove=document.getElementById('grooveModeBtn');
   const controls=document.getElementById('grooveControls');
   const input=document.getElementById('metronome');
   const isGroove=S.metroMode==='groove';
-  wood?.classList.toggle('on',!isGroove);groove?.classList.toggle('on',isGroove);
-  wood?.setAttribute('aria-pressed',String(!isGroove));groove?.setAttribute('aria-pressed',String(isGroove));
+  wood?.classList.toggle('on',!isGroove);
+  groove?.classList.toggle('on',isGroove);
+  wood?.setAttribute('aria-pressed',String(!isGroove));
+  groove?.setAttribute('aria-pressed',String(isGroove));
   if(controls)controls.hidden=!isGroove;
   if(isGroove)populateGrooveSelect();
-  // Groove 是可直接聆聽的伴奏模式；點擊 Groove 時若節拍器尚未開啟，先同步開啟再啟動排程。
-  // 木魚模式仍尊重使用者的節拍器開關，不會因切換音色而意外發聲。
+  // Groove 為可直接聆聽的伴奏模式，切換過去時自動開啟節拍器；
+  // 木魚模式尊重目前節拍器開關，不因切換音色而意外發聲。
   if(isGroove){
     if(input)input.checked=true;
     startMetronome();
@@ -4719,15 +4653,20 @@ function setMetronomeMode(mode){
     startMetronome();
   }
 }
-function stopMetronome(keepBeatTimeline=false){
-  const hadScheduledMetronome=metroInterval!==null||Boolean(grooveStartTimer);
+function stopMetronome(){
+  musicalClockActive=false;
+  musicalClockAnchor=0;
+  musicalClockPeriod=0;
+  musicalClockSource='';
+  metronomeSpeakerOn=false;
+  if(metroSilentInterval){clearInterval(metroSilentInterval);metroSilentInterval=0;}
+  if(metronomeLaunchTimer){clearTimeout(metronomeLaunchTimer);metronomeLaunchTimer=0;}
   if(tempoRestartTimer){clearTimeout(tempoRestartTimer);tempoRestartTimer=0;}
   if(grooveStartTimer){clearTimeout(grooveStartTimer);grooveStartTimer=0;}
   grooveRunId++;
-  // metroInterval 現為自校正 setTimeout 的 handle，clearTimeout 才能正確取消。
   if(metroInterval){clearInterval(metroInterval);metroInterval=null;}
-  if(!keepBeatTimeline)stopBeatTimeline();
-  if(hadScheduledMetronome){fadeGrooveOutput();fadeStopGrooveVoices();}
+  fadeGrooveOutput();
+  fadeStopGrooveVoices();
   metroBeat=0;grooveStep=0;
   stopBeatIndicator();
   stopGrooveMeter();
@@ -4750,89 +4689,126 @@ function fadeStopGrooveVoices(){
     }catch(error){}
     handle.sources.forEach(source=>{try{source.stop(now+fadeSeconds+.035);}catch(error){}});
   });
-  setTimeout(()=>handles.forEach(disposeGrooveVoice),Math.ceil((fadeSeconds+.16)*1000));
+  setTimeout(()=>handles.forEach(handle=>grooveVoiceStops.delete(handle)),Math.ceil((fadeSeconds+.16)*1000));
 }
-function startMetronome(){
-  // 只有原本就有節拍器排程時才等待舊聲部淡出；樂器單獨播放後首次開節拍器不可延遲跳過起拍。
-  const restartDelayMs=metroInterval!==null||grooveStartTimer?145:0;
-  // 重建節拍器排程時保留正在使用的 AudioContext 時脈，避免讓進行中的樂器失去原本的排程代次。
-  stopMetronome(true);
+function startMetronomeNow(anchorSec){
+  stopMetronome();
   ensureAudioReady();
   metroBeat=0;
   grooveStep=0;
   const input=document.getElementById('metronome');
-  // startMetronome 也會由 Groove 預設／速度／波形切換流程直接呼叫；此處明確同步開關，
-  // 讓淡出後的 restoreGrooveOutput 不會因舊的 checked=false 而跳過，避免輸出永久停在 0.0001。
+  // startMetronome 也會由 Groove 預設／速度／波形切換流程直接呼叫；此處明確同步開關。
   if(input){input.checked=true;input.setAttribute('aria-label',`關閉節拍器（${S.tempo} BPM）`);input.setAttribute('aria-checked','true');}
   const bpm=getTempoBpm();
-  const timelineRun=acquireBeatTimelineForPlayback();
+  const beatSec=60/bpm;
+  const barSec=beatSec*4;
   const pattern=GROOVE_PATTERNS[S.groove]||GROOVE_PATTERNS.disco;
+  // 共用時鐘：錨點＝第一拍（小節線），period＝一小節（四拍），單位為秒。
+  // 節拍器聲音、1234 顯示、和弦與琶音都對齊這個錨點。
+  const nowSec=AC?AC.currentTime:0;
+  const anchor=(typeof anchorSec==='number'&&isFinite(anchorSec)&&anchorSec>=nowSec-0.25)?anchorSec:Math.ceil(nowSec/barSec)*barSec;
+  musicalClockActive=true;
+  musicalClockAnchor=anchor;
+  musicalClockPeriod=barSec;
+  musicalClockSource='metronome';
+  metronomeSpeakerOn=true;
   if(S.metroMode==='groove'){
     const runId=++grooveRunId;
-    // 先讓舊聲部與總線完成交叉淡出，再建立新排程；避免 tempo／Groove 切換時在非零交叉點立即重啟。
-    const startGrooveScheduler=()=>{
+    const startDelay=Math.max(0,anchor-nowSec);
+    grooveStartTimer=setTimeout(()=>{
       grooveStartTimer=0;
       if(runId!==grooveRunId||S.metroMode!=='groove'||!document.getElementById('metronome')?.checked)return;
       restoreGrooveOutput();
-      beatIndicatorActive=true;updatePlaybackMonitorVisibility();
+      musicalClockAnchor=AC.currentTime; // 以實際第一個 step 對齊第一拍
+      beatIndicatorActive=true;metroBeat=0;updateBeatIndicator(0,true,'Groove');updatePlaybackMonitorVisibility();
+      playGrooveStep(0);
       startGrooveMeter();
-      // 排入 AudioContext 前方 120ms 的音訊佇列；JS timer 只負責補佇列，不能再決定發聲瞬間。
-      const patternForSchedule=GROOVE_PATTERNS[S.groove]||GROOVE_PATTERNS.disco;
-      const division=Math.max(1,patternForSchedule.division);
-      const stepSeconds=beatTimeline.beatMs/1000/division;
-      const elapsedSteps=(AC.currentTime-beatTimeline.originTime)/stepSeconds;
-      // 接入正在播放的樂器時，從共用時脈的下一個可排程細分拍加入；
-      // 不要等到下一小節，否則剛啟動的 Groove 會漏掉目前小節剩餘的拍點。
-      let nextStep=Math.max(0,Math.ceil(elapsedSteps-1e-6));
-      while(beatTimeline.originTime+nextStep*stepSeconds<AC.currentTime+0.005)nextStep++;
-      const firstStep=nextStep%patternForSchedule.steps;
-      metroBeat=(Math.floor(firstStep/division)+BEATS_PER_MEASURE-1)%BEATS_PER_MEASURE;
-      const scheduleGroove=()=>{
-        if(timelineRun!==beatTimeline.runId)return;
-        const now=AC.currentTime;
-        const horizon=now+BEAT_SCHEDULE_AHEAD_SECONDS;
-        while(beatTimeline.originTime+nextStep*stepSeconds<=horizon){
-          const targetStep=nextStep++;
-          const targetTime=beatTimeline.originTime+targetStep*stepSeconds;
-          if(targetTime<now-0.025)continue;
-          const step=targetStep%patternForSchedule.steps;
-          const beat=Math.floor(step/division)%4;
-          playGrooveStep(step,targetTime);
-          const uiDelay=Math.max(0,(targetTime-now)*1000);
-          setTimeout(()=>{if(runId===grooveRunId&&timelineRun===beatTimeline.runId){grooveStep=step;if(beat!==metroBeat){metroBeat=beat;updateBeatIndicator(beat,true,'Groove');}}},uiDelay);
-        }
-      };
-      scheduleGroove();
-      metroInterval=setInterval(scheduleGroove,25);
-    };
-    if(restartDelayMs)grooveStartTimer=setTimeout(startGrooveScheduler,restartDelayMs);
-    else startGrooveScheduler();
+      metroInterval=setInterval(()=>{
+        grooveStep=(grooveStep+1)%pattern.steps;
+        const nextBeat=Math.floor(grooveStep/Math.max(1,pattern.division))%4;
+        if(nextBeat!==metroBeat){metroBeat=nextBeat;updateBeatIndicator(metroBeat,true,'Groove');}
+        if(grooveStep===0)musicalClockAnchor=ac().currentTime; // 每個小節第一拍重新對齊錨點
+        playGrooveStep(grooveStep);
+      },60000/bpm/pattern.division);
+    },Math.max(1,Math.round(startDelay*1000)));
   }else{
-    beatIndicatorActive=true;updatePlaybackMonitorVisibility();
-    // 木魚與所有樂器共用絕對 beat index，提前 120ms 排入音訊時鐘。
-    // 木魚加入已播放的樂器時，接續同一時脈的下一拍，維持當下小節的拍號。
-    // 使用絕對拍 index，因此之後的第一至第四拍都與和弦／琶音共用同一原點。
-    let nextBeatIndex=Math.max(0,Math.ceil((AC.currentTime-beatTimeline.originTime)*1000/beatTimeline.beatMs-1e-6));
-    while(beatTimeline.originTime+nextBeatIndex*beatTimeline.beatMs/1000<AC.currentTime+0.005)nextBeatIndex++;
-    const runId=grooveRunId;
-    metroBeat=(nextBeatIndex+BEATS_PER_MEASURE-1)%BEATS_PER_MEASURE;
-    const scheduleWoodblock=()=>{
-      if(timelineRun!==beatTimeline.runId)return;
-      const now=AC.currentTime,horizon=now+BEAT_SCHEDULE_AHEAD_SECONDS;
-      while(beatTimeline.originTime+nextBeatIndex*beatTimeline.beatMs/1000<=horizon){
-        const beatIndex=nextBeatIndex++;
-        const targetTime=beatTimeline.originTime+beatIndex*beatTimeline.beatMs/1000;
-        if(targetTime<now-0.025)continue;
-        const beat=beatIndex%BEATS_PER_MEASURE;
-        playMetronomeBeat(beat===0,targetTime);
-        const uiDelay=Math.max(0,(targetTime-now)*1000);
-        setTimeout(()=>{if(runId===grooveRunId&&timelineRun===beatTimeline.runId){metroBeat=beat;updateBeatIndicator(beat,true,'木魚');}},uiDelay);
-      }
-    };
-    scheduleWoodblock();
-    metroInterval=setInterval(scheduleWoodblock,25);
+    beatIndicatorActive=true;updateBeatIndicator(0,true,'木魚');updatePlaybackMonitorVisibility();
+    playMetronomeBeat(true);
+    metroInterval=setInterval(()=>{
+      metroBeat=(metroBeat+1)%4;
+      if(metroBeat===0)musicalClockAnchor=ac().currentTime; // 每個小節第一拍重新對齊錨點，讓和弦／琶音共用同一時鐘
+      updateBeatIndicator(metroBeat,true,'木魚');
+      playMetronomeBeat(metroBeat===0);
+    },Math.round(beatSec*1000));
   }
 }
+function resyncActiveHarmonyToMetronome(force=false){
+  const status=document.getElementById('progressionPlaybackStatus');
+  const active=(force||Boolean(status?.classList.contains('on')))&&Array.isArray(lastSmartHarmonyProgression)&&lastSmartHarmonyProgression.length>0;
+  if(!active)return;
+  const progression=lastSmartHarmonyProgression.map(chord=>({...chord}));
+  const ctx=ensureAudioReady();
+  const beatSec=60/Math.max(30,Number(S.tempo)||72);
+  const barSec=beatSec*4;
+  // 對齊到下一個第一拍（小節線），與節拍器共用相同時鐘，避免慢幾拍。
+  const targetAnchor=Math.ceil((ctx.currentTime+1e-3)/barSec)*barSec;
+  const delay=Math.max(0,targetAnchor-ctx.currentTime);
+  // 取消未發出的計時器，不停止目前已發出的和弦尾韻；下一個第一拍重新開始，避免開節拍器時瞬間靜音。
+  clearSmartHarmonyTimers();
+  setTimeout(()=>{
+    if(!document.getElementById('metronome')?.checked)return;
+    musicalClockActive=true;musicalClockAnchor=targetAnchor;musicalClockPeriod=barSec;musicalClockSource='metronome';
+    playSmartHarmony(progression);
+  },Math.round(delay*1000));
+}
+function startMetronomeSilentCountdown(anchorSec){
+  // 等到下一個第一拍之前，先以靜音方式顯示目前的 1234 位置（不播出聲音）；
+  // 例如在第 3 拍按下，會先顯示 3、4，直到下一個第一拍再由 startMetronomeNow 播出重音。
+  const ctx=ac();
+  const barSec=musicalClockPeriod>0?musicalClockPeriod:(60/Math.max(30,Number(S.tempo)||72))*4;
+  const beatSec=barSec/4;
+  const now=ctx.currentTime;
+  let idx=Math.floor((((now-anchorSec)%barSec)+barSec)%barSec/beatSec);
+  if(idx<0)idx=0;
+  if(idx>3)idx=3;
+  beatIndicatorActive=true;
+  const label=S.metroMode==='groove'?'Groove':'木魚';
+  const show=()=>{updateBeatIndicator(idx,true,label);idx=(idx+1)%4;};
+  show();
+  if(metroSilentInterval){clearInterval(metroSilentInterval);}
+  metroSilentInterval=setInterval(show,Math.round(beatSec*1000));
+  setTimeout(()=>{if(metroSilentInterval){clearInterval(metroSilentInterval);metroSilentInterval=0;}},Math.max(0,Math.round((anchorSec-now)*1000)));
+}
+function startMetronome(){
+  if(metronomeLaunchTimer){clearTimeout(metronomeLaunchTimer);metronomeLaunchTimer=0;}
+  if(metroSilentInterval){clearInterval(metroSilentInterval);metroSilentInterval=0;}
+  const ctx=ensureAudioReady();
+  const beatSec=60/Math.max(30,Number(S.tempo)||72);
+  const barSec=beatSec*4;
+  // 目標：下一個第一拍（小節線）－節拍器聲音、1234 顯示、和弦與琶音都對齊這裡。
+  const nextDownbeat=Math.ceil(ctx.currentTime/barSec)*barSec;
+  const hadMetronomeClock=metronomeSpeakerOn;
+  const harmonyWasPlaying=Boolean(document.getElementById('progressionPlaybackStatus')?.classList.contains('on'))&&Array.isArray(lastSmartHarmonyProgression)&&lastSmartHarmonyProgression.length>0;
+  const delay=Math.max(0,nextDownbeat-ctx.currentTime);
+  if(delay>.018){
+    // 先以靜音方式把 1234 跑到第一拍，再正式出聲；確保聲音與拍顯示同步、不錯拍。
+    musicalClockActive=true;musicalClockAnchor=nextDownbeat;musicalClockPeriod=barSec;musicalClockSource='metronome';
+    startMetronomeSilentCountdown(nextDownbeat);
+    metronomeLaunchTimer=setTimeout(()=>{
+      metronomeLaunchTimer=0;
+      startMetronomeNow(nextDownbeat);
+      if(!hadMetronomeClock&&harmonyWasPlaying)resyncActiveHarmonyToMetronome(true);
+    },Math.round(delay*1000));
+  }else{
+    startMetronomeNow(nextDownbeat);
+    if(!hadMetronomeClock&&harmonyWasPlaying)resyncActiveHarmonyToMetronome(true);
+  }
+}
+document.getElementById('metroMute').onchange=function(){
+  S.metroMute=this.checked;
+  this.setAttribute('aria-checked',String(this.checked));
+  showToast(this.checked?'節拍器靜音：僅顯示 1234，暫不出聲':'節拍器靜音已取消');
+};
 document.getElementById('metronome').onchange=function(){
   if(this.checked)startMetronome();
   else{
@@ -4841,8 +4817,18 @@ document.getElementById('metronome').onchange=function(){
     this.setAttribute('aria-checked','false');
   }
 };
-document.getElementById('woodblockModeBtn').onclick=function(){setMetronomeMode('woodblock');showToast('木魚模式已啟用；Groove 已關閉');};
-document.getElementById('grooveModeBtn').onclick=function(){setMetronomeMode('groove');showToast('Groove 模式已啟用；木魚已關閉');};
+document.getElementById('woodblockModeBtn').onclick=function(){
+  const input=document.getElementById('metronome');
+  if(S.metroMode!=='woodblock'){setMetronomeMode('woodblock');showToast('木魚模式已啟用；Groove 已關閉');return;}
+  if(input&&input.checked){input.checked=false;stopMetronome();input.setAttribute('aria-label','開啟節拍器');input.setAttribute('aria-checked','false');showToast('木魚已關閉');}
+  else if(input){input.checked=true;startMetronome();showToast('木魚已開啟');}
+};
+document.getElementById('grooveModeBtn').onclick=function(){
+  const input=document.getElementById('metronome');
+  if(S.metroMode!=='groove'){setMetronomeMode('groove');showToast('Groove 模式已啟用；木魚已關閉');return;}
+  if(input&&input.checked){input.checked=false;stopMetronome();input.setAttribute('aria-label','開啟節拍器');input.setAttribute('aria-checked','false');showToast('Groove 已關閉');}
+  else{setMetronomeMode('groove');showToast('Groove 模式已啟用；木魚已關閉');}
+};
 document.getElementById('grooveCategorySelect').onchange=function(){S.grooveCategory=this.value;populateGrooveSelect();if(S.metroMode==='groove'&&document.getElementById('metronome').checked)startMetronome();};
 document.getElementById('grooveSelect').onchange=function(){S.groove=this.value;if(S.metroMode==='groove'&&document.getElementById('metronome').checked)startMetronome();showToast(`Groove：${GROOVE_STYLE_LABELS[S.groove]}`);};
 document.getElementById('grooveWaveformSelect').onchange=function(){setGrooveWaveform(this.value,true);showToast(`Groove 合成波形：${getGrooveWaveformLabel()}（${S.grooveWaveform==='sine'?'圓潤':S.grooveWaveform==='sawtooth'?'明亮':S.grooveWaveform==='square'?'粗獷':'均衡'}）`);};
@@ -4867,18 +4853,20 @@ document.addEventListener('keydown',e=>{
   if(e.key==='g'||e.key==='G')document.getElementById('generateBtn').click();
 });
 
-// Touch device audio unlock
-document.body.addEventListener('click',function unlockAudio(){
-  if(AC&&AC.state==='suspended')AC.resume();
-  document.body.removeEventListener('click',unlockAudio);
-},{once:true});
+// Touch／滑鼠音訊解鎖：必須在原始使用者手勢內建立並 resume AudioContext；
+// 若等到 rAF、setTimeout 或 async 播放排程才解鎖，瀏覽器會把音訊留在 suspended。
+document.body.addEventListener('pointerdown',function unlockAudio(){ensureAudioReady();},{passive:true});
+document.body.addEventListener('keydown',function unlockAudioFromKeyboard(event){
+  if(event.code==='Space'||event.key==='Enter')ensureAudioReady();
+},{passive:true});
 
 // Init
 applyTheme(S.theme,false);
 populateGrooveSelect();
 setMetronomeMode('woodblock');
 setPlaybackMonitorHeightLocked(playbackMonitorHeightLocked,false);
-setMobilePureMode(S.audioDeviceProfile,false);
+setMobilePureMode(S.mobilePureMode,false);
+applyDeviceAudioProfile(S.deviceAudioProfile,false,false);
 syncGrooveAudioControls();
 render();
 </script>

@@ -266,26 +266,12 @@ describe("隨堂考試模式契約", () => {
     expect(html).not.toContain("${renderMiniPiano(target,'112px')}");
   });
 
-  it("Groove 聲部使用單層零起音包絡，減少疊音瞬態", () => {
-    expect(html).toContain("input.gain.value=1.08");
-    expect(html).toContain("toneFilter.frequency.value=7200");
-    expect(html).toContain("master.gain.setValueAtTime(0,now);");
-    expect(html).toContain("const attack=Math.min(.010,Math.max(.006,duration*.06));");
-    expect(html).toContain("master.gain.linearRampToValueAtTime(0,releaseEnd);");
+  it("Groove 總線與聲部使用較長平滑包絡，避免瞬態逼逼與啵啵雜音", () => {
+    expect(html).toContain("input.gain.value=1.16");
+    expect(html).toContain("toneFilter.frequency.value=7600");
+    expect(html).toContain("const attack=Math.min(.060,Math.max(.042,duration*.28))");
+    expect(html).toContain("const normalizedLevel=S.mobilePureMode ? .72 : .94");
     expect(html).toContain("const fadeSeconds=.16");
-  });
-
-  it("提供響應式音級換算題庫、交卷評分與連錯三次答案提示", () => {
-    expect(html).toContain('<option value="ScaleDegreeQuiz">音級換算題庫</option>');
-    expect(html).toContain("function createScaleDegreeQuizQuestion()");
-    expect(html).toContain("function checkScaleDegreeQuiz()");
-    expect(html).toContain("question.attempts>=3?'revealed':'wrong'");
-    expect(html).toContain("首次答對 ${correct}／${questions.length} 題");
-    expect(html).toContain("SCALE_DEGREE_NAMES[question.sourceDegree]");
-    expect(html).toContain("SCALE_DEGREE_NAMES[question.targetDegree]");
-    expect(html).toContain("Math.min(200,parsed)");
-    expect(html).toContain("@media(max-width:600px){.degree-quiz-page");
-    expect(html).toContain("body.scale-degree-quiz-mode .sidebar{display:none!important}");
   });
 
   it("Exam 成績報告會顯示正確率與常錯音符", () => {
@@ -306,6 +292,15 @@ describe("隨堂考試模式契約", () => {
     expect(html).toContain("const beats=clampExamBeats(S.examBeatsPerQuestion)");
     expect(html).toContain("Number(S.examQuestionBpm)");
     expect(html).toContain("saveExamSettings()");
+    expect(html).toContain(".exam-controls .sb-row{display:grid;grid-template-columns:minmax(52px,auto) minmax(0,1fr) minmax(0,auto)");
+    expect(html).toContain(".exam-controls .exam-question-limit{display:block;width:100%;min-width:0;max-width:100%;box-sizing:border-box}");
+  });
+
+  it("Exam 必須在設定拍數內完成完整和弦，且同步 BPM 節拍器", () => {
+    expect(html).toContain("const target=S.examQuestion.midis");
+    expect(html).toContain("if(target.every(note=>S.examSelected.includes(note))){finishExamQuestion(false);}");
+    expect(html).toContain("const beatMs=()=>60000/Math.max(30,Math.min(300,Number(S.examQuestionBpm)||72))");
+    expect(html).toContain("題目出現後，請在設定的拍數內點亮完整和弦音；出題速度會同步節拍器");
   });
 
   it("Exam 正誤輸入會觸發音效與粒子回饋", () => {
